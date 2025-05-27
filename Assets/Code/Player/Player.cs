@@ -1,0 +1,2155 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.UI;
+using System.Linq;
+using UnityEngine.SceneManagement;
+using Pathfinding;
+using TMPro;
+
+public class Square
+{
+    public float X1 { get; set; }
+    public float Y1 { get; set; }
+    public float X2 { get; set; }
+    public float Y2 { get; set; }
+    public float X3 { get; set; }
+    public float Y3 { get; set; }
+   
+
+    public bool IsPointInside(float x, float y)
+    {
+        float area = 0.5f * Mathf.Abs(X1 * (Y2 - Y3) + X2 * (Y3 - Y1) + X3 * (Y1 - Y2));
+        float area1 = 0.5f * Mathf.Abs(X1 * (y - Y1) + x * (Y1 - Y2) + X2 * (Y2 - y));
+        float area2 = 0.5f * Mathf.Abs(x * (Y2 - Y3) + X2 * (Y3 - y) + X3 * (y - Y2));
+        float area3 = 0.5f * Mathf.Abs(X1 * (Y3 - y) + X3 * (y - Y1) + x * (Y1 - Y3));
+
+        float sumOfAreas = area1 + area2 + area3;
+
+        return Mathf.Abs(sumOfAreas - area) < 0.000001; // Adjust the tolerance as needed
+    }
+}
+
+
+
+public class Player : MonoBehaviour {
+    public bool CutSceenMode { get; set; }
+
+    public int MaxHP { get; set; }
+
+
+    public int HP { get; set; }
+    public int Height { get; set; }
+
+    public int MaxHunger { get; set; }
+    public int Hunger { get; set; }
+
+    public int MaxPlague { get; set; }
+    public int Plague { get; set; }
+
+    public int MaxStamina { get; set; }
+    public int Stamina { get; set; }
+
+    public int DamageAmount { get; set; }
+
+    public int Payment { get; set; }
+    public int LootItem { get; set; }
+
+    public float Speed { get; set; }
+    public float DashDuration { get; set; }
+    public int Vision { get; set; }
+    public int VisionBase { get; set; }
+    public float VisionBlackFieldIncreasing = 0.5f;
+    public float VisionRemoveBlackTopBorder = 2;
+    public int VisionPlusOnDay = 0;
+
+
+    public int Sniff { get; set; }
+    public float StaminaRestore { get; set; }
+
+
+    public int DamageAll { get; set; }
+    public int FireDamage { get; set; }
+    public int IceDamage { get; set; }
+    public int MagicDamage { get; set; }
+    public int MechanicDamage { get; set; }
+    
+
+
+    public List<GameObject> coll_obj = new List<GameObject>();
+    public List<GameObject> Characters = new List<GameObject>();
+
+    public InputMode IM;
+
+
+    private Animator PlayerAnim;
+    private Animator Bodyanim;
+    public GameObject MutateIntoThis { get; set; }
+
+    public bool _gameover { get; set; }
+
+    public Transform _transform { get; set; }
+
+    public MenuCustom menu { get; set; }
+    public DayAndNight DayNight { get; set; }
+
+    
+    private Texture2D SaveTexture;
+    private float SaveAlpha;
+
+    
+    private float secondstimer, seconds, minutes, hours, StaminaTimer, HungerTimer;
+    public float MutationTimer { get; set; }
+    public float PathRescan { get; set; }
+
+    public float PathRescanBoundTimer { get; private set; }
+    private Bounds RescanBound;
+
+    private Texture2D BGScreen, MoneyTexture, LoveTexture;
+    private float DashTimer;
+
+    private float ControllTextureAlpha;
+    private Texture2D ChoiseTexture;
+
+
+
+    public int YPos { get; set; }
+    public int XPos { get; set; }
+
+    public float Invinc { get; private set; }
+    private Texture GamepadT, KeyboardT, BG_HP_Black, BG_HP_White;
+    public float MaxSeconds { get; set; }
+    
+    private AudioSource DamageAS;
+    private AudioSource Hit;
+
+
+    private List<AudioClip> DamageClips = new List<AudioClip>();
+
+    private AudioClip PickUpMoney, OpenMap, OpenInventory, OpenCardsInv, DeathClip, DashClip;
+
+
+    private string StartLayer = "Pers";
+    private string ForG = "ItemFG";
+    public Inventory inv { get; set; }
+
+    private UnityEngine.Audio.AudioMixer mg;
+    private bool devmode;
+
+    public float _normalHSpeed, _normalVSpeed;
+    public int side { get; set; }
+
+    public bool Chatting;
+    public bool Attacking { get; set; }
+    public GameObject ChattingObject;
+    public GameObject CurrentGun;
+
+    private CollList FaceZone, FaceDownZone, FaceUpZone, FaceZoneBack;
+
+    private GameObject PlayerMask;
+    private Material StartMaterial, WhiteMaterial;
+    
+    private Vector2 PrevPlayerPos;
+    private bool MouseButtonRight;
+
+    private AstarPath AP;
+    private bool Dashback;
+
+    public bool UnderAttack { get; set; }
+    private AudioSource FightMusic;
+    public List<GameObject> AttackingEnemies = new List<GameObject>();
+
+    private GameObject ItemEffect;
+    private Constructor _constr;
+    private GameObject StatsObject;
+
+    private Material mat;
+
+    private GameObject BodySPRT, BodyParent, LegLeft, LegRight, Hunger_Scrollbar, HP_Scrollbar, Stamina_Scrollbar;
+
+    public Sprite[] LegsSPRTS;
+
+    public Camera MainCamera { get; set; }
+
+    public GameObject MouseOB { get; set; }
+
+    public List<GameObject> CollidingItems;
+    public List<GameObject> CollidingCharacter;
+
+    private float HungerAlpha, HungerAlphaSide;
+
+    public bool StartLoading { get; set; }
+
+
+    private List<GameObject> Hearts = new List<GameObject>();
+    private List<GameObject> HeartsMax = new List<GameObject>();
+    private List<GameObject> StaminaHearts = new List<GameObject>();
+    private List<GameObject> StaminaHeartsMax = new List<GameObject>();
+    private List<GameObject> HungerHearts = new List<GameObject>();
+    private List<GameObject> HungerHeartsMax = new List<GameObject>();
+
+    private RectTransform HPBG;
+    private RectTransform HungerBG;
+    private RectTransform StaminaBG;
+
+    public bool SliderHPUI;
+    public bool SeparateHeartsHPUI;
+    public bool EnableAttackSoundIfEnemyInCamera;
+
+
+    public int HungerDamage = 3;
+    public float TimerOnTheScene { get; set; }
+
+    public int CameraNormalSize = 2;
+
+    public bool RestartSameLocationOnDeath;
+    public bool RestartAllOnDeath;
+
+    public bool Showdamage;
+    public bool HeightControllON;
+
+    public int SpeedMultiplier = 1;
+
+    private int layerPlus, parentLayerOrder, layerBuffer, maxChild = 1;
+    private string layerName = "";
+    private BoxCollider2D playerBox, boxCollider;
+
+    private GameObject[] FlippingObjects;
+    private MovementControll obj_movementControll;
+    private SpriteRenderer obj_spriteRenderer, obj_BaseSPRT;
+    private GameObject obj_child;
+
+    private float PixelPerStat;
+    private List<GameObject> batch;
+    
+    private List<GameObject> objectsInRange = new List<GameObject>();
+    public LayerMask LMask;
+    private Collider2D[] colliders;
+    private SpriteRenderer Child_SPRT;
+
+    private int testint = 0;
+    public bool TEST { get; set; }
+    public float FadeInDelay { get; set; }
+
+    public bool CanFlip = true;
+    private float HPSlotWidth = 20;
+    private float HungerSlotWidth = 15;
+    private float StaminaSlotWidth = 15;
+
+    public new Vector2 FlippingRange = new Vector2(10, 7);
+
+    private void Awake()
+    {
+        DayNight = GameObject.Find("DayAndNight").GetComponent<DayAndNight>();
+        inv = GetComponent<Inventory>();
+
+        playerBox = GetComponent<BoxCollider2D>();
+
+        if (GameObject.Find("HPBG") != null)
+        {
+            HPBG = GameObject.Find("HPBG").GetComponent<RectTransform>();
+            HungerBG = GameObject.Find("HungerBG").GetComponent<RectTransform>();
+            StaminaBG = GameObject.Find("StaminaBG").GetComponent<RectTransform>();
+        }
+
+
+        HungerAlphaSide = 1;
+        MouseOB = GameObject.Find("MouseOB");
+
+
+        MainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
+        mat = Resources.Load<Material>("Shaders/FadeMaterial");
+        if(transform.Find("FightMusic")!=null)
+        FightMusic = transform.Find("FightMusic").GetComponent<AudioSource>();
+        _constr = GameObject.Find("Constructor").GetComponent<Constructor>();
+        BodySPRT = transform.Find("Body").Find("BodySPRT").gameObject;
+        BodyParent = transform.Find("Body").gameObject;
+        LegLeft = GameObject.Find("LegLeft").gameObject;
+        LegRight = GameObject.Find("LegRight").gameObject;
+
+        if (GameObject.Find("PathFinding")!=null)
+        AP = GameObject.Find("PathFinding").GetComponent<AstarPath>();
+
+        Speed = 1;
+        DashDuration = 0.6f;
+  
+
+        StartMaterial = GetComponent<SpriteRenderer>().material;
+        WhiteMaterial = Resources.Load<Material>("Materials/DamageLight");
+
+        FaceZone = transform.Find("FaceZone").gameObject.GetComponent<CollList>();
+        FaceZoneBack = transform.Find("FaceZoneBack").gameObject.GetComponent<CollList>();
+        FaceDownZone = transform.Find("FaceDownZone").gameObject.GetComponent<CollList>();
+        FaceUpZone = transform.Find("FaceUpZone").gameObject.GetComponent<CollList>();
+        side = 1;
+        mg = Resources.Load<UnityEngine.Audio.AudioMixer>("Sound/NewAudioMixer");
+      
+        MaxStamina = 5;
+
+        Stamina = MaxStamina;
+
+       // Load();
+        
+        DamageAS = transform.Find("LegsZone").GetComponent<AudioSource>();
+        Hit = transform.Find("Body").GetComponent<AudioSource>();
+
+        DeathClip = Resources.Load<AudioClip>("Sound/UI/Death");
+        PickUpMoney = Resources.Load<AudioClip>("Sound/UI/GetMoney");
+        OpenMap = Resources.Load<AudioClip>("Sound/UI/Map_Open");
+        OpenInventory = Resources.Load<AudioClip>("Sound/UI/Inventory_Open");
+        OpenCardsInv = Resources.Load<AudioClip>("Sound/UI/CardDeck_Open");
+
+        
+        DashClip = Resources.Load<AudioClip>("Sound/UI/Dash");
+
+        YPos = 0;
+        GamepadT = Resources.Load<Texture2D>("Sprites/UI/Gamepad_icon");
+        KeyboardT = Resources.Load<Texture2D>("Sprites/UI/KeyBoard_icon");
+        BG_HP_Black = Resources.Load<Texture>("Sprites/UI/Level_BG_Black");
+        BG_HP_White = Resources.Load<Texture>("Sprites/UI/Level_BG_White");
+       
+       DamageClips.Add(Resources.Load<AudioClip>("Sound/Hits/Player_Get_Damage_0"));
+
+   
+        
+      
+        ChoiseTexture = Resources.Load<Texture2D>("Sprites/UI/ChoiseIcon");
+
+        
+
+        BGScreen = Resources.Load<Texture2D>("Sprites/UI/BGScreen");
+
+        MoneyTexture = Resources.Load<Texture2D>("Sprites/UI/Money");
+        LoveTexture = Resources.Load<Texture2D>("Sprites/UI/Love");
+        
+        if (SceneManager.GetActiveScene().name == "CutSceen") CutSceenMode = true;
+
+        SaveTexture = Resources.Load<Texture2D>("Sprites/UI/Flopy");
+     
+        
+        
+        _transform = transform;
+        PlayerAnim = GetComponent<Animator>();
+        Bodyanim = transform.Find("Body").Find("BodySPRT").GetComponent<Animator>();
+
+
+        menu = GameObject.Find("Constructor").GetComponent<MenuCustom>();
+     
+        if(_constr.GetComponent<InputMode>()!=null)
+        IM = _constr.GetComponent<InputMode>();
+        else IM = GetComponent<InputMode>();
+
+
+        MaxSeconds = 100;
+
+        /* if(SceneManager.GetActiveScene().name!="Menu")
+         Save();*/
+
+       GameObject ChattingUIObject = GameObject.Find("Chatting");
+
+
+        PlayerMask = GameObject.Find("PlayerMask");
+
+        StatsObject = GameObject.Find("Stats");
+
+        Hunger_Scrollbar = StatsObject.transform.Find("Hunger_Scrollbar").gameObject;
+        HP_Scrollbar = StatsObject.transform.Find("HP_Scrollbar").gameObject;
+        Stamina_Scrollbar = StatsObject.transform.Find("Stamina_Scrollbar").gameObject;
+
+  
+
+        ResetFlippingObjects();
+
+        //PlayerPrefs.DeleteAll();
+
+
+     
+
+    }
+
+    public void ResetFlippingObjects()
+    {
+        FlippingObjects = GameObject.FindGameObjectsWithTag("Flipping");
+    }
+
+
+    private void OnGUI()
+    {
+        if(TEST)
+        GUI.Box(new Rect(Screen.width - 200, Screen.height - 100, 200, 100), "TEST", inv.skin.customStyles[0]);
+    }
+
+    void Update()
+    {
+       
+        if(!StartLoading)
+        TimerOnTheScene += Time.deltaTime;
+
+
+        if (DayNight != null)
+        {
+
+           
+
+            if (DayNight.Day_Cycle == DayAndNight.DayCycle.Day)
+                Vision = VisionBase + VisionPlusOnDay;
+            else Vision = VisionBase + VisionPlusOnDay / 2;
+        }
+        else Vision = VisionBase;
+
+
+        if (SeparateHeartsHPUI)
+        DrawHPParts();
+
+        if (SliderHPUI)
+            DrawHPSliders();
+
+        HungerIncreaser();
+
+
+        objectsInRange.Clear();
+
+        colliders = Physics2D.OverlapBoxAll(MainCamera.transform.position, FlippingRange , 0f, LMask);
+
+        for (int i=0; i < colliders.Length; i++)
+        {
+           
+            if (colliders[i].gameObject.tag == "Flipping" || colliders[i].gameObject.tag == "Pers" || colliders[i].gameObject.tag == "Toilet")
+            {
+               
+                objectsInRange.Add(colliders[i].gameObject);
+            }
+        }
+
+
+
+       
+      SequentialBatchProcessing(objectsInRange, 40);
+
+
+
+        // if (Input.GetKeyDown(KeyCode.LeftControl)&&Input.GetKeyDown(KeyCode.D))
+        // devmode = !devmode;
+      
+        
+      /*  if (IM.enter_b && IM._horizontal>0) testint ++;
+            
+        
+
+        if (testint == 5)
+        {
+            TEST = true;
+           
+        }
+        else TEST = false;
+        */
+
+        if (TEST)
+        {
+            if (IM.RightTrigger)
+            {
+                int thisloc = 0;
+
+                for (int i = 0; i < menu.SL.LocationsNames.Length; i++)
+                {
+                    if (menu.SL.LocationsNames[i] == SceneManager.GetActiveScene().name) thisloc = i;
+                }
+
+
+                if (thisloc < menu.SL.LocationsNames.Length - 1) thisloc++;
+
+                menu.CurrentSlotNumber = 6;
+
+                menu.CurrentSlotLocations[menu.CurrentSlotNumber] = SceneManager.GetActiveScene().name;
+
+
+                menu.SL.ThisLocationIsCreated();
+                
+                menu.TransitionToTheScene(menu.SL.LocationsNames[thisloc], true);
+                
+
+            }
+
+            if (IM.LeftTrigger)
+            {
+                int thisloc = 0;
+
+                for (int i = 0; i < menu.SL.LocationsNames.Length; i++)
+                {
+                    if (menu.SL.LocationsNames[i] == SceneManager.GetActiveScene().name) thisloc = i;
+                }
+
+
+                if (thisloc>0) thisloc--;
+
+                menu.CurrentSlotNumber = 6;
+
+                menu.CurrentSlotLocations[menu.CurrentSlotNumber] = SceneManager.GetActiveScene().name;
+
+
+                menu.SL.ThisLocationIsCreated();
+
+                menu.TransitionToTheScene(menu.SL.LocationsNames[thisloc], true);
+               
+
+            }
+
+            if (TEST && IM.inventory_b)
+            {
+
+                for (int i = 0; i < inv.database.items.Count; i++)
+                {
+                    if (inv.database.items[i].CanStack)
+                        inv.AddItem(inv.database.items[i].itemID, 999, inv.database.items[i].Durability, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
+                    else
+                        inv.AddItem(inv.database.items[i].itemID, 1, inv.database.items[i].Durability, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
+                }
+
+            }
+        }
+
+
+
+        if (Input.GetKeyDown(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.A))
+        {
+
+            for (int i = 0; i < inv.database.items.Count; i++)
+            {
+                if (inv.database.items[i].CanStack)
+                    inv.AddItem(inv.database.items[i].itemID, 999, inv.database.items[i].Durability, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
+                else
+                    inv.AddItem(inv.database.items[i].itemID, 1, inv.database.items[i].Durability, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
+            }
+
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Equals))
+        {
+
+            inv.AddItem(9, 999, 99999, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
+            
+
+        }
+
+
+
+
+        if (devmode)
+        {
+            if (Input.GetKeyDown(KeyCode.F12))
+            {
+                float bgvol = PlayerPrefs.GetFloat("BG_V");
+                float objvol = PlayerPrefs.GetFloat("Objects_V");
+                float mastervol = PlayerPrefs.GetFloat("Master_V");
+              //  int bossfights = PlayerPrefs.GetInt("BossFights");
+
+                PlayerPrefs.DeleteAll();
+
+              //  PlayerPrefs.SetInt("BossFights", bossfights);
+                PlayerPrefs.SetFloat("Master_V", mastervol);
+                PlayerPrefs.SetFloat("Objects_V", objvol);
+                PlayerPrefs.SetFloat("BG_V", bgvol);
+
+
+                PlayerPrefs.SetInt("FirstRun", 0);
+
+
+                SceneManager.LoadScene("Menu");
+            }
+           
+        }
+
+
+
+
+        if (_gameover)
+        {
+            print("GAMEOVER");
+            PlayerAnim.SetBool("Death", true);
+
+        }
+
+        
+
+        if (!CutSceenMode)
+        {
+            Anim();
+        }
+        
+        
+        if (!_gameover && !menu.MenuONOFF && !_constr.Building && !StartLoading)
+        {
+            HandleInput();
+            Timer();
+            MousePlayerMove();
+          
+        }
+
+        Movement();
+
+        if (PathRescan < 0.05 && PathRescan > 0)
+        {
+            if(!StartLoading)
+                PathScan();
+            else PathScan();
+
+        }
+
+      
+        if (PathRescan > 0) PathRescan -= Time.deltaTime;
+           else PathStopScan();
+
+
+        if (PathRescanBoundTimer < 0.05 && PathRescanBoundTimer > 0)
+        {
+            AstarPath.active.UpdateGraphs(RescanBound);
+            print("RescanBound " + RescanBound);
+        }
+
+
+        if (PathRescanBoundTimer > 0) PathRescanBoundTimer -= Time.deltaTime;
+ 
+
+        if (PlayerMask != null)
+        {
+            mat.SetFloat("_MaskTargetX", PlayerMask.transform.position.x);
+            mat.SetFloat("_MaskTargetY", PlayerMask.transform.position.y);
+            mat.SetFloat("_RenderDistance", 2);
+        }
+    }
+
+
+
+
+    void Movement()
+    {
+
+
+        if (!GetComponent<AudioSource>().isPlaying) GetComponent<AudioSource>().pitch = 1;
+
+             MouseButtonRight = IM.RightMouseButton;
+
+
+        if (StartLoading ||CutSceenMode|| _gameover || _constr.Building || menu.MenuONOFF || inv.blueprintshow || inv.showinvent || Attacking || inv.showjournal || inv.showinvent || _constr.ChooseMouseObject || MutationTimer > Time.fixedTime)
+        {
+            _normalHSpeed = _normalVSpeed = 0;
+               GetComponent<Rigidbody2D>().velocity = new Vector3(_normalHSpeed * 2.5f, _normalVSpeed * 2.5f, 0);
+            return;
+        }
+
+        if ( _constr.Game_SPEED > 0)
+        {
+            if (!IM.RightMouseButton)
+            {
+                if (DashTimer < Time.fixedTime)
+                {
+                    _normalHSpeed = IM._horizontal * SpeedMultiplier;
+                    _normalVSpeed = IM._vertical * SpeedMultiplier;
+
+
+                    if (Mathf.Abs(_normalVSpeed) > 0 && Mathf.Abs(_normalHSpeed) > 0)
+                    {
+                        _normalHSpeed = IM._horizontal / 1.4f * SpeedMultiplier;
+                        _normalVSpeed = IM._vertical / 1.4f * SpeedMultiplier;
+                    }
+                }
+            }
+        }
+        else _normalHSpeed = _normalVSpeed = 0;
+
+
+        UnderAttackAudio();
+
+        GetComponent<Rigidbody2D>().velocity = new Vector3(_normalHSpeed * 2.5f, _normalVSpeed * 2.5f, 0);
+        if(CanFlip) Flip();
+        
+
+    }
+
+
+    //INPUT
+    private void HandleInput()
+    {
+
+
+        BulletsControll();
+        CollRemoval();
+
+
+
+
+    }
+
+
+
+    void BulletsControll()
+    {
+        for (int j = 0; j < GameObject.FindGameObjectsWithTag("Bullet").Length; j++)
+        {
+            GameObject b = GameObject.FindGameObjectsWithTag("Bullet")[j].gameObject;
+            
+            if (b.GetComponent<CollList>().GetCollList().Contains(gameObject)  && b.GetComponent<Bullet>().DamagePlayer && Invinc < Time.fixedTime)
+            {
+                ReceiveDamage(b.GetComponent<Bullet>().Damage);
+
+            
+
+                BlowThisSmall(b);
+        
+            }
+    
+            
+        }
+    }
+
+
+
+
+
+    void CollRemoval()
+    {
+        for (int i = 0; i < coll_obj.Count; i++)
+        {
+            if (coll_obj[i] != null)
+            {
+                if (coll_obj[i].GetComponent<BoxCollider2D>() != null)
+                {
+
+                    if (!coll_obj[i].GetComponent<BoxCollider2D>().enabled)
+                    {
+
+                        coll_obj.RemoveAt(i);
+                    }
+
+                } 
+                
+            }
+            else coll_obj.RemoveAt(i);
+        }
+    }
+
+
+
+
+    private void Flip()
+    {
+
+        if (DashTimer < Time.fixedTime && !Attacking)
+        {
+            if (!IM.joystick)
+            {
+                if (_normalHSpeed < 0)
+                    side = -1;
+                else if (_normalHSpeed > 0)
+                    side = 1;
+            }
+            else
+            {
+                if (_normalHSpeed < -0.3)
+                    side = -1;
+                else if (_normalHSpeed > 0.3)
+                    side = 1;
+            }
+
+            _transform.localScale = new Vector3(side, _transform.localScale.y, _transform.localScale.z);
+        }
+    }
+
+    void HeightControll()
+    {
+        BodySPRT.transform.position = new Vector3(BodySPRT.transform.position.x, BodyParent.transform.position.y + 0.04f * Height);
+
+        if (Height < LegsSPRTS.Length)
+        {
+            LegLeft.GetComponent<SpriteRenderer>().sprite = LegsSPRTS[Height];
+            LegRight.GetComponent<SpriteRenderer>().sprite = LegsSPRTS[Height];
+        }
+
+        MainCamera.orthographicSize = CameraNormalSize + 0.35f*Height;
+    }
+
+    void DashAnimationAndSound(float DashTimerDuration, string anim_name)
+    {
+        PlayerAnim.SetBool("Walk", false);
+        PlayerAnim.SetBool(anim_name, true);
+        DashTimer = Time.fixedTime + DashTimerDuration;
+
+     
+        if (Stamina >= 2)
+        {
+            PlaySoundsPitched(DashClip, 1);
+            ReduceStamina(-2);
+        }
+        else
+        {
+            PlaySoundsPitched(DashClip, 0.7f);
+            ReduceStamina(-Stamina);
+        }
+    }
+
+
+    private void Anim()
+    {
+        if (menu.MenuONOFF) return;
+
+       if(HeightControllON) HeightControll();
+
+        if (_transform.Find("Vision") != null)
+        {
+            _transform.Find("Vision").transform.localScale = new Vector3(0.6f + (Vision * VisionBlackFieldIncreasing), 0.6f + (Vision * VisionBlackFieldIncreasing), 1);
+            if (Vision == VisionRemoveBlackTopBorder) _transform.Find("Vision").GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
+            else _transform.Find("Vision").GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
+        }
+
+
+        if (Invinc - 0.8f > Time.fixedTime)
+            _constr.SetMaterial(gameObject, WhiteMaterial);
+        else _constr.SetMaterial(gameObject, StartMaterial);
+
+
+        if (Invinc > Time.fixedTime && Invinc - 0.8f < Time.fixedTime)
+        {
+            _constr.SetColorAndAlpha(gameObject, new Color(1, 1, 1, 0.6f));
+            
+        }
+
+        if (Invinc > Time.fixedTime && Invinc < Time.fixedTime+0.05f)
+            _constr.SetColorAndAlpha(gameObject, new Color(1, 1, 1, 1));
+
+        if (Invinc < Time.fixedTime )
+            _constr.SetColorAndAlpha(gameObject, new Color(1, 1, 1, 1));
+
+        /*for (int i = 0; i < expl.Length; i++)
+        {
+            if (coll_obj.Contains(expl[i]))
+            {
+                anim.SetBool("Death", true);
+            }
+        }*/
+
+        if (Bodyanim != null)
+        {
+            if (MutationTimer > Time.fixedTime)
+            {
+                Bodyanim.SetBool("Mutate", true);
+
+            }
+            else Bodyanim.SetBool("Mutate", false);
+        }
+
+        if (DashTimer < Time.fixedTime)
+        {
+           
+
+            if (_normalHSpeed != 0 || _normalVSpeed != 0)
+            {
+                PlayerAnim.SetBool("Walk", true);
+                
+            }
+            else
+            {
+                PlayerAnim.SetBool("Walk", false);
+            }
+        }
+
+    
+
+        if (IM.Dash )
+        {
+
+  
+
+            int DashSpeed = 5;
+            float DashTimerDuration = 0.15f * DashDuration;
+            if (Stamina < 2)
+            {
+                DashSpeed = 1;
+                DashTimerDuration = 0.05f * DashDuration;
+            }
+
+            if (_normalHSpeed ==0 && _normalVSpeed == 0 && DashTimer < Time.fixedTime)
+            {
+               
+                Invinc = Time.fixedTime + 0.3f * DashDuration;
+                Dashback = true;
+                if (FaceZoneBack.GetCollList().Count == 0)
+                {
+         
+                    _normalHSpeed = DashSpeed * _transform.localScale.x * -1;
+                    _normalVSpeed = 0;
+                }
+
+
+                DashAnimationAndSound(DashTimerDuration, "DashBack");
+            }
+
+            if (Mathf.Abs(_normalHSpeed) >= Mathf.Abs(_normalVSpeed) && _normalHSpeed != 0 && DashTimer < Time.fixedTime)
+            {
+            
+              
+                if (FaceZone.GetCollList().Count == 0)
+                {
+                
+                    Invinc = Time.fixedTime + 0.3f * DashDuration;
+                    _normalHSpeed = DashSpeed * _transform.localScale.x;
+                   
+                }
+
+                DashAnimationAndSound(DashTimerDuration, "Dash");
+
+            }
+
+            if (Mathf.Abs(_normalHSpeed) < Mathf.Abs(_normalVSpeed) && _normalVSpeed < 0 && DashTimer < Time.fixedTime)
+            {
+                
+            
+                if (FaceDownZone.GetComponent<CollList>().GetCollList().Count == 0)
+                {
+                    print("DOWN2");
+                    Invinc = Time.fixedTime + 0.3f * DashDuration;
+                    _normalVSpeed = -DashSpeed;
+                }
+
+                DashAnimationAndSound(DashTimerDuration, "DashDown");
+            }
+
+            if (Mathf.Abs(_normalHSpeed) < Mathf.Abs(_normalVSpeed) && _normalVSpeed > 0 && DashTimer < Time.fixedTime)
+            {
+                
+                if (FaceUpZone.GetCollList().Count == 0)
+                {
+              
+                    Invinc = Time.fixedTime + 0.3f * DashDuration;
+                    _normalVSpeed = DashSpeed;
+                }
+
+
+                DashAnimationAndSound(DashTimerDuration, "DashUp");
+            }
+
+            
+        }
+
+
+
+        if (!Dashback)
+        {
+
+            if (FaceZone.GetCollList().Count > 0 && ( DashTimer > Time.fixedTime))
+            {
+
+                _normalHSpeed = 0;
+                //DashTimer = -1;
+            }
+        }
+        if (FaceDownZone.GetCollList().Count > 0 && _normalVSpeed < 0)
+        {
+            
+            _normalVSpeed = 0;
+           // DashTimer = -1;
+        }
+        if (FaceUpZone.GetCollList().Count > 0 && _normalVSpeed > 0)
+        {
+            _normalVSpeed = 0;
+           // DashTimer = -1;
+        }
+
+      
+        
+        if (StaminaTimer < Time.fixedTime && Stamina< MaxStamina)
+        {
+            ReduceStamina(1);
+
+        }
+
+        if (DashTimer < Time.fixedTime)
+        {
+            Dashback = false;
+            PlayerAnim.SetBool("Dash", false);
+            PlayerAnim.SetBool("DashUp", false);
+            PlayerAnim.SetBool("DashDown", false);
+            PlayerAnim.SetBool("DashBack", false);
+        }
+        
+
+
+
+
+
+    }
+
+
+
+   void SequentialBatchProcessing(List<GameObject> list, int batchSize)
+    {
+        for (int i = 0; i < list.Count; i += batchSize)
+        {
+            batch = list.Skip(i).Take(batchSize).ToList();
+            ProcessBatch(batch);
+        }
+    }
+
+    void ProcessBatch(List<GameObject> batch)
+    {
+     LayerFlipСycle(batch.ToArray());
+    }
+
+
+
+
+    void ObjFlip(GameObject Child, ref int LayerPlus, string LLayer, int ParentLayerOrder, int i, int pluslayer)
+    {
+        Child_SPRT = null;
+        Child_SPRT = Child.GetComponent<SpriteRenderer>();
+
+        if (Child_SPRT == null)
+            return;
+
+
+        Child_SPRT.sortingLayerName = LLayer;
+        Child_SPRT.sortingOrder = ParentLayerOrder + (1 * i + 2);
+
+        if(Child.name == "Base") Child_SPRT.sortingOrder = ParentLayerOrder - 1;
+        if (Child.name == "BG") Child_SPRT.sortingOrder = ParentLayerOrder - 2;
+        LayerPlus = ParentLayerOrder + (1 * i + 2);
+
+    }
+
+
+    void LayerFlipСycle(GameObject[] Perss)
+    {
+        if (Perss == null)
+        {
+            return ;
+        }
+
+
+        if (Perss.Length == 0)
+        {
+            return;
+        }
+             
+
+        for (int p = 0; p < Perss.Length; p++)
+        {
+            ObjectInLayerToFlip(Perss[p]);
+            
+        }
+                    
+                
+            
+        
+    }
+    void ObjectInLayerToFlip(GameObject obj)
+    {
+        if(obj==null) return;
+
+        if (Mathf.Abs(obj.transform.position.x - MainCamera.transform.position.x) >= MainCamera.orthographicSize * 8f ||
+            Mathf.Abs(obj.transform.position.y - MainCamera.transform.position.y) >= MainCamera.orthographicSize * 8f)
+        {
+            return;
+        }
+
+  
+        boxCollider = obj.GetComponent<BoxCollider2D>();
+        obj_movementControll = obj.GetComponent<MovementControll>();
+        obj_spriteRenderer = obj.GetComponent<SpriteRenderer>();
+   
+        if (obj.transform.parent == _constr.transform || (obj.transform.parent != null && obj.transform.parent.tag == "Flipping"))
+        {
+            return;
+        }
+
+
+        if (boxCollider.bounds.min.y < playerBox.bounds.min.y)
+        {
+            layerName = ForG;
+        }
+        else
+        {
+            layerName = StartLayer;
+        }
+
+        layerPlus = 0;
+        parentLayerOrder = 0;
+        layerBuffer = -200;
+        maxChild = 1;
+
+        if (obj_movementControll != null &&
+            obj_movementControll.ObjectOfOccupation != null &&
+            obj_movementControll.ObjectOfOccupation.transform.Find("Base") != null)
+        {
+            obj_BaseSPRT = obj_movementControll.ObjectOfOccupation.transform.Find("Base").GetComponent<SpriteRenderer>();
+
+            obj_spriteRenderer.sortingLayerName = obj_BaseSPRT.sortingLayerName;
+            obj_spriteRenderer.sortingOrder = obj_BaseSPRT.sortingOrder + 1;
+            parentLayerOrder = obj_spriteRenderer.sortingOrder;
+        }
+        else
+        {
+            ApplyLayerOrder(obj, layerName, out parentLayerOrder, layerBuffer, boxCollider.bounds.min.y);
+        }
+
+        layerPlus = parentLayerOrder;
+
+        SetChildLayer(obj, layerPlus, layerName);
+
+    }
+
+    void SetChildLayer(GameObject obj, int parentSortingOrder, string layerName)
+    {
+        for (int i = 0; i < obj.transform.childCount; i++)
+        {
+         
+                obj_child = obj.transform.GetChild(i).gameObject;
+
+            if (obj_child.name != "Vision")
+            {
+                ObjFlip(obj_child, ref parentSortingOrder, layerName, parentSortingOrder, -1, 1);
+
+                SetChildLayer(obj_child, parentSortingOrder, layerName);
+            }
+            
+        }
+    }
+
+    string TriangleCollision(GameObject obj)
+    {
+
+        bool FG = false;
+        bool BG = false;
+        string LLayer = StartLayer;
+
+        BoxCollider2D PlayerBox = GetComponent<BoxCollider2D>();
+        BoxCollider2D _boxcollider = obj.GetComponent<BoxCollider2D>();
+
+        PubObject PO = obj.GetComponent<PubObject>();
+        Bounds BoxBounds = _boxcollider.bounds;
+
+        if (PO == null)
+        {
+
+            if (_boxcollider.bounds.min.y < PlayerBox.bounds.min.y)
+                LLayer = ForG;
+            else
+                LLayer = StartLayer;
+
+            return LLayer;
+
+
+        }
+      
+
+
+        Vector2 playerpos = new Vector2(_transform.position.x + side*0.1f, _transform.position.y - 0.15f);
+
+        Square triangleLeftBG0 = new Square()
+        {
+            X1 = BoxBounds.center.x,
+            Y1 = BoxBounds.min.y,
+            X2 = BoxBounds.min.x,
+            Y2 = BoxBounds.min.y,
+            X3 = BoxBounds.min.x,
+            Y3 = BoxBounds.min.y + (BoxBounds.center.x - BoxBounds.min.x) / 2
+        };
+
+
+        Square triangleRightBG0 = new Square()
+        {
+            X1 = BoxBounds.center.x,
+            Y1 = BoxBounds.min.y,
+            X2 = BoxBounds.max.x,
+            Y2 = BoxBounds.min.y,
+            X3 = BoxBounds.max.x,
+            Y3 = BoxBounds.min.y + (BoxBounds.max.x - BoxBounds.center.x) / 2
+        };
+
+
+
+
+        Square triangleLeftFG0 = new Square()
+        {
+            X1 = BoxBounds.center.x,
+            Y1 = BoxBounds.max.y,
+            X2 = BoxBounds.min.x,
+            Y2 = BoxBounds.max.y,
+            X3 = BoxBounds.min.x,
+            Y3 = BoxBounds.max.y - (BoxBounds.center.x - BoxBounds.min.x) / 2
+        };
+
+
+        Square triangleRightFG0 = new Square()
+        {
+            X1 = BoxBounds.center.x,
+            Y1 = BoxBounds.max.y,
+            X2 = BoxBounds.max.x,
+            Y2 = BoxBounds.max.y,
+            X3 = BoxBounds.max.x,
+            Y3 = BoxBounds.max.y - (BoxBounds.center.x - BoxBounds.min.x) / 2
+        };
+
+
+
+        bool isInsideBGLeft0 = triangleLeftBG0.IsPointInside(playerpos.x, playerpos.y);
+
+
+
+        bool isInsideBGRight0 = triangleRightBG0.IsPointInside(playerpos.x, playerpos.y);
+
+        bool isInsideFGLeft0 = triangleLeftFG0.IsPointInside(playerpos.x, playerpos.y);
+
+        bool isInsideFGRight0 = triangleRightFG0.IsPointInside(playerpos.x, playerpos.y);
+
+
+        if (isInsideBGLeft0) PO.AddLeftBG = 0.5f;
+
+        if (isInsideBGRight0) PO.AddRightBG = 0.5f;
+
+        if (isInsideFGLeft0) PO.AddLeftFG = 0.5f;
+
+        if (isInsideFGRight0) PO.AddRightFG = 0.5f;
+
+        Square triangleLeftBG = new Square()
+        {
+            X1 = BoxBounds.center.x,
+            Y1 = BoxBounds.min.y,
+            X2 = BoxBounds.min.x - PO.AddLeftBG,
+            Y2 = BoxBounds.min.y,
+            X3 = BoxBounds.min.x - PO.AddLeftBG,
+            Y3 = BoxBounds.min.y + (PO.AddLeftBG + BoxBounds.center.x - BoxBounds.min.x) / 2
+        };
+
+
+        Square triangleRightBG = new Square()
+        {
+            X1 = BoxBounds.center.x,
+            Y1 = BoxBounds.min.y,
+            X2 = BoxBounds.max.x + PO.AddRightBG,
+            Y2 = BoxBounds.min.y,
+            X3 = BoxBounds.max.x + PO.AddRightBG,
+            Y3 = BoxBounds.min.y + (PO.AddRightBG + BoxBounds.max.x - BoxBounds.center.x) / 2
+        };
+
+
+
+
+        Square triangleLeftFG = new Square()
+        {
+            X1 = BoxBounds.center.x,
+            Y1 = BoxBounds.max.y,
+            X2 = BoxBounds.min.x - PO.AddLeftFG,
+            Y2 = BoxBounds.max.y,
+            X3 = BoxBounds.min.x - PO.AddLeftFG,
+            Y3 = BoxBounds.max.y - (PO.AddLeftFG + BoxBounds.center.x - BoxBounds.min.x) / 2
+        };
+
+
+        Square triangleRightFG = new Square()
+        {
+            X1 = BoxBounds.center.x,
+            Y1 = BoxBounds.max.y,
+            X2 = BoxBounds.max.x + PO.AddRightFG,
+            Y2 = BoxBounds.max.y,
+            X3 = BoxBounds.max.x + PO.AddRightFG,
+            Y3 = BoxBounds.max.y - (PO.AddRightFG + BoxBounds.center.x - BoxBounds.min.x) / 2
+        };
+
+
+        // Check if point P(3, 3) is inside the triangle
+
+
+        PO.isInsideBGLeft = triangleLeftBG.IsPointInside(playerpos.x, playerpos.y);
+
+
+
+        PO.isInsideBGRight = triangleRightBG.IsPointInside(playerpos.x, playerpos.y);
+
+        PO.isInsideFGLeft = triangleLeftFG.IsPointInside(playerpos.x, playerpos.y);
+
+        PO.isInsideFGRight = triangleRightFG.IsPointInside(playerpos.x, playerpos.y);
+
+
+
+        if (!PO.isInsideBGLeft && !PO.isInsideBGRight && !PO.isInsideFGLeft && !PO.isInsideFGRight)
+        {
+            FG = BG = false;
+            PO.AddLeftBG = PO.AddRightBG = 0;
+            PO.AddLeftFG = PO.AddRightFG = 0;
+
+
+           
+        }
+
+        if ((PO.isInsideBGLeft || PO.isInsideBGRight) && !FG) BG = true;
+        if ((PO.isInsideFGLeft || PO.isInsideFGRight) && !BG) FG = true;
+
+
+        if (FG) BG = false;
+        if (BG) FG = false;
+
+
+
+        Debug.DrawLine(new Vector3(triangleLeftBG.X1, triangleLeftBG.Y1), new Vector3(triangleLeftBG.X2, triangleLeftBG.Y2), Color.red);
+        Debug.DrawLine(new Vector3(triangleLeftBG.X2, triangleLeftBG.Y2), new Vector3(triangleLeftBG.X3, triangleLeftBG.Y3), Color.red);
+        Debug.DrawLine(new Vector3(triangleLeftBG.X3, triangleLeftBG.Y3), new Vector3(triangleLeftBG.X1, triangleLeftBG.Y1), Color.red);
+
+
+
+        Debug.DrawLine(new Vector3(triangleLeftFG.X1, triangleLeftFG.Y1), new Vector3(triangleLeftFG.X2, triangleLeftFG.Y2), Color.red);
+        Debug.DrawLine(new Vector3(triangleLeftFG.X2, triangleLeftFG.Y2), new Vector3(triangleLeftFG.X3, triangleLeftFG.Y3), Color.red);
+        Debug.DrawLine(new Vector3(triangleLeftFG.X3, triangleLeftFG.Y3), new Vector3(triangleLeftFG.X1, triangleLeftFG.Y1), Color.red);
+
+        Debug.DrawLine(new Vector3(triangleRightBG.X1, triangleRightBG.Y1), new Vector3(triangleRightBG.X2, triangleRightBG.Y2), Color.red);
+        Debug.DrawLine(new Vector3(triangleRightBG.X2, triangleRightBG.Y2), new Vector3(triangleRightBG.X3, triangleRightBG.Y3), Color.red);
+        Debug.DrawLine(new Vector3(triangleRightBG.X3, triangleRightBG.Y3), new Vector3(triangleRightBG.X1, triangleRightBG.Y1), Color.red);
+
+
+
+        Debug.DrawLine(new Vector3(triangleRightFG.X1, triangleRightFG.Y1), new Vector3(triangleRightFG.X2, triangleRightFG.Y2), Color.red);
+        Debug.DrawLine(new Vector3(triangleRightFG.X2, triangleRightFG.Y2), new Vector3(triangleRightFG.X3, triangleRightFG.Y3), Color.red);
+        Debug.DrawLine(new Vector3(triangleRightFG.X3, triangleRightFG.Y3), new Vector3(triangleRightFG.X1, triangleRightFG.Y1), Color.red);
+
+
+
+       
+        if (FG)
+        {
+            LLayer = ForG;
+        }
+        else if (BG)
+        {
+
+            LLayer = StartLayer;
+        }
+
+        if (!BG && !FG)
+        {
+            if (_transform.position.y - 0.2f > _boxcollider.bounds.center.y)
+            {
+
+                LLayer = ForG;
+            }
+            else LLayer = StartLayer;
+        }
+
+        return LLayer;
+    }
+
+
+   
+
+    void ApplyLayerOrder(GameObject ob, string larename, out int outorder, int layerbuffer, float ypos)
+    {
+        ob.GetComponent<SpriteRenderer>().sortingLayerName = larename;
+        ob.GetComponent<SpriteRenderer>().sortingOrder = (int)(ypos * layerbuffer);
+        outorder = (int)(ypos * layerbuffer);
+
+
+    }
+
+    public void BlowThisSmall(GameObject g)
+    {
+   
+        if (g == null) return;
+
+       
+        GameObject blow;
+        blow = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Effects/Explosion_Small"));
+        blow.transform.position = g.transform.position;
+
+
+        if (g.GetComponent<Trail>() != null)
+        {
+            
+                for (int j = 0; j < g.GetComponent<Trail>().ObjList.Count; j++)
+                {
+                    Destroy(g.GetComponent<Trail>().ObjList[j]);
+                }
+                
+
+        }
+
+        Destroy(g);
+        ResetFlippingObjects();
+    }
+
+    public void BlowThis(GameObject g)
+    {
+        
+        GameObject blow = null;
+           
+
+        if (g.GetComponent<Character>() != null)
+        {
+
+            if (g.GetComponent<Character>()._SoundType == Character.SoundType.Wood)
+                blow = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Effects/Explosion_Wood_Effect"));
+            else if (g.GetComponent<Character>()._SoundType == Character.SoundType.Flesh)
+                blow = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Effects/Explosion_Flesh_Effect"));
+            else 
+                blow = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Effects/Explosion_Flesh_Effect"));
+
+        }
+        else if (g.GetComponent<StatsControll>() != null)
+        {
+            if (g.GetComponent<StatsControll>()._SoundType == StatsControll.SoundType.Wood)
+                blow = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Effects/Explosion_Wood_Effect"));
+        else if (g.GetComponent<StatsControll>()._SoundType == StatsControll.SoundType.Flesh)
+            blow = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Effects/Explosion_Flesh_Effect"));
+
+        else if(g.GetComponent<StatsControll>()._SoundType == StatsControll.SoundType.Silent)
+                blow = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Effects/Explosion_Pop"));
+
+            else blow = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Effects/Explosion"));
+        }
+        else
+
+            blow = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Effects/Explosion"));
+
+        if (blow != null)
+        {
+            if (GameObject.Find("Explosion") != null)
+            {
+
+                blow.GetComponent<AudioSource>().enabled = false;
+            }
+
+            blow.transform.position = g.transform.position;
+
+            blow.name = "Explosion";
+        }
+
+        if (g.layer == 8)
+        {
+            if (g.GetComponent<BoxCollider2D>() != null)
+            RescanInBounds(g.GetComponent<BoxCollider2D>().bounds);
+            else PathRescan = 1;
+        }
+
+
+        Destroy(g);
+        ResetFlippingObjects();
+    }
+
+
+    public void PathScan()
+    {
+        print("PathScan");
+
+        if (AP != null) AP.Scan();
+    }
+
+    void PathScanAsync()
+    {
+        print("PathScanAsync");
+
+        if (AP != null) AP.ScanAsync();
+    }
+
+    void PathStopScan()
+    {
+        if (AP != null) AP.StopAllCoroutines();
+    }
+
+
+
+    void Timer()
+    {
+
+        if (secondstimer < Mathf.Floor(Time.fixedTime) && !_gameover)
+        {
+            
+                seconds++;
+              
+                secondstimer = Mathf.Floor(Time.fixedTime);
+            
+        }
+
+        if (seconds >= 60)
+        {
+            minutes++;
+            seconds = 0;
+            
+        }
+
+
+        if (minutes >= 60)
+        {
+            minutes = 0;
+            hours++;
+        }
+    }
+
+
+
+    public void PlayHandsAudio(AudioClip AC, int pitch)
+    {
+        GetComponent<AudioSource>().pitch = pitch;
+        GetComponent<AudioSource>().clip = AC;
+        GetComponent<AudioSource>().Play();
+    }
+
+
+
+    public void ReceiveDamage(int damage)
+    {
+        if (_gameover || MutationTimer > Time.fixedTime) return;
+        if (Invinc < Time.fixedTime && DashTimer < Time.fixedTime)
+        {
+            
+            HP -= damage;
+            PlaySoundsPitched(DamageClips[Random.Range(0, DamageClips.Count)],1);
+
+            Invinc = Time.fixedTime + 1;
+
+            if (Showdamage)
+                inv.ADDPickedName(damage.ToString(), 1,1, _transform.position);
+        }
+
+    }
+
+     void HungerIncreaser()
+     {
+        if (HungerDamage <= 0) return;
+        if (Hunger >= MaxHunger) _constr.AddLogPartOnes("You are starving!", "Ти вмираєш з голоду!", "あなたは飢えている！", gameObject);
+        else _constr.RemoveLogPart("You are starving!");
+
+        if (HungerTimer < Time.fixedTime && !StartLoading && !menu.MenuONOFF)
+        {
+            if (Hunger < MaxHunger)
+            {
+                Hunger++;
+                HungerTimer = Time.fixedTime + (DayNight.DayLength / MaxHunger) / 2;
+            }
+            else
+            {
+                ReceiveDamage(HungerDamage);
+                HungerTimer = Time.fixedTime + (DayNight.DayLength / MaxHunger) / 4;
+            }
+
+           
+        }
+
+     }
+
+    public void PlaySoundsPitched(AudioClip AC,float pitch)
+    {
+      
+
+        if (!GetComponent<AudioSource>().isPlaying)
+        {
+            GetComponent<AudioSource>().clip = AC;
+            GetComponent<AudioSource>().pitch = pitch;
+            GetComponent<AudioSource>().Play();
+        }
+    }
+
+
+    public float GetMaxSeconds()
+    {
+        return MaxSeconds;
+    }
+    public float GetSeconds()
+    {
+        return seconds;
+    }
+
+    void DrawHPParts()
+    {
+     
+        if (inv.crafting || inv.blueprintshow) return;
+
+
+        if (HP <= 0 && !inv.showinvent)
+        {
+            /*if (!_gameover)
+            {
+                PlayHandsAudio(DeathClip, 1);
+                if (FightMusic != null)
+                    FightMusic.Stop();
+                _gameover = true;
+            }*/
+        }
+
+        if (Stamina_Scrollbar != null)
+        {
+            Destroy(HP_Scrollbar);
+            Destroy(Hunger_Scrollbar);
+            Destroy(StatsObject.transform.Find("Plague_Scrollbar").gameObject);
+            Destroy(Stamina_Scrollbar);
+        }
+
+
+        if (_gameover)
+        {
+            if (IM.enter_b)
+            {
+                if (!SceneManager.GetActiveScene().name.Contains("Boss"))
+                {
+                    if(RestartSameLocationOnDeath)
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+
+                    if (RestartAllOnDeath)
+                    {
+                        menu.DrawTutorial = 0;
+                        menu.FirstStart = 0;
+                    
+
+                        menu.SL.ResetLocations();
+
+                        menu.TransitionToTheScene(menu.StartLocation, false);
+                        
+                    }
+                }
+                else
+                {
+                    if (RestartAllOnDeath)
+                    {
+                        menu.DrawTutorial = 0;
+                        menu.FirstStart = 0;
+               
+
+                        menu.SL.ResetLocations();
+                     
+                        menu.TransitionToTheScene(menu.StartLocation, false);
+
+                    }
+
+                    if (RestartSameLocationOnDeath)
+                    {
+                        if (menu.SL.LastLocation != null)
+                        {
+                            if (menu.SL.LastLocation.Length > 0)
+                                SceneManager.LoadScene(menu.SL.LastLocation);
+                            else SceneManager.LoadScene(menu.StartLocation);
+                        }
+                        else SceneManager.LoadScene(menu.StartLocation);
+                    }
+                }
+            }
+
+
+            if (GameObject.Find("GomeoverOB") == null)
+            {
+
+                GameObject GomeoverOB = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/Gameover"), GameObject.Find("Canvas").transform);
+                GomeoverOB.name = "GomeoverOB";
+            }
+        }
+
+
+        Vector2 pos = new Vector2(Screen.width / 9, Screen.height - Screen.height / 10);
+        float switchdiv = 1;
+#if UNITY_SWITCH
+        switchdiv = 1.2f;
+#endif
+       
+        CreateHeartsMax(HeartsMax, MaxHP, Resources.Load<GameObject>("Prefabs/UI/HPMax"), switchdiv);
+        CreateHeartsMax(StaminaHeartsMax, MaxStamina, Resources.Load<GameObject>("Prefabs/UI/Stamina"), switchdiv);
+
+        if(HungerDamage>0)
+        CreateHeartsMax(HungerHeartsMax, MaxHunger, Resources.Load<GameObject>("Prefabs/UI/Hunger"), switchdiv);
+
+        for (int h = 0; h < Hunger; h++)
+        {
+            if (HungerHearts.Count < Hunger)
+            {
+                GameObject H = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/Hunger"), StatsObject.transform);
+                HungerSlotWidth = H.GetComponent<RectTransform>().sizeDelta.x/ switchdiv;
+
+                HungerHearts.Add(H);
+
+
+            }
+        }
+
+        for (int h = 0; h < Stamina; h++)
+        {
+            if (StaminaHearts.Count < Stamina)
+            {
+                GameObject H = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/Stamina"), StatsObject.transform);
+                StaminaSlotWidth = H.GetComponent<RectTransform>().sizeDelta.x/ switchdiv;
+                StaminaHearts.Add(H);
+
+            }
+        }
+
+        RectTransform HPIcon_RectT = StatsObject.transform.Find("HPIcon").GetComponent<RectTransform>();
+
+        RectTransform HungerIcon_RectT = StatsObject.transform.Find("HungerIcon").GetComponent<RectTransform>();
+        RectTransform StaminaIcon_RectT = StatsObject.transform.Find("StaminaIcon").GetComponent<RectTransform>();
+
+#if UNITY_SWITCH
+        
+         float HPSlotDist = 0;
+
+         float HungerSlotDist = 0;
+
+         float StaminaSlotDist = 0;
+
+         float div = 1.25f;
+
+
+         float HPBGWidth = (HPSlotWidth * 1.5f + HPSlotDist) * (MaxHP);
+         float HungerBGWidth = (HungerSlotWidth*1.5f + HungerSlotDist) * (MaxHunger);
+         float StaminaBGWidth = (StaminaSlotWidth*1.5f + StaminaSlotDist) * (MaxStamina) ;
+
+        
+         HPBG.sizeDelta = new Vector2(HPBGWidth + (HPSlotWidth / div) * 3, HPBG.sizeDelta.y);
+         HungerBG.sizeDelta = new Vector2(HungerBGWidth + (HungerSlotWidth / div) * 3 , HungerBG.sizeDelta.y);
+         StaminaBG.sizeDelta = new Vector2(StaminaBGWidth + (StaminaSlotWidth / div) * 3 , StaminaBG.sizeDelta.y);
+
+#else
+
+
+
+        float HPSlotDist = HPSlotWidth/6;
+
+      
+        float HungerSlotDist = HungerSlotWidth/3;
+
+      
+        float StaminaSlotDist = StaminaSlotWidth/3;
+
+        float div = 1.25f;
+
+      
+        HPBG.sizeDelta = new Vector2((HPSlotWidth + HPSlotDist) * MaxHP + (HPSlotWidth / div) * 2 + HPSlotDist * 2, HPBG.sizeDelta.y);
+        HungerBG.sizeDelta = new Vector2((HungerSlotWidth + HungerSlotDist) * MaxHunger + (HungerSlotWidth / div) *2 + HungerSlotDist * 2, HungerBG.sizeDelta.y);
+        StaminaBG.sizeDelta = new Vector2((StaminaSlotWidth + StaminaSlotDist) * MaxStamina + (StaminaSlotWidth / div) * 2 + StaminaSlotDist * 2, StaminaBG.sizeDelta.y);
+
+
+#endif
+
+
+
+        HPBG.position = new Vector3(HPIcon_RectT.position.x + HPIcon_RectT.sizeDelta.x / 1.5f - HPSlotWidth/ div- HPSlotDist, HPIcon_RectT.position.y, 1);
+        HungerBG.position = new Vector3(HungerIcon_RectT.position.x + HungerIcon_RectT.sizeDelta.x/ 1.5f - HungerSlotWidth/ div - HungerSlotDist, HungerIcon_RectT.position.y, 1);
+        StaminaBG.position = new Vector3(StaminaIcon_RectT.position.x + StaminaIcon_RectT.sizeDelta.x/ 1.5f - StaminaSlotWidth/ div - StaminaSlotDist, StaminaIcon_RectT.position.y, 1);
+
+
+        
+        for (int h = 0; h < HeartsMax.Count; h++)
+        HeartsMax[h].GetComponent<RectTransform>().position = new Vector3(HPIcon_RectT.position.x + HPIcon_RectT.sizeDelta.x / 1.5f + h * (HPSlotWidth + HPSlotDist), pos.y, 1);
+
+        for (int i = 0; i < HungerHeartsMax.Count; i++)
+        HungerHeartsMax[i].GetComponent<RectTransform>().position = new Vector3(HungerIcon_RectT.position.x + HungerIcon_RectT.sizeDelta.x / 1.5f + (HungerSlotWidth + HungerSlotDist) * i, HungerIcon_RectT.position.y, 1);
+
+        for (int i = 0; i < StaminaHeartsMax.Count; i++)
+        StaminaHeartsMax[i].GetComponent<RectTransform>().position = new Vector3(StaminaIcon_RectT.position.x + StaminaIcon_RectT.sizeDelta.x / 1.5f + (StaminaSlotWidth + StaminaSlotDist) * i, StaminaIcon_RectT.position.y, 1);
+
+
+        DestroyOvervalueMaxHearts(HeartsMax, MaxHP);
+        DestroyOvervalueMaxHearts(StaminaHeartsMax, MaxStamina);
+        DestroyOvervalueMaxHearts(HungerHeartsMax, MaxHunger);
+
+
+        if (Hearts.Count < HP)
+        {
+            GameObject H = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/HP"), StatsObject.transform);
+           
+            H.GetComponent<RectTransform>().position = new Vector3(HPIcon_RectT.position.x + HPIcon_RectT.sizeDelta.x/1.5f + Hearts.Count * (HPSlotWidth + HPSlotDist), pos.y, 1);
+            H.GetComponent<RectTransform>().sizeDelta = new Vector3(HPSlotWidth, HPSlotWidth, 1);
+
+            Hearts.Add(H);
+            
+            for (int i = 0; i < Hearts.Count; i++)
+            {
+                Hearts[i].GetComponent<RectTransform>().position = new Vector3(HPIcon_RectT.position.x + HPIcon_RectT.sizeDelta.x/1.5f + i * (HPSlotWidth + HPSlotDist), HPIcon_RectT.position.y, 1);
+
+            }
+
+        }
+
+       
+
+
+        if (Hearts.Count > HP)
+        {
+            int hcount = Hearts.Count - 1;
+
+            for (int i = hcount; i >= HP; i--)
+            {
+                // if (i > Hearts.Count - 1) break;
+                if (i < Hearts.Count && Hearts.Count > 0)
+                {
+                    if (Hearts[i] != null)
+                        Destroy(Hearts[i]);
+                    Hearts.RemoveAt(Hearts.Count - 1);
+
+                }
+
+
+            }
+
+        }
+
+        for (int i = 0; i < HungerHearts.Count; i++)
+        {
+            HungerHearts[i].GetComponent<RectTransform>().position = new Vector3(HungerIcon_RectT.position.x + HungerIcon_RectT.sizeDelta.x/1.5f + (HungerSlotWidth + HungerSlotDist)*i, HungerIcon_RectT.position.y, 1);
+           
+        }
+
+        if (HungerHearts.Count > Hunger)
+        {
+            int stcount = HungerHearts.Count - 1;
+
+            for (int i = stcount; i >= Hunger; i--)
+            {
+                if (i < HungerHearts.Count && HungerHearts.Count > 0)
+                {
+                    Destroy(HungerHearts[i]);
+                    HungerHearts.RemoveAt(HungerHearts.Count - 1);
+                }
+
+            }
+
+        }
+
+
+        for (int i = 0; i < StaminaHearts.Count; i++)
+        {
+           StaminaHearts[i].GetComponent<RectTransform>().position = new Vector3(StaminaIcon_RectT.position.x + StaminaIcon_RectT.sizeDelta.x/1.5f + (StaminaSlotWidth + StaminaSlotDist)*i , StaminaIcon_RectT.position.y, 1);
+        }
+
+        if (StaminaHearts.Count > Stamina)
+        {
+            int stcount = StaminaHearts.Count - 1;
+
+            for (int i = stcount; i >= Stamina; i--)
+            {
+                if (i < StaminaHearts.Count && StaminaHearts.Count > 0)
+                {
+                    Destroy(StaminaHearts[i]);
+                    StaminaHearts.RemoveAt(StaminaHearts.Count - 1);
+                }
+
+            }
+
+        }
+
+        
+
+    }
+
+    void DestroyOvervalueMaxHearts(List<GameObject> list, int maxvalue)
+    {
+        if (list.Count <= maxvalue) return;
+        
+        int hcount = list.Count - 1;
+
+        for (int i = hcount; i >= maxvalue; i--)
+        {
+            
+            if (i < list.Count && list.Count > 0)
+            {
+                if (list[i] != null)
+                    Destroy(list[i]);
+                HeartsMax.RemoveAt(list.Count - 1);
+
+            }
+
+
+        }
+        
+    }
+
+    void CreateHeartsMax(List<GameObject> list, int maxcount, GameObject Heart_res, float switchdiv)
+    {
+        if (list.Count >= maxcount) return;
+        
+        int exmax = list.Count;
+        for (int h = 0; h < (maxcount - exmax); h++)
+        {
+            GameObject H = Instantiate<GameObject>(Heart_res, StatsObject.transform);
+            HPSlotWidth = H.GetComponent<RectTransform>().sizeDelta.x / switchdiv;
+            H.GetComponent<Image>().color = new Color(0,0,0,1);
+            list.Add(H);
+        }
+        
+    }
+
+     
+    void UnderAttackAudio()
+    {
+        if (FightMusic == null) return;
+
+    
+
+        if (AttackingEnemies.Count > 0) UnderAttack = true;
+        else UnderAttack = false;
+
+
+        if (UnderAttack)
+        {
+            if (!FightMusic.isPlaying)
+                FightMusic.Play();
+
+            if (FightMusic.volume < 1) FightMusic.volume += Time.deltaTime;
+
+            menu.mg.SetFloat("BG", -80);
+        }
+        else if (FightMusic.volume > 0)
+        {
+
+
+            float bg = 3 * (menu.BGSlider.value * 10) - 30;
+            if (bg > 10) bg = 10;
+            menu.mg.SetFloat("BG", bg);
+
+
+            FightMusic.volume -= Time.deltaTime / 2;
+        }
+    }
+
+    void DrawHPSliders()
+    {
+
+        if (HP <= 0 && !inv.showinvent)
+        {
+           /* if (!_gameover)
+            {
+                PlayHandsAudio(DeathClip, 1);
+                if (FightMusic != null)
+                    FightMusic.Stop();
+                _gameover = true;
+            }*/
+        }
+
+
+
+        //OLD DRAWING HEARTS PART
+
+        /*
+        if (Hearts.Count < HP)
+        {
+            GameObject H = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/HP"), GameObject.Find("Stats").transform);
+            H.GetComponent<RectTransform>().position = new Vector3(GameObject.Find("Stats").GetComponent<RectTransform>().position.x + Hearts.Count * 0.5f, GameObject.Find("Stats").GetComponent<RectTransform>().position.y, 1);
+            Hearts.Add(H);
+        }
+
+         if (Hearts.Count > HP)
+         {
+             int hcount = Hearts.Count-1;
+
+             for (int i = hcount; i >= HP; i--)
+             {
+                 // if (i > Hearts.Count - 1) break;
+                 if (i < Hearts.Count && Hearts.Count>0)
+                 {
+                     if (Hearts[i] != null)
+                         Destroy(Hearts[i]);
+                     Hearts.RemoveAt(Hearts.Count - 1);
+
+                 }
+
+
+             }
+
+         }*/
+
+
+        // NEW HP SLIDER
+
+        PixelPerStat = 20;
+        HP_Scrollbar.GetComponent<Scrollbar>().size = (float)HP / (float)MaxHP;
+
+        if (HP_Scrollbar.transform.Find("Text") != null)
+            HP_Scrollbar.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = HP + " / " + MaxHP;
+
+        HP_Scrollbar.transform.Find("FG").GetComponent<RectTransform>().sizeDelta = new Vector2(MaxHP * PixelPerStat, 40);
+        HP_Scrollbar.GetComponent<RectTransform>().sizeDelta = new Vector2(MaxHP * PixelPerStat, 40);
+     
+
+        if (Hunger >= MaxHunger)
+        {
+            _constr.SetUIAlpha(Hunger_Scrollbar, HungerAlpha, 1 + HungerAlpha / 8);
+
+            HungerAlpha += HungerAlphaSide * Time.deltaTime * 2;
+            if (HungerAlpha > 1.2f) HungerAlphaSide = -1;
+            if (HungerAlpha < 0.4) HungerAlphaSide = 1;
+        }
+        else
+        {
+            _constr.SetUIAlpha(Hunger_Scrollbar, 1, 1);
+
+        }
+
+        Hunger_Scrollbar.GetComponent<Scrollbar>().size = ((float)MaxHunger - (float)Hunger)/ (float)MaxHunger;
+        Hunger_Scrollbar.transform.Find("FG").GetComponent<RectTransform>().sizeDelta = new Vector2(MaxHunger * PixelPerStat, 40);
+        Hunger_Scrollbar.GetComponent<RectTransform>().sizeDelta = new Vector2(MaxHunger * PixelPerStat, 40);
+
+        if (MaxPlague > 0)
+        {
+            StatsObject.transform.Find("Plague_Scrollbar").GetComponent<Scrollbar>().size =  (float)Plague / (float)MaxPlague;
+            StatsObject.transform.Find("Plague_Scrollbar").Find("FG").GetComponent<RectTransform>().sizeDelta = new Vector2(MaxPlague * PixelPerStat, 40);
+            StatsObject.transform.Find("Plague_Scrollbar").GetComponent<RectTransform>().sizeDelta = new Vector2(MaxPlague * PixelPerStat, 40);
+        }
+
+
+        Stamina_Scrollbar.GetComponent<Scrollbar>().size = (float)Stamina / (float)MaxStamina;
+        if(Stamina_Scrollbar.transform.Find("Text")!=null)
+        Stamina_Scrollbar.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = Stamina + " / " + MaxStamina;
+
+        Stamina_Scrollbar.transform.Find("FG").GetComponent<RectTransform>().sizeDelta = new Vector2(MaxStamina * PixelPerStat, 40);
+        Stamina_Scrollbar.GetComponent<RectTransform>().sizeDelta = new Vector2(MaxStamina * PixelPerStat, 40);
+
+
+        /* if (StaminaHearts.Count < Stamina)
+         {
+             GameObject H = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/Stamina"), StatsObject.transform);
+             H.GetComponent<RectTransform>().position = new Vector3(StatsObject.GetComponent<RectTransform>().position.x + StaminaHearts.Count * 0.5f, StatsObject.GetComponent<RectTransform>().position.y-1.6f, 1);
+             StaminaHearts.Add(H);
+         }*/
+
+
+        if (StaminaHearts.Count > Stamina)
+        {
+            int stcount = StaminaHearts.Count-1;
+
+            for (int i = stcount; i >= Stamina; i--)
+            {
+              
+                Destroy(StaminaHearts[i]);
+                StaminaHearts.RemoveAt(StaminaHearts.Count - 1);
+                
+                
+            }
+
+        }
+
+
+        if (!_gameover)
+        {
+            return;
+        }
+
+
+
+        if (IM.enter_b)
+        {
+            if (RestartAllOnDeath)
+            {
+                menu.FirstStart = 0;
+            }
+
+            if (!SceneManager.GetActiveScene().name.Contains("Boss"))
+                menu.TransitionToTheScene(SceneManager.GetActiveScene().name, false);
+            
+            else
+            {
+                if (menu.SL.LastLocation != null)
+                {
+                    if (menu.SL.LastLocation.Length > 0)
+                        menu.TransitionToTheScene(menu.SL.LastLocation, false);
+         
+                    else  menu.TransitionToTheScene(menu.SL.LastLocation, false);
+                   
+                }
+                else menu.TransitionToTheScene(menu.SL.LastLocation, false);
+           
+            }
+
+         
+
+        }
+
+
+        if (GameObject.Find("GomeoverOB") == null)
+        {
+
+            GameObject GomeoverOB = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/Gameover"), GameObject.Find("Canvas").transform);
+            GomeoverOB.name = "GomeoverOB";
+        }
+        
+
+    }
+
+    public void Heal(int heal, string MagicEffectToCast)
+    {
+        if (MaxHP >= HP + heal)
+            HP += heal;
+        else HP = MaxHP;
+
+
+        if (MagicEffectToCast != null)
+        {
+            ItemEffect = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Effects/" + MagicEffectToCast));
+
+            ItemEffect.transform.position = _transform.position;
+        }
+
+    }
+
+    public void Eating(int setiety, string MagicEffectToCast)
+    {
+        if (Hunger > 0)
+            Hunger -= setiety;
+
+        if (Hunger < 0) Hunger = 0;
+
+       
+        ItemEffect = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Effects/EatingEffect"));
+       
+        _constr.SetColorAndAlpha(gameObject, new Color(1, 1, 1, 1));
+
+        ItemEffect.transform.position = _transform.position;
+
+    }
+
+    void MousePlayerMove()
+    {
+        if (IM.RightMouseButton)
+        {
+            Vector2 Move =  MainCamera.ScreenToWorldPoint(MouseOB.transform.position)  - _transform.position  ;
+            
+            _normalHSpeed = Move.normalized.x * SpeedMultiplier;
+            _normalVSpeed = Move.normalized.y * SpeedMultiplier;
+
+        }
+
+
+     
+    }
+
+    public void RescanInBounds(Bounds bound)
+    {
+        AstarPath.active.UpdateGraphs(bound);
+
+        RescanBound = bound;
+        PathRescanBoundTimer = 0.06f;
+
+    }
+
+
+    public void ReduceStamina(int stam)
+    {
+        Stamina+= stam;
+
+
+        StaminaTimer = Time.fixedTime + 1 - StaminaRestore / 10;
+    }
+
+
+    private void OnTriggerStay2D(Collider2D c)
+	{
+		
+		if(!coll_obj.Contains(c.gameObject))
+		{
+            coll_obj.Add(c.gameObject);
+		}
+		
+	}
+	
+	private void OnTriggerExit2D(Collider2D c)
+	{
+		
+		if(coll_obj.Contains(c.gameObject))
+		{
+            coll_obj.Remove(c.gameObject);
+		}
+		
+	}
+
+}

@@ -1,0 +1,734 @@
+fileFormatVersion: 2
+guid: 2b218cd53dfda21469ff12c4333b7982
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 3029469179116465362
+    second: EnemyEffects_0
+  - first:
+      213: 4124622625894860895
+    second: EnemyEffects_1
+  - first:
+      213: -8395945005782968927
+    second: EnemyEffects_2
+  - first:
+      213: -6966884350573251460
+    second: EnemyEffects_3
+  - first:
+      213: 4351913373667050263
+    second: EnemyEffects_4
+  - first:
+      213: -4179177374100491676
+    second: EnemyEffects_5
+  - first:
+      213: 8612724922020104700
+    second: EnemyEffects_6
+  - first:
+      213: -5007830684342030888
+    second: EnemyEffects_7
+  - first:
+      213: 451222663509827773
+    second: EnemyEffects_8
+  - first:
+      213: -184803432238124367
+    second: EnemyEffects_9
+  - first:
+      213: -6436082486840222989
+    second: EnemyEffects_10
+  - first:
+      213: 1162423912525351959
+    second: EnemyEffects_11
+  - first:
+      213: 8013004792568441075
+    second: EnemyEffects_12
+  - first:
+      213: -4452188580148357246
+    second: EnemyEffects_13
+  - first:
+      213: -86980379237392697
+    second: EnemyEffects_14
+  - first:
+      213: 4121464807945326857
+    second: EnemyEffects_15
+  - first:
+      213: 2058474043188310556
+    second: EnemyEffects_16
+  - first:
+      213: 7823178091449510495
+    second: EnemyEffects_17
+  - first:
+      213: -539645438816326141
+    second: EnemyEffects_18
+  - first:
+      213: 4446182843156687460
+    second: EnemyEffects_19
+  - first:
+      213: -8827253337890120602
+    second: EnemyEffects_20
+  - first:
+      213: -146023925780216998
+    second: EnemyEffects_21
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 40
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 1
+  swizzle: 50462976
+  cookieLightType: 1
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 256
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 256
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 256
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 256
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 256
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 256
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: Nintendo Switch
+    maxTextureSize: 256
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: Windows Store Apps
+    maxTextureSize: 256
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: EnemyEffects_0
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 230
+        width: 20
+        height: 20
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6cfeb312d1a427e49b0b514de631c904
+      internalID: 3029469179116465362
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_1
+      rect:
+        serializedVersion: 2
+        x: 31
+        y: 230
+        width: 20
+        height: 20
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3e15894598c8b6a43ab8e372b6dff70b
+      internalID: 4124622625894860895
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_2
+      rect:
+        serializedVersion: 2
+        x: 55
+        y: 229
+        width: 20
+        height: 20
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 457908ab2830b4448a79df5a7227419e
+      internalID: -8395945005782968927
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_3
+      rect:
+        serializedVersion: 2
+        x: 79
+        y: 230
+        width: 20
+        height: 20
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 90e43662aa97996439d1678b664cff45
+      internalID: -6966884350573251460
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_4
+      rect:
+        serializedVersion: 2
+        x: 103
+        y: 230
+        width: 20
+        height: 20
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2749080e9947e794a9c995ddbec9f2c1
+      internalID: 4351913373667050263
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_5
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 183
+        width: 32
+        height: 37
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: caf706c9548318b4ba3b16acbef30cc9
+      internalID: -4179177374100491676
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_6
+      rect:
+        serializedVersion: 2
+        x: 35
+        y: 183
+        width: 32
+        height: 37
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2e3d229a99316d047bc59cac0f68fcf6
+      internalID: 8612724922020104700
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_7
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 183
+        width: 32
+        height: 37
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 440463d223374eb42a2208055dc09d6d
+      internalID: -5007830684342030888
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_8
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 183
+        width: 34
+        height: 37
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9ea710e0cd3dcf7428764a7e60d88ac9
+      internalID: 451222663509827773
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_9
+      rect:
+        serializedVersion: 2
+        x: 154
+        y: 183
+        width: 40
+        height: 37
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9cae0f05a76d3e04786e92de93c2ca3d
+      internalID: -184803432238124367
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_10
+      rect:
+        serializedVersion: 2
+        x: 202
+        y: 183
+        width: 48
+        height: 37
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e6d3e6dc2eafae543841cdddaf8cf4c8
+      internalID: -6436082486840222989
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_11
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 127
+        width: 48
+        height: 39
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7ceeaa8e8cecc7f42a1c641a7b2f56df
+      internalID: 1162423912525351959
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_12
+      rect:
+        serializedVersion: 2
+        x: 52
+        y: 125
+        width: 48
+        height: 41
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7ae9a205d922c904da676dd5f80a0b34
+      internalID: 8013004792568441075
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_13
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 125
+        width: 48
+        height: 41
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a94793f98c801494d92d5de5fe5ac03e
+      internalID: -4452188580148357246
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_14
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 82
+        width: 32
+        height: 26
+      alignment: 9
+      pivot: {x: 0.5107138, y: 0.4604413}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: db4d43ec73456b944b513312c7f32a2e
+      internalID: -86980379237392697
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_15
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 80
+        width: 35
+        height: 25
+      alignment: 9
+      pivot: {x: 0.4899532, y: 0.5479981}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e66b0b6460d6a2e49a2bcbbcde04765b
+      internalID: 4121464807945326857
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_16
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 73
+        width: 31
+        height: 41
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5710773}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6c15ca6908f4d694e9fc6634ffb1b51b
+      internalID: 2058474043188310556
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_19
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 14
+        width: 39
+        height: 40
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5505a352147ee094cbf424eb1aa6dda5
+      internalID: 4446182843156687460
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_20
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 135
+        width: 46
+        height: 31
+      alignment: 9
+      pivot: {x: 0.86863774, y: 0.06362029}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: de769d0ca10568e4cb49dd64c44c5ce9
+      internalID: -8827253337890120602
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_21
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 99
+        width: 37
+        height: 30
+      alignment: 9
+      pivot: {x: 0.8410975, y: 0.08309657}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b18c90f6d84b585469de6ba0cc189828
+      internalID: -146023925780216998
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_17
+      rect:
+        serializedVersion: 2
+        x: 193
+        y: 66
+        width: 23
+        height: 28
+      alignment: 9
+      pivot: {x: 0.7638158, y: 0.08427592}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 45a81ace289482346ba771acb0bc07f1
+      internalID: 7823178091449510495
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemyEffects_18
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 36
+        width: 16
+        height: 18
+      alignment: 9
+      pivot: {x: 0.65329933, y: 0.09921625}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a9b84b83f420a22489018d8592c215d4
+      internalID: -539645438816326141
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: f137012180410284f9dcc553d11e0eca
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      EnemyEffects_0: 3029469179116465362
+      EnemyEffects_1: 4124622625894860895
+      EnemyEffects_10: -6436082486840222989
+      EnemyEffects_11: 1162423912525351959
+      EnemyEffects_12: 8013004792568441075
+      EnemyEffects_13: -4452188580148357246
+      EnemyEffects_14: -86980379237392697
+      EnemyEffects_15: 4121464807945326857
+      EnemyEffects_16: 2058474043188310556
+      EnemyEffects_17: 7823178091449510495
+      EnemyEffects_18: -539645438816326141
+      EnemyEffects_19: 4446182843156687460
+      EnemyEffects_2: -8395945005782968927
+      EnemyEffects_20: -8827253337890120602
+      EnemyEffects_21: -146023925780216998
+      EnemyEffects_3: -6966884350573251460
+      EnemyEffects_4: 4351913373667050263
+      EnemyEffects_5: -4179177374100491676
+      EnemyEffects_6: 8612724922020104700
+      EnemyEffects_7: -5007830684342030888
+      EnemyEffects_8: 451222663509827773
+      EnemyEffects_9: -184803432238124367
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
