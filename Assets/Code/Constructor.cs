@@ -1553,7 +1553,7 @@ public class Constructor : MonoBehaviour
 
 
             if (!_PubObject.decoration)
-                objecttobuild.transform.position = new Vector2(ConstructorObjectPosition.x, ConstructorObjectPosition.y + 0.5f * ObjectOnGround_PubObject.TopObjectsCount);
+                objecttobuild.transform.position = new Vector2(ConstructorObjectPosition.x, ConstructorObjectPosition.y + 1 * ObjectOnGround_PubObject.TopObjectsCount);
             else objecttobuild.transform.position = new Vector2(ConstructorObjectPosition.x, ConstructorObjectPosition.y);
 
             if (objecttobuild.transform.Find("Base") != null)
@@ -1746,7 +1746,7 @@ public class Constructor : MonoBehaviour
 
             return;
         }
-        else _transform.GetChild(0).position = new Vector3(_transform.position.x + 0.5f, _transform.GetChild(0).position.y, _transform.GetChild(0).position.z);
+        else _transform.GetChild(0).position = new Vector3(_transform.position.x + 0.5f, _transform.GetChild(0).position.y - 0.5f, _transform.GetChild(0).position.z);
 
 
 
@@ -1883,7 +1883,7 @@ public class Constructor : MonoBehaviour
                     if (ObjectOnGround.GetComponent<PubObject>().TopObjectsCount < 99)
                         ChildOnMouse.position = new Vector3(
                             ChildOnMouse.position.x,
-                            _transform.position.y + 0.5f * (ObjectOnGround.GetComponent<PubObject>().TopObjectsCount + 1),
+                            _transform.position.y + 1 * (ObjectOnGround.GetComponent<PubObject>().TopObjectsCount + 1),
                             ChildOnMouse.position.z);
                 }
 
@@ -2351,30 +2351,36 @@ public class Constructor : MonoBehaviour
         
 
         Vector3 v = Tile.CellToWorld(new Vector3Int(XPos, YPos, 1));
-      //  v = new Vector3(Mathf.Clamp(v.x, _min.x, _max.x), Mathf.Clamp(v.y, _min.y, _max.y), v.z);
-
+        //  v = new Vector3(Mathf.Clamp(v.x, _min.x, _max.x), Mathf.Clamp(v.y, _min.y, _max.y), v.z);
+        float ObshiftX = 0f;
+        float ObshiftY = 0.25f;
+        float ObshiftOnBoardX = 0.5f;
         Vector2 mouse = pl.MainCamera.ScreenToWorldPoint(new Vector3(IM.MousePosition.x, IM.MousePosition.y, 0));
 
         if (pl.IM.MouseMode)
         {
-            
-            Vector3Int vi = Tile.WorldToCell(new Vector3(mouse.x - 0.5f, mouse.y + 0.2f, 0));
+
+
+
+            Vector3Int vi = Tile.WorldToCell(new Vector3(mouse.x - ObshiftX, mouse.y + ObshiftY, 0));
             if (Building)
                 v = Tile.CellToWorld(new Vector3Int(vi.x, vi.y, 1));
 
-            
+
+
+
             XPos = Tile.WorldToCell(v).x;
-                YPos = Tile.WorldToCell(v).y;
-                
+            YPos = Tile.WorldToCell(v).y;
+
         }
-        
 
         MaxField = bounds.max;
         MinField = bounds.min;
 
-        if (ConstructorObjectPosition != new Vector2(v.x + 0.5f, v.y))
+        if (ConstructorObjectPosition != new Vector2(v.x + ObshiftOnBoardX, v.y + 0.25f))
         {
-            ConstructorObjectPosition = new Vector2(v.x + 0.5f, v.y);
+
+            ConstructorObjectPosition = new Vector2(v.x + ObshiftOnBoardX, v.y + 0.25f);
             isRandomised = false;
         }
 
@@ -3133,7 +3139,7 @@ public class Constructor : MonoBehaviour
 
         Vector3 v = Tile.CellToWorld(new Vector3Int(XPos, YPos, 1));
 
-        ConstructorObjectPosition = new Vector2(v.x + 0.5f, v.y);
+        ConstructorObjectPosition = new Vector2(v.x + 0.5f, v.y - 0.5f);
         
         _transform.position = v;
         
