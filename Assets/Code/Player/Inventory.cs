@@ -335,7 +335,7 @@ public class Inventory : MonoBehaviour
             Slot.name = "Slot" + x;
             slots.Add(Slot);
 
-            print("slots x " + x);
+        
 
             s++;
         }
@@ -402,7 +402,8 @@ public class Inventory : MonoBehaviour
 
 
 
-        if (pl.GetComponent<Achivements>()!=null) ShowAch = pl.GetComponent<Achivements>().ShowAch;
+        if (pl.GetComponent<Achivements>()!=null) 
+            ShowAch = pl.GetComponent<Achivements>().ShowAch;
 
         if(!blueprintshow)
         Start_Close_Inventory();
@@ -411,7 +412,9 @@ public class Inventory : MonoBehaviour
 
         SelectFolder();
 
-        SetItemsIntoSlots();
+
+        for (int x = 0; x < slots.Count; x++)
+            SetItemsIntoSlots(x);
 
         ChoiseSlotsWithMouse();
 
@@ -619,6 +622,7 @@ public class Inventory : MonoBehaviour
                 CurrentItem = 0;
                 PauseInventory = false;
                 ChooseTopSegmentSlot = false;
+                inventoryFolder = new List<Item>();
                 UpdateInvFolder();
             }
         }
@@ -633,7 +637,9 @@ public class Inventory : MonoBehaviour
             FolderButtons[CurrentFolder].transform.Find("NewItemTag").gameObject.SetActive(false);
             CurrentItem = 0;
             SlotSlide = 0;
+            inventoryFolder = new List<Item>();
             UpdateInvFolder();
+
             IM.ActionDelay = 0.1f;
         }
 
@@ -644,29 +650,22 @@ public class Inventory : MonoBehaviour
             FolderButtons[CurrentFolder].transform.Find("NewItemTag").gameObject.SetActive(false);
             CurrentItem = 0;
             SlotSlide = 0;
+            inventoryFolder = new List<Item>();
             UpdateInvFolder();
             IM.ActionDelay = 0.1f;
         }
 
 
-        if (inventoryFolder.Count<=0)
-        {
-            for (int i = 0; i < inventory.Count; i++)
-            {
-                if (inventory[i].Structure && inventory[i]._StructureType == Item.StructureType.Building||
-                    inventory[i].Structure && inventory[i]._StructureType == Item.StructureType.Protection||
-                   inventory[i].Structure && inventory[i]._StructureType == Item.StructureType.Decoration)
-                {
-                    inventoryFolder.Add(DeepCopyItem(inventory[i].itemID, inventory[i].Count, 999));
-                    print("SelectFolder " + i);
-                }
+        if (!showinvent) return;
 
-            }
+
+        if (inventoryFolder.Count <= 0)
+        {
             CurrentItem = 0;
         }
 
 
-        
+
     }
 
 
@@ -736,71 +735,58 @@ public class Inventory : MonoBehaviour
 
 
 
-    void SetItemsIntoSlots()
+    void SetItemsIntoSlots(int x)
     {
-
-
-        for (int x = 0; x < slots.Count; x++)
+        if (x > inventoryFolder.Count - 1)
         {
-
-
-            if (x <= inventoryFolder.Count - 1)
-            {
-                if (inventoryFolder[x] != null)
-                {
-                    if (inventoryFolder[x].itemID > -1)
-                    {
-                        if (slots[x].transform.Find("Item") == null)
-                        {
-                            GameObject ItemOB = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/Item"), slots[x].transform);
-                            ItemOB.GetComponent<RectTransform>().position = slots[x].GetComponent<RectTransform>().position;
-
-                            ItemOB.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/Items/" + inventoryFolder[x].itemNames[0]);
-                            ItemOB.GetComponent<Image>().color = new Color(1, 1, 1, 1);
-
-                            Image IMG = ItemOB.transform.Find("Status").GetComponent<Image>();
-
-                            SetStatus(inventoryFolder[x], ref IMG);
-
-
-
-
-                            ItemOB.name = "Item";
-
-                            if (inventoryFolder[x].CanStack)
-                                slots[x].transform.Find("Item").transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "x " + inventoryFolder[x].Count;
-
-                        }
-                        else
-                        {
-                            Image IMG = slots[x].transform.Find("Item").transform.Find("Status").GetComponent<Image>();
-
-                            SetStatus(inventoryFolder[x], ref IMG);
-
-                            slots[x].transform.Find("Item").transform.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/Items/" + inventoryFolder[x].itemNames[0]);
-                            slots[x].transform.Find("Item").transform.GetComponent<Image>().color = new Color(1, 1, 1, 1);
-
-                            if (inventoryFolder[x].Count > 0 && inventoryFolder[x].CanStack)
-                                slots[x].transform.Find("Item").transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "x " + inventoryFolder[x].Count;
-                            else slots[x].transform.Find("Item").transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "";
-
-                        }
-                    }
-
-
-                    if (inventoryFolder[x].itemID == -1 && slots[x].transform.Find("Item") != null)
-                    {
-                        Destroy(slots[x].transform.Find("Item").gameObject);
-                    }
-                }
-            }
-            else if (slots[x].transform.Find("Item") != null)
+            if (slots[x].transform.Find("Item") != null)
                 Destroy(slots[x].transform.Find("Item").gameObject);
-
-
-
-
+            return;
         }
+        if (inventoryFolder[x] == null) return;
+
+        if (inventoryFolder[x].itemID > -1)
+        {
+            if (slots[x].transform.Find("Item") == null)
+            {
+                GameObject ItemOB = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/Item"), slots[x].transform);
+                ItemOB.GetComponent<RectTransform>().position = slots[x].GetComponent<RectTransform>().position;
+
+                ItemOB.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/Items/" + inventoryFolder[x].itemNames[0]);
+                ItemOB.GetComponent<Image>().color = new Color(1, 1, 1, 1);
+
+
+
+
+
+                ItemOB.name = "Item";
+
+                if (inventoryFolder[x].CanStack)
+                    slots[x].transform.Find("Item").transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "x " + inventoryFolder[x].Count;
+
+            }
+            else
+            {
+                Image IMG = slots[x].transform.Find("Item").transform.Find("Status").GetComponent<Image>();
+
+
+                slots[x].transform.Find("Item").transform.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/Items/" + inventoryFolder[x].itemNames[0]);
+                slots[x].transform.Find("Item").transform.GetComponent<Image>().color = new Color(1, 1, 1, 1);
+
+                if (inventoryFolder[x].Count > 0 && inventoryFolder[x].CanStack)
+                    slots[x].transform.Find("Item").transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "x " + inventoryFolder[x].Count;
+                else slots[x].transform.Find("Item").transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "";
+
+            }
+        }
+
+
+        if (inventoryFolder[x].itemID == -1 && slots[x].transform.Find("Item") != null)
+        {
+            Destroy(slots[x].transform.Find("Item").gameObject);
+        }
+
+
     }
 
 
@@ -924,7 +910,8 @@ public class Inventory : MonoBehaviour
 
     public Item GetItemInDatabase(int id)
     {
-        Item result = null;
+        Item result = new Item();
+        if (database == null) return result;
 
         for (int i = 0; i < database.items.Count; i++)
         {
@@ -1418,7 +1405,7 @@ public class Inventory : MonoBehaviour
 
 
 
-    public string ToolpitString(Item i)
+    public string TooltipsString(Item i)
     {
 
         //#FF5D5D - red
@@ -1762,11 +1749,10 @@ public class Inventory : MonoBehaviour
 
     void ChoiseSlotsWithMouse()
     {
-       // if (IM.MouseMode) return;
+      
 
         if (pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(CraftingCross) && pl.IM.LeftMouseButtonDown)
         {
-          //  ONOFF(StatsUI, true);
             ONOFF(GameObject.Find("ButtonsUI"), true);
             ONOFF(Controlls, true);
             if (showjournal) DrawJournal(false);
@@ -1983,7 +1969,7 @@ public class Inventory : MonoBehaviour
         {
 
 
-            if ( showinvent )
+            if ( showinvent && inventoryFolder.Count > 0)
             {
                 if (CurrentItem > inventoryFolder.Count - 1) CurrentItem = inventoryFolder.Count - 1;
 
@@ -1991,13 +1977,8 @@ public class Inventory : MonoBehaviour
                 if (GetCurrentItem().itemID > -1)
                 {
                 
-                    ToolTip.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = ToolpitString(inventoryFolder[CurrentItem]);
+                    ToolTip.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = TooltipsString(inventoryFolder[CurrentItem]);
               
-                   /* if (Choose.transform.position.y < 700)
-                        ToolTip.transform.position = Choose.transform.position;
-                    else
-                        ToolTip.transform.position = new Vector3(Choose.transform.position.x, 700, ToolTip.transform.position.z);
-                        */
 
                 }
                 else ToolTip.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "";
@@ -2047,12 +2028,6 @@ public class Inventory : MonoBehaviour
         ToolTip.transform.SetAsLastSibling();
 
     }
-
-
-
-
-
-
 
 
 
@@ -2347,7 +2322,7 @@ public class Inventory : MonoBehaviour
         if (i.GetComponent<PathUpdate>() != null)
             i.GetComponent<PathUpdate>().enabled = false;
 
-        i.transform.position = new Vector2(_constr.transform.position.x + 0.5f, _constr.transform.position.y);
+        i.transform.position = new Vector2(_constr.transform.position.x + 0.5f, _constr.transform.position.y + 0.5f);
         i.name = "Mouse" + n.name;
 
         i.GetComponent<PubObject>()._TileBase = TargetTile[0];

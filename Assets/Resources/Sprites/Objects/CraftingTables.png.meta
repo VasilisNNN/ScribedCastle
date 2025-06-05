@@ -101,7 +101,6 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
-    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
@@ -129,7 +128,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 32
+  spritePixelsToUnits: 256
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -145,12 +144,11 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 1
-  swizzle: 50462976
   cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 256
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 0
@@ -159,7 +157,7 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
     androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 1
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Standalone
     maxTextureSize: 256
@@ -171,7 +169,7 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
     androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 1
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Nintendo Switch
     maxTextureSize: 256
@@ -220,6 +218,18 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: PS5
+    maxTextureSize: 256
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -227,12 +237,12 @@ TextureImporter:
       name: CraftingTables_0
       rect:
         serializedVersion: 2
-        x: 2
-        y: 220
-        width: 25
-        height: 32
+        x: 10
+        y: 1619
+        width: 286
+        height: 415
       alignment: 9
-      pivot: {x: 0.4387752, y: 0.1525903}
+      pivot: {x: 0.46393007, y: 0.15959753}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -240,552 +250,6 @@ TextureImporter:
       bones: []
       spriteID: 2d724a7b765c1b042b5a541a469ad62d
       internalID: 7604693277659657743
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_1
-      rect:
-        serializedVersion: 2
-        x: 34
-        y: 220
-        width: 22
-        height: 22
-      alignment: 9
-      pivot: {x: 0.4943272, y: 0.28443563}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 70d0d257fe9af034385e3f043cc21885
-      internalID: 7658134468993396255
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_2
-      rect:
-        serializedVersion: 2
-        x: 62
-        y: 219
-        width: 42
-        height: 34
-      alignment: 9
-      pivot: {x: 0.5, y: 0.17}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a88b64b6ce7af2e44b2f0305e8c7f1ab
-      internalID: -4089118481255032306
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_3
-      rect:
-        serializedVersion: 2
-        x: 109
-        y: 220
-        width: 26
-        height: 27
-      alignment: 9
-      pivot: {x: 0.5, y: 0.19}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ac216585ffc53d045b7d9d0e816139d7
-      internalID: -4120857723078406267
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_4
-      rect:
-        serializedVersion: 2
-        x: 139
-        y: 220
-        width: 22
-        height: 34
-      alignment: 9
-      pivot: {x: 0.5, y: 0.16}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 2bd8720aba160ff4f8d0b3303466fa24
-      internalID: 8256099992602214127
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_5
-      rect:
-        serializedVersion: 2
-        x: 165
-        y: 219
-        width: 24
-        height: 33
-      alignment: 9
-      pivot: {x: 0.5, y: 0.165}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a3e8467f95157b8488602fff80805e8d
-      internalID: -3372891526082653166
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_6
-      rect:
-        serializedVersion: 2
-        x: 194
-        y: 219
-        width: 22
-        height: 31
-      alignment: 9
-      pivot: {x: 0.5, y: 0.165}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 8e85720517e43104f862d1b7cbbf541c
-      internalID: 2880630262172585007
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_7
-      rect:
-        serializedVersion: 2
-        x: 222
-        y: 213
-        width: 22
-        height: 43
-      alignment: 9
-      pivot: {x: 0.5, y: 0.125}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 39dfca2f1c5fc4545aa88a0f1c61ee51
-      internalID: 651186281652276642
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_8
-      rect:
-        serializedVersion: 2
-        x: 110
-        y: 185
-        width: 26
-        height: 27
-      alignment: 9
-      pivot: {x: 0.5, y: 0.19}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d732ae76ef578084c9da6f19e4190759
-      internalID: 7153812221673970042
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_9
-      rect:
-        serializedVersion: 2
-        x: 110
-        y: 152
-        width: 26
-        height: 27
-      alignment: 9
-      pivot: {x: 0.5, y: 0.19}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 85e10f6fa853c0848b2451c54e732fc4
-      internalID: 6657183826484493066
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_10
-      rect:
-        serializedVersion: 2
-        x: 1
-        y: 99
-        width: 30
-        height: 28
-      alignment: 9
-      pivot: {x: 0.5, y: 0.27}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 8c390356b9486cf45a0be3b21489968f
-      internalID: -1760753716330992188
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_11
-      rect:
-        serializedVersion: 2
-        x: 33
-        y: 99
-        width: 30
-        height: 33
-      alignment: 9
-      pivot: {x: 0.5, y: 0.22}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 58890e3f9d2f3aa4f89b110acd8b64b0
-      internalID: -3710163472778213114
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_12
-      rect:
-        serializedVersion: 2
-        x: 33
-        y: 63
-        width: 30
-        height: 33
-      alignment: 9
-      pivot: {x: 0.5, y: 0.22}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 1c3cfd76bbf671d48a8017095119db3f
-      internalID: -7687957707572821341
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_13
-      rect:
-        serializedVersion: 2
-        x: 33
-        y: 27
-        width: 30
-        height: 33
-      alignment: 9
-      pivot: {x: 0.5, y: 0.22}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 789858a73868455449a72a58710a89cc
-      internalID: -6360954370309936953
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_14
-      rect:
-        serializedVersion: 2
-        x: 62
-        y: 183
-        width: 42
-        height: 34
-      alignment: 9
-      pivot: {x: 0.5, y: 0.17}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 7ebb697fea4785c4789da78614ce7fdc
-      internalID: 6906169378162491820
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_15
-      rect:
-        serializedVersion: 2
-        x: 62
-        y: 149
-        width: 42
-        height: 34
-      alignment: 9
-      pivot: {x: 0.5, y: 0.17}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 80c6f36a9adfca742900f2f2db4028bc
-      internalID: -3934588149356155942
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_16
-      rect:
-        serializedVersion: 2
-        x: 221
-        y: 167
-        width: 24
-        height: 44
-      alignment: 9
-      pivot: {x: 0.5, y: 0.125}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 422aad06e6eaa5f47a9619b4ca7ac6e6
-      internalID: -1548239486904987483
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_17
-      rect:
-        serializedVersion: 2
-        x: 221
-        y: 121
-        width: 24
-        height: 43
-      alignment: 9
-      pivot: {x: 0.5, y: 0.125}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 5153ef88016a508479b60f1dfa7a5c78
-      internalID: -916862128751824355
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_18
-      rect:
-        serializedVersion: 2
-        x: 222
-        y: 75
-        width: 22
-        height: 43
-      alignment: 9
-      pivot: {x: 0.5, y: 0.125}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: cb2f3e42677788a4c820ba2160f53647
-      internalID: 7685459828221301264
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_19
-      rect:
-        serializedVersion: 2
-        x: 222
-        y: 29
-        width: 22
-        height: 43
-      alignment: 9
-      pivot: {x: 0.5, y: 0.125}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 2afc57caca11e044797608fc942bc29f
-      internalID: 3089317717442135500
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_20
-      rect:
-        serializedVersion: 2
-        x: 193
-        y: 29
-        width: 22
-        height: 43
-      alignment: 9
-      pivot: {x: 0.5, y: 0.125}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 8f9b80a682ca2284fa91d001851fa32f
-      internalID: -4517027868900219381
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_21
-      rect:
-        serializedVersion: 2
-        x: 194
-        y: 187
-        width: 22
-        height: 31
-      alignment: 9
-      pivot: {x: 0.5, y: 0.165}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: bfb334984d74a0946a5072ade16dcd12
-      internalID: 1513932206025892668
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_22
-      rect:
-        serializedVersion: 2
-        x: 194
-        y: 155
-        width: 22
-        height: 31
-      alignment: 9
-      pivot: {x: 0.5, y: 0.165}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 24f9a27ee97f31d4c8cd07a5b4a98b52
-      internalID: -3966739455465120947
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_23
-      rect:
-        serializedVersion: 2
-        x: 1
-        y: 67
-        width: 30
-        height: 28
-      alignment: 9
-      pivot: {x: 0.5, y: 0.27}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a734494eb1a08ce499e1a289ecfb705b
-      internalID: -902746548882298333
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_24
-      rect:
-        serializedVersion: 2
-        x: 1
-        y: 36
-        width: 30
-        height: 28
-      alignment: 9
-      pivot: {x: 0.5, y: 0.27}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 17331425610650e4b815c48f304627e1
-      internalID: -8261323461576846151
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_25
-      rect:
-        serializedVersion: 2
-        x: 2
-        y: 184
-        width: 25
-        height: 32
-      alignment: 9
-      pivot: {x: 0.4387752, y: 0.1525903}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 996938385eeee994e83f117ccb4a3ab5
-      internalID: 973154813115357247
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CraftingTables_26
-      rect:
-        serializedVersion: 2
-        x: 2
-        y: 148
-        width: 25
-        height: 32
-      alignment: 9
-      pivot: {x: 0.4387752, y: 0.1525903}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 5519cf99aad4b9f419df4be7d0f0619d
-      internalID: 4802031151094517104
       vertices: []
       indices: 
       edges: []
@@ -801,35 +265,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      CraftingTables_23: -902746548882298333
       CraftingTables_0: 7604693277659657743
-      CraftingTables_6: 2880630262172585007
-      CraftingTables_15: -3934588149356155942
-      CraftingTables_16: -1548239486904987483
-      CraftingTables_19: 3089317717442135500
-      CraftingTables_17: -916862128751824355
-      CraftingTables_1: 7658134468993396255
-      CraftingTables_10: -1760753716330992188
-      CraftingTables_24: -8261323461576846151
-      CraftingTables_22: -3966739455465120947
-      CraftingTables_14: 6906169378162491820
-      CraftingTables_7: 651186281652276642
-      CraftingTables_2: -4089118481255032306
-      CraftingTables_8: 7153812221673970042
-      CraftingTables_12: -7687957707572821341
-      CraftingTables_9: 6657183826484493066
-      CraftingTables_11: -3710163472778213114
-      CraftingTables_21: 1513932206025892668
-      CraftingTables_3: -4120857723078406267
-      CraftingTables_5: -3372891526082653166
-      CraftingTables_18: 7685459828221301264
-      CraftingTables_26: 4802031151094517104
-      CraftingTables_13: -6360954370309936953
-      CraftingTables_25: 973154813115357247
-      CraftingTables_4: 8256099992602214127
-      CraftingTables_20: -4517027868900219381
   spritePackingTag: 
   pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

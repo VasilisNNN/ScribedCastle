@@ -238,7 +238,7 @@ public class SaveLoad : MonoBehaviour
 
 
 
-        for (int i = 0; i < 15; i++)
+        for (int i = 0; i < 100; i++)
             BPConstructed.Add(0);
 
 
@@ -2613,6 +2613,13 @@ public class SaveLoad : MonoBehaviour
 
             }
 
+
+            if (n.GetComponent<StatsControll>() != null)
+            {
+                n.GetComponent<StatsControll>().BuildedStructure = true;
+
+            }
+
             if (n.GetComponent<BoxCollider2D>() != null)
             {
                 n.GetComponent<BoxCollider2D>().enabled = false;
@@ -2651,7 +2658,7 @@ public class SaveLoad : MonoBehaviour
                     _SpriteRenderer.sortingOrder = ParentOB.GetComponent<SpriteRenderer>().sortingOrder + 1 * ParentOB.transform.childCount + 1;
 
                 if (!_PubObject.decoration)
-                    n.transform.position = new Vector3(ParentOB.transform.position.x, ParentOB.transform.position.y + 0.5f * ParentOB.GetComponent<PubObject>().TopObjectsCount, 0);
+                    n.transform.position = new Vector3(ParentOB.transform.position.x, ParentOB.transform.position.y + 1 * ParentOB.GetComponent<PubObject>().TopObjectsCount, 0);
                 else n.transform.position = new Vector3(ParentOB.transform.position.x, ParentOB.transform.position.y, 0);
             }
             else
@@ -2661,7 +2668,6 @@ public class SaveLoad : MonoBehaviour
             }
 
 
-            //Debug.Log("YES PARENT: " + "PARENT NAME: " + n.transform.parent.name + " NAME:" + n.name + " Pos: " + n.transform.position);
         }
         else
         {

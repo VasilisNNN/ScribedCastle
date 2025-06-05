@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.Tilemaps;
 using System;
 using TMPro;
+using Pathfinding;
 
 public class StatsControll : MonoBehaviour
 {
@@ -135,7 +136,7 @@ public class StatsControll : MonoBehaviour
     private Tilemap FloorTM;
     private CollList Coll;
 
-    private Tail TailOb;
+
     private AudioSource AU;
 
     private CharacterMove CM;
@@ -154,12 +155,14 @@ public class StatsControll : MonoBehaviour
 
     [HideInInspector]
     public string SpawnPointName;
+    private Transform _transform;
 
+    private Color StartColor;
     private void Awake()
     {
 
-        
 
+        _transform = transform;
 
         DrawVision = true;
 
@@ -253,8 +256,8 @@ public class StatsControll : MonoBehaviour
         SR = GetComponent<SpriteRenderer>();
 
 
+        StartColor = SR.color;
 
-       
 
 
 
@@ -342,9 +345,6 @@ public class StatsControll : MonoBehaviour
 
         //if (GameObject.Find(name) != null && GameObject.Find(name) != gameObject) Destroy(gameObject);
 
-        TailOb = GetComponent<Tail>();
-
-     
     }
 
     void SetDeathClip()
@@ -422,34 +422,79 @@ public class StatsControll : MonoBehaviour
             if (material != null)
                 SR.material = material;
 
-            SR.color = new Color(SR.color.r, SR.color.g, SR.color.b, Alpha);
-        
 
-    }
-    void SetColorToTail( Material material)
-    {
-        if (TailOb == null) return;
-        
-        for (int i = 0; i < TailOb.TailObjs.Count; i++)
+        Vector3 TargetPos = pl.MainCamera.transform.position;
+
+    
+
+        if (BuildedStructure && _transform.parent ==null)
         {
-            if (TailOb.TailObjs[i].transform.parent != transform)
-            {
-                
-                if (material != null)
-                    TailOb.TailSPRTs[i].material = material;
 
-                TailOb.TailSPRTs[i].color = new Color(TailOb.TailSPRTs[i].color.r, TailOb.TailSPRTs[i].color.g, TailOb.TailSPRTs[i].color.b, Alpha);
+            if (_transform.position.y > TargetPos.y-2)
+            {
+                float Camdepth = ((_transform.position.y - 2) - (pl.MainCamera.transform.position.y - 2)) / 6;
+                float Mousedepth = (_transform.position.y - pl.MainCamera.ScreenToWorldPoint(pl.IM.MousePosition).y) / 20;
+
+                float colordepth = Camdepth + Mousedepth;
+
+
+                colordepth = Mathf.Clamp(colordepth, 0f, 0.7f);
+             
+
+                SR.color = new Color(StartColor.r - colordepth, StartColor.g - colordepth / 1.1f, StartColor.b - colordepth / 1.5f, Mathf.Lerp(SR.color.a, Alpha, Time.deltaTime * 10));
+                for (int i = 0; i < transform.childCount; i++)
+                    SetChildColor(material, i, new Color(StartColor.r - colordepth , StartColor.g - colordepth / 1.1f, StartColor.b - colordepth / 1.5f));
+
             }
+            else
+
+            {
+                SR.color = new Color(StartColor.r, StartColor.g, StartColor.b, Mathf.Lerp(SR.color.a, Alpha, Time.deltaTime * 10));
+                for (int i = 0; i < transform.childCount; i++)
+                    SetChildColor(material, i, StartColor);
+
+            }
+            
         }
+        else
+        {
+            for (int i = 0; i < transform.childCount; i++)
+                SetChildColor(material, i, transform.GetChild(i).GetComponent<SpriteRenderer>().color);
+
+            SR.color = new Color(SR.color.r, SR.color.g, SR.color.b, Mathf.Lerp(SR.color.a, Alpha, Time.deltaTime * 10));
+        }
+
+
         
     }
+
+
+    void SetChildColor(Material material, int i, Color color)
+    {
+        
+            ChildSPRT = transform.GetChild(i).GetComponent<SpriteRenderer>();
+
+
+            if (ChildSPRT != null && transform.GetChild(i).GetComponent<Blinking>() == null)
+            {
+                if (material != null)
+                    ChildSPRT.material = material;
+
+                if (transform.GetChild(i).name != "Base")
+                    ChildSPRT.color = new Color(color.r, color.g, color.b, Alpha);
+
+            }
+        
+    }
+
+
+
 
     public void SetColorAndMaterial(float alpha, Material material)
     {
         Alpha = alpha;
         SetColorToSPRT(SR, material);
 
-        SetColorToTail(material);
 
         if (transform.localScale.x<1)
         transform.localScale = new Vector3(
@@ -457,22 +502,6 @@ public class StatsControll : MonoBehaviour
             transform.localScale.y + Time.deltaTime,
             transform.localScale.z + Time.deltaTime);
         else transform.localScale = new Vector3(1,1,1);
-
-        for (int i = 0; i < transform.childCount; i++)
-        {
-            ChildSPRT = transform.GetChild(i).GetComponent<SpriteRenderer>();
-
-
-            if (ChildSPRT != null && transform.GetChild(i).GetComponent<Blinking>()==null)
-            {
-                if (material != null)
-                    ChildSPRT.material = material;
-
-                if(transform.GetChild(i).name!="Base")
-                    ChildSPRT.color = new Color(ChildSPRT.color.r, ChildSPRT.color.g, ChildSPRT.color.b, alpha);
-
-            }
-        }
 
 
 

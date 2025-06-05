@@ -205,14 +205,14 @@ public class CameraBor : MonoBehaviour {
             {
                 
                 DirectMove_XSpeed += Time.deltaTime * speedmultiplier;
-                    Cursor.SetCursor(CursorRightT, new Vector2(-0.5f, 0.5f), new CursorMode());
+                    Cursor.SetCursor(CursorRightT, new Vector2(-0.5f, 0.5f), CursorMode.ForceSoftware);
                 
             }
             if (pl.IM.MousePosition.x < XBorder.x && transform.position.x > _min.x + cameraHalfWidth)
             {
                
                      DirectMove_XSpeed -= Time.deltaTime * speedmultiplier;
-                    Cursor.SetCursor(CursorLeftT, new Vector2(0.5f, 0.5f), new CursorMode());
+                    Cursor.SetCursor(CursorLeftT, new Vector2(0.5f, 0.5f), CursorMode.ForceSoftware);
                 
             }
 
@@ -220,7 +220,7 @@ public class CameraBor : MonoBehaviour {
             {
                 
                 DirectMove_YSpeed += Time.deltaTime * speedmultiplier;
-                    Cursor.SetCursor(CursorUpT, new Vector2(0.5f, 0.5f), new CursorMode());
+                    Cursor.SetCursor(CursorUpT, new Vector2(0.5f, 0.5f), CursorMode.ForceSoftware);
                 
             }
 
@@ -228,13 +228,13 @@ public class CameraBor : MonoBehaviour {
             {
             
                 DirectMove_YSpeed -= Time.deltaTime * speedmultiplier;
-                    Cursor.SetCursor(CursorDownT, new Vector2(0.5f, 0.5f), new CursorMode());
+                    Cursor.SetCursor(CursorDownT, new Vector2(0.5f, 0.5f), CursorMode.ForceSoftware);
                 
             }
 
 
             if (pl.IM.MousePosition.x < XBorder.y && pl.IM.MousePosition.x > XBorder.x && pl.IM.MousePosition.y < YBorder.y && pl.IM.MousePosition.y > YBorder.x)
-                Cursor.SetCursor(CursorT, new Vector2(0, 0), new CursorMode());
+                Cursor.SetCursor(CursorT, new Vector2(0, 0), CursorMode.ForceSoftware);
 
         }
         else

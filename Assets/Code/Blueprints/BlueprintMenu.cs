@@ -53,13 +53,15 @@ public class BlueprintMenu : MonoBehaviour
     private GameObject EscapeBlueprint;
 
     private BlueprintDatabase BData;
-    private TextMeshProUGUI BlueprintNameText;
+    private TextMeshProUGUI BlueprintNameText, BlueprintDescText;
+    private float partWidth = 80;
+
 
     void Start()
     {
         BData = gameObject.AddComponent<BlueprintDatabase>();
         BlueprintNameText = GameObject.Find("BlueprintNameText").GetComponent<TextMeshProUGUI>();
-
+        BlueprintDescText = GameObject.Find("BlueprintDescText").GetComponent<TextMeshProUGUI>();
         EscapeBlueprint = GameObject.Find("EscapeBlueprint");
 
         BlueprintText = transform.Find("BlueprintText").GetComponent<TextMeshProUGUI>();
@@ -90,7 +92,9 @@ public class BlueprintMenu : MonoBehaviour
 
         for (int i = 0; i < BP.Count; i++)
         {
+            BP[i].Unlocked = false;
             BP[i].UpdateBP();
+           
         }
         Assembled = true;
 
@@ -100,6 +104,34 @@ public class BlueprintMenu : MonoBehaviour
 
     }
 
+    void CleanMenu()
+    {
+        for (int i = 0; i < BluePrintObjects.Count; i++)
+        {
+            Destroy(BluePrintObjects[i]);
+
+        }
+
+
+        for (int i = 0; i < Rewards.Count; i++)
+        {
+                Destroy(Rewards[i]);
+
+        }
+      
+        for (int i = 0; i < BlueFloorObjects.Count; i++)
+         {
+             Destroy(BlueFloorObjects[i]);
+
+         }
+
+       
+        Rewards = new List<GameObject>();
+
+        BlueFloorObjects = new List<GameObject>();
+        BluePrintObjects = new List<GameObject>();
+    }
+ 
     void CreateMenu()
     {
 
@@ -121,7 +153,7 @@ public class BlueprintMenu : MonoBehaviour
             for (int ii = 0; ii < BP[i].ObjectList.Count; ii++)
             {
             
-                float partWidth = 100;
+             
 
                
 
@@ -139,13 +171,13 @@ public class BlueprintMenu : MonoBehaviour
             
 
             float color =1;
-            float width = 50f;
-            for (int x = -5; x < 5; x++)
+     
+            for (int x = -5; x < 6; x++)
             {
-                for (int y = -5; y < 5; y++)
+                for (int y = -5; y < 6; y++)
                 {
                     GameObject BlueFloorPart = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/BlueprintFloor"), BlueFloor.transform);
-                    Vector2 BlueFloorPartPOS = new Vector2(x * width - y * width, y * (width /2)+ x* (width / 2) + (width / 2));
+                    Vector2 BlueFloorPartPOS = new Vector2(x * partWidth , y * (partWidth) );
                     BlueFloorPart.GetComponent<RectTransform>().anchoredPosition = BlueFloorPartPOS;
                     BlueFloorPart.transform.SetAsFirstSibling();
 
@@ -260,6 +292,8 @@ public class BlueprintMenu : MonoBehaviour
 
 void MoveBlueprints()
     {
+        if (BlueFloorObjects.Count < BluePrintObjects.Count) return;
+
         for (int i = 0; i < BluePrintObjects.Count; i++)
         {
             Vector2 BluePrPOS = new Vector2(Mathf.Lerp(BluePrintObjects[i].GetComponent<RectTransform>().anchoredPosition.x, i * BPSlotWidth - CurrentBP* BPSlotWidth, Time.deltaTime*15), 1);
@@ -275,11 +309,22 @@ void MoveBlueprints()
         
         for (int i = 0; i < BP.Count; i++)
         {
+
+            if (!BP[i].Unlocked && menu.SL.BPConstructed[i] >0)
+            {
+                CleanMenu();
+                BP[i].Unlocked = true;
+                BP[i].UpdateBP();
+                CreateMenu();
+
+                BackToNormalNumber = 0;
+            }
+
             if (BlueFloorObjects[i].transform.Find("BluePrintDone") != null)
                 BlueFloorObjects[i].transform.Find("BluePrintDone").GetComponent<RectTransform>().anchoredPosition = new Vector2(BlueFloorObjects[i].GetComponent<RectTransform>().anchoredPosition.x + BPSlotWidth / 3, BlueFloorObjects[i].GetComponent<RectTransform>().anchoredPosition.y - BPSlotWidth / 3);
 
 
-            if (ReadObject(BP[i].ObjectList) && menu.SL.BPConstructed[i] == 0)
+            if (ReadObject(BP[i].ObjectList) && menu.SL.BPConstructed[i] == 0 && BP[i].Rewards.Length>0)
             {
           
                 for (int r = 0; r < BP[i].Rewards.Length; r++)
@@ -292,7 +337,7 @@ void MoveBlueprints()
                      BluePrintDone.name = "BluePrintDone";
 
                 }
-
+               
                 LastBlueprint = i;
                 menu.SL.BPConstructed[i] = 1;
 
@@ -316,15 +361,16 @@ void MoveBlueprints()
 
         for (int i = 0; i < BP.Count; i++)
         {
-      
-            if (BlueFloorObjects[i].transform.Find("BluePrintDone") == null && menu.SL.BPConstructed[i]==1)
+
+            if (BlueFloorObjects[i].transform.Find("BluePrintDone") == null && menu.SL.BPConstructed[i] == 1)
             {
+              
+
                 GameObject BluePrintDone = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/BlueprintDone"), BlueFloorObjects[i].transform);
                 BluePrintDone.name = "BluePrintDone";
 
+
             }
-
-
 
         }
 
@@ -335,10 +381,10 @@ void MoveBlueprints()
     {
         float result = 0;
 
-        float partWidth = Mathf.Clamp(Screen.width / BP.transform.childCount/2, 10, 100);
+        float partW = Mathf.Clamp(Screen.width / BP.transform.childCount/2, 10, partWidth);
 
 
-        float finaldest = BP.GetComponent<RectTransform>().anchoredPosition.x + partWidth * currentchild - BP.transform.childCount * (partWidth/2);
+        float finaldest = BP.GetComponent<RectTransform>().anchoredPosition.x + partW * currentchild - BP.transform.childCount * (partW / 2);
 
         result = Mathf.Lerp(BrickRT.anchoredPosition.x, finaldest, Time.deltaTime * 10);
 
@@ -368,6 +414,63 @@ void MoveBlueprints()
             BackToNormalNumber = 0;
         Assembled = false;
     }
+    void LayersAnimation()
+    {
+
+
+        int CountCount = BluePrintObjects[CurrentBP].transform.childCount;
+
+        if (Mathf.Abs(BluePrintObjects[CurrentBP].GetComponent<RectTransform>().position.x - pl.IM.MousePosition.x) > 500 ||
+            Mathf.Abs(BluePrintObjects[CurrentBP].GetComponent<RectTransform>().position.y - pl.IM.MousePosition.y) > 300)
+        {
+            for (int i = 0; i < CountCount; i++)
+                ChangePartColor(i, 1);
+            
+            return;
+        }
+
+
+        if (DisassembleTimer > Time.fixedTime)
+        {
+            for (int i = 0; i < CountCount; i++)
+                ChangePartColor(i, 1);
+            return;
+        }
+        if (!Assembled) 
+        {
+            for (int i = 0; i < CountCount; i++)
+                ChangePartColor(i, 1);
+            return;
+        }
+
+        for (int i = 0; i < CountCount; i++)
+        {
+            if (!BP[CurrentBP].ObjectList[i].hasParrent)
+            {
+            
+                if (Mathf.Abs(pl.IM.MousePosition.y - BluePrintObjects[CurrentBP].transform.GetChild(i).GetComponent<RectTransform>().position.y) < partWidth / 2)
+                    ChangePartColor(i, 1);
+                else ChangePartColor(i, 0);
+            }
+            else
+            {
+
+                if (Mathf.Abs((pl.IM.MousePosition.y + BP[CurrentBP].ObjectList[i].orderinParrent * partWidth) - BluePrintObjects[CurrentBP].transform.GetChild(i).GetComponent<RectTransform>().position.y) < partWidth/2)
+                    ChangePartColor(i, 1);
+                else ChangePartColor(i, 0);
+            }
+
+        }
+
+    }
+
+
+    void ChangePartColor(int i, float Alpha)
+    {
+        BluePrintObjects[CurrentBP].transform.GetChild(i).GetComponent<Image>().color = 
+          new Color(1, 1, 1, Mathf.Lerp(BluePrintObjects[CurrentBP].transform.GetChild(i).GetComponent<Image>().color.a, Alpha,Time.deltaTime*10));
+
+    }
 
     void AnimationBackToNormal()
     {
@@ -376,6 +479,9 @@ void MoveBlueprints()
         
         int i = CurrentBP;
             int ii = BackToNormalNumber;
+        if (BluePrintObjects.Count <= 0) return;
+        if (BP.Count <= 0) return;
+        if (BP[i].ObjectList.Count <= 0) return;
 
         if (BluePrintObjects[i].transform.childCount > 0)
         {
@@ -389,12 +495,12 @@ void MoveBlueprints()
             if (Mathf.Abs(RT.anchoredPosition.x - StartXPos) < 10 && Mathf.Abs(RT.anchoredPosition.y - StartYPos)< 10) menu.PlayAudio(Assemble[Random.Range(0, Assemble.Length)]);
 
             RT.anchoredPosition =
-            new Vector2(Mathf.Lerp(RT.anchoredPosition.x, BP[i].ObjectList[BackToNormalNumber].Place.x * 100, Time.deltaTime*10),
-                        Mathf.Lerp(RT.anchoredPosition.y, BP[i].ObjectList[BackToNormalNumber].Place.y * 100, Time.deltaTime*10));
+            new Vector2(Mathf.Lerp(RT.anchoredPosition.x, BP[i].ObjectList[BackToNormalNumber].Place.x * partWidth, Time.deltaTime*10),
+                        Mathf.Lerp(RT.anchoredPosition.y, BP[i].ObjectList[BackToNormalNumber].Place.y * partWidth, Time.deltaTime*10));
 
 
-            float XAbs = Mathf.Abs(RT.anchoredPosition.x - BP[i].ObjectList[BackToNormalNumber].Place.x * 100);
-            float YAbs = Mathf.Abs(RT.anchoredPosition.y - BP[i].ObjectList[BackToNormalNumber].Place.y * 100);
+            float XAbs = Mathf.Abs(RT.anchoredPosition.x - BP[i].ObjectList[BackToNormalNumber].Place.x * partWidth);
+            float YAbs = Mathf.Abs(RT.anchoredPosition.y - BP[i].ObjectList[BackToNormalNumber].Place.y * partWidth);
 
          
 
@@ -489,6 +595,7 @@ void MoveBlueprints()
             MoveBlueprints();
 
         BlueprintNameText.text = BData.items[CurrentBP].itemNames[menu.Language];
+        BlueprintDescText.text = BData.items[CurrentBP].itemDesc[menu.Language];
 
         if (menu.IM.space_b || (menu.UIColl(PlayButton) && menu.IM.LeftMouseButtonDown) || menu.IM.enter_b)
         {
@@ -500,8 +607,9 @@ void MoveBlueprints()
        
             AnimationDisAssemble();
             AnimationBackToNormal();
-       
-      
+        LayersAnimation();
+
+
         if ( menu.IM.exit_b || menu.IM.menu_b)
         {
 
@@ -591,9 +699,10 @@ void MoveBlueprints()
          
             for (int ii = 0; ii < BluePrintObjects[i].transform.childCount; ii++)
             {
-                float partWidth = 100;
+          
 
-
+                if (BP[i].ObjectList.Count == 0) return;
+           
                 BluePrintObjects[i].transform.GetChild(ii).GetComponent<RectTransform>().anchoredPosition = new Vector2(BP[i].ObjectList[ii].Place.x * partWidth, BP[i].ObjectList[ii].Place.y * partWidth);
               
             }
@@ -629,7 +738,7 @@ void MoveBlueprints()
             return;
 
         AllCandidates[AllCandidates.Count - 1].hasParrent = true;
-
+ 
         for (int p = 0; p < prnt.transform.childCount; p++)
         {
             if (AllCandidates[AllCandidates.Count - 1].Object == prnt.transform.GetChild(p).gameObject)
@@ -680,8 +789,7 @@ void MoveBlueprints()
             {
                 Vector2 place = StartPlace + objectList[j].Place;
 
-              //  print("StartPlace: " + StartPlace + " / ObjectList " + j + " / place : " + place);
-
+             
                 for (int i = 0; i < AllCandidates.Count; i++)
                 {
                  
@@ -692,6 +800,7 @@ void MoveBlueprints()
 
                 
                         ConstructionStates[j] = 1;
+                        
                        
                     }
                       
@@ -703,15 +812,11 @@ void MoveBlueprints()
 
             if (ConstructionStates != null)
             {
-              
                 if (ConstructionStates.Sum() == objectList.Count) return true;
             }
 
         }
 
-
-
-    
 
         return result;
 

@@ -62,12 +62,11 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
-    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMipmapLimit: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -90,7 +89,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 32
+  spritePixelsToUnits: 256
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -106,7 +105,6 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 1
-  swizzle: 50462976
   cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
@@ -120,7 +118,7 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
     androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 1
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Standalone
     maxTextureSize: 2048
@@ -132,7 +130,7 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
     androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 1
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Server
     maxTextureSize: 2048
@@ -193,6 +191,18 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: PS5
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -200,12 +210,12 @@ TextureImporter:
       name: EnemiesLegs_0
       rect:
         serializedVersion: 2
-        x: 3
-        y: 225
-        width: 10
-        height: 27
+        x: 24
+        y: 1800
+        width: 80
+        height: 216
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -221,12 +231,12 @@ TextureImporter:
       name: EnemiesLegs_1
       rect:
         serializedVersion: 2
-        x: 17
-        y: 225
-        width: 10
-        height: 27
+        x: 136
+        y: 1800
+        width: 80
+        height: 216
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -242,12 +252,12 @@ TextureImporter:
       name: EnemiesLegs_2
       rect:
         serializedVersion: 2
-        x: 31
-        y: 224
-        width: 10
-        height: 28
+        x: 248
+        y: 1792
+        width: 80
+        height: 224
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -263,12 +273,12 @@ TextureImporter:
       name: EnemiesLegs_3
       rect:
         serializedVersion: 2
-        x: 45
-        y: 224
-        width: 10
-        height: 28
+        x: 360
+        y: 1792
+        width: 80
+        height: 224
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -284,12 +294,12 @@ TextureImporter:
       name: EnemiesLegs_4
       rect:
         serializedVersion: 2
-        x: 59
-        y: 224
-        width: 12
-        height: 28
+        x: 472
+        y: 1792
+        width: 96
+        height: 224
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -305,12 +315,12 @@ TextureImporter:
       name: EnemiesLegs_5
       rect:
         serializedVersion: 2
-        x: 76
-        y: 224
-        width: 10
-        height: 28
+        x: 608
+        y: 1792
+        width: 80
+        height: 224
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -326,12 +336,12 @@ TextureImporter:
       name: EnemiesLegs_6
       rect:
         serializedVersion: 2
-        x: 91
-        y: 224
-        width: 11
-        height: 28
+        x: 728
+        y: 1792
+        width: 88
+        height: 224
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -347,12 +357,12 @@ TextureImporter:
       name: EnemiesLegs_7
       rect:
         serializedVersion: 2
-        x: 106
-        y: 224
-        width: 12
-        height: 28
+        x: 848
+        y: 1792
+        width: 96
+        height: 224
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -368,12 +378,12 @@ TextureImporter:
       name: EnemiesLegs_8
       rect:
         serializedVersion: 2
-        x: 122
-        y: 224
-        width: 11
-        height: 28
+        x: 976
+        y: 1792
+        width: 88
+        height: 224
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -389,12 +399,12 @@ TextureImporter:
       name: EnemiesLegs_10
       rect:
         serializedVersion: 2
-        x: 50
-        y: 214
-        width: 3
-        height: 3
+        x: 88
+        y: 1688
+        width: 48
+        height: 48
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -410,12 +420,12 @@ TextureImporter:
       name: EnemiesLegs_11
       rect:
         serializedVersion: 2
-        x: 54
-        y: 214
-        width: 3
-        height: 3
+        x: 152
+        y: 1688
+        width: 48
+        height: 48
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -431,12 +441,12 @@ TextureImporter:
       name: EnemiesLegs_12
       rect:
         serializedVersion: 2
-        x: 58
-        y: 214
-        width: 3
-        height: 3
+        x: 216
+        y: 1688
+        width: 48
+        height: 48
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -452,12 +462,12 @@ TextureImporter:
       name: EnemiesLegs_13
       rect:
         serializedVersion: 2
-        x: 62
-        y: 214
-        width: 3
-        height: 3
+        x: 280
+        y: 1688
+        width: 48
+        height: 48
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -470,22 +480,127 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: EnemiesLegs_14
+      name: EnemiesLegs_9
       rect:
         serializedVersion: 2
-        x: 46
-        y: 214
-        width: 3
-        height: 3
+        x: 24
+        y: 1688
+        width: 48
+        height: 48
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9faaf27c803ba444090a74f15c6481d0
-      internalID: -951165760
+      spriteID: e1cf53c1ea63cc34ba4a17724577e22d
+      internalID: 1078810003
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemiesLegs_14
+      rect:
+        serializedVersion: 2
+        x: 368
+        y: 1712
+        width: 24
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 05b93fbd0ee3e0643914e0b77f27e390
+      internalID: 8108336477104168356
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemiesLegs_15
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 1712
+        width: 24
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ccdf4fe2914d2c9458322f1766adfd35
+      internalID: -2092731950
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemiesLegs_16
+      rect:
+        serializedVersion: 2
+        x: 432
+        y: 1712
+        width: 24
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 67763ceb3aafdb546a2bc1eeb226b088
+      internalID: -1855955528
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemiesLegs_17
+      rect:
+        serializedVersion: 2
+        x: 464
+        y: 1712
+        width: 24
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 58219fc9ba31fd641b0f9589382a1985
+      internalID: -951453900
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EnemiesLegs_18
+      rect:
+        serializedVersion: 2
+        x: 496
+        y: 1712
+        width: 24
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2cd0241d78dd490488179a0c018b186a
+      internalID: 1301266285
       vertices: []
       indices: 
       edges: []
@@ -508,6 +623,10 @@ TextureImporter:
       EnemiesLegs_12: -1409464636913147225
       EnemiesLegs_13: -5951386566718164760
       EnemiesLegs_14: 8108336477104168356
+      EnemiesLegs_15: -2092731950
+      EnemiesLegs_16: -1855955528
+      EnemiesLegs_17: -951453900
+      EnemiesLegs_18: 1301266285
       EnemiesLegs_2: -877073922757398257
       EnemiesLegs_3: -877037713008987182
       EnemiesLegs_4: 109678607873300811
@@ -515,8 +634,10 @@ TextureImporter:
       EnemiesLegs_6: 1841188165922333946
       EnemiesLegs_7: -2775191134905062313
       EnemiesLegs_8: 9200152761863279509
-  mipmapLimitGroupName: 
+      EnemiesLegs_9: 1078810003
+  spritePackingTag: 
   pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

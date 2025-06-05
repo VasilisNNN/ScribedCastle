@@ -20,7 +20,7 @@ public class BlueprintDatabase : MonoBehaviour {
         items.Add(new Item(
       0,0, Item.type.item,
       new string[7] { "Small tower", "Маленька башта", "スモールタワー", "", "", "", "" },
-      new string[7] { "", "", "", "", "", "", "" },
+      new string[7] { "1", "1", "1", "", "", "", "" },
       /*Cost*/ 0
       ));
 
@@ -125,7 +125,36 @@ new string[7] { "", "", "", "", "", "", "" },
   /*Cost*/ 0
   ));
 
-
+        items.Add(new Item(
+ 15, 15, Item.type.item,
+ new string[7] { "Garden", "Сад", "庭", "", "", "", "" },
+ new string[7] { "", "", "", "", "", "", "" },
+ /*Cost*/ 0
+ ));
+        items.Add(new Item(
+ 16, 16, Item.type.item,
+ new string[7] { "Garden", "Сад", "庭", "", "", "", "" },
+ new string[7] { "", "", "", "", "", "", "" },
+ /*Cost*/ 0
+ ));
+        items.Add(new Item(
+ 17, 17, Item.type.item,
+ new string[7] { "Garden", "Сад", "庭", "", "", "", "" },
+ new string[7] { "", "", "", "", "", "", "" },
+ /*Cost*/ 0
+ ));
+        items.Add(new Item(
+ 18, 18, Item.type.item,
+ new string[7] { "Garden", "Сад", "庭", "", "", "", "" },
+ new string[7] { "", "", "", "", "", "", "" },
+ /*Cost*/ 0
+ ));
+        items.Add(new Item(
+ 19, 19, Item.type.item,
+ new string[7] { "Garden", "Сад", "庭", "", "", "", "" },
+ new string[7] { "", "", "", "", "", "", "" },
+ /*Cost*/ 0
+ ));
 
     }
 

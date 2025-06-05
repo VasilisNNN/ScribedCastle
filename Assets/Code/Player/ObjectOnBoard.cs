@@ -15,6 +15,7 @@ public class ObjectOnBoard
     public PubObject PO;
     public Vector2 BaseObjectPosition = new Vector2(-999, -999);
     public bool hasParrent;
+  
     public int orderinParrent;
 
     public TileBase _TileBase;

@@ -71,7 +71,6 @@ public class MovementControll : MonoBehaviour
     public float FollowBorder = 2;
 
 
-    public List<GameObject> Tables = new List<GameObject>();
     private List<GameObject> Beds = new List<GameObject>();
 
     public GameObject[] A_Point;
@@ -128,9 +127,7 @@ public class MovementControll : MonoBehaviour
 
         pl = GameObject.Find("Player").GetComponent<Player>();
 
-        if (pl.inv.GetItemInDatabase(312) != null && Tables.Count <= 0)
-            Tables.Add(pl.inv.GetItemInDatabase(312).ObjectPrefs);
-
+      
         if (pl.inv.GetItemInDatabase(315) != null)
             Beds.Add(pl.inv.GetItemInDatabase(315).ObjectPrefs);
 
@@ -261,15 +258,7 @@ public class MovementControll : MonoBehaviour
 
 
 
-        if (Stats.Satiety < Stats.SatietyMax / 3 && Stats.CanBeHungry)
-        {
-
-            for (int i = 0; i < Tables.Count; i++)
-            {
-                SearchForTargets(Tables[i], 0);
-
-            }
-        }
+     
 
         if (pl.DayNight.Day_Cycle == DayAndNight.DayCycle.Night && Stats.CanSleep)
         {

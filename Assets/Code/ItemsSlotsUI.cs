@@ -126,7 +126,7 @@ public class ItemsSlotsUI : MonoBehaviour
             MoveAndChoose();
 
             AddNeedItem();
-            NeededItemControll();
+            NeededItemsControll();
 
             if (pl.IM.exit_b && showthis)
             {
@@ -1152,7 +1152,7 @@ public class ItemsSlotsUI : MonoBehaviour
             if (Slots[CurrentRow].items[CurrentSlot] != null && Slots[CurrentRow].items[CurrentSlot].itemID > -1)
             {
                // pl.inv.ToolTip.SetActive(true);
-                pl.inv.ToolTip.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = pl.inv.ToolpitString(Slots[CurrentRow].items[CurrentSlot]);
+                pl.inv.ToolTip.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = pl.inv.TooltipsString(Slots[CurrentRow].items[CurrentSlot]);
 
 
 
@@ -1552,12 +1552,24 @@ public class ItemsSlotsUI : MonoBehaviour
         return res;
     }
 
-    void NeededItemControll()
+    void NeededItemsControll()
     {
         if (!showthis) return;
         if (CurrentRow > Slots.Length - 1) return;
         if (CurrentSlot > Slots[CurrentRow].items.Count - 1) return;
+        if (pl.IM.MouseMode && !MouseCollideWithSlots())
+        {
+            for (int i = 0; i < pl.inv.NeedItemGameobject.Count; i++)
+            {
+                if (i > pl.inv.NeedItemGameobject.Count - 1) break;
 
+                pl.inv.NeedItemGameobject[i].GetComponent<RectTransform>().position = new Vector3(999999, 9999999, 1);
+
+
+            }
+
+            return;
+        }
         CurrentItem = pl.inv.DeepCopyItem(Slots[CurrentRow].items[CurrentSlot].itemID, 1, Slots[CurrentRow].items[CurrentSlot].Durability);
         int foldercurrentNum = CurrentRow * (Slots[CurrentRow].Slot.Length) + CurrentSlot;
 

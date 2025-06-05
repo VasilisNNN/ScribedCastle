@@ -18,8 +18,16 @@ public class Blueprint : MonoBehaviour
     public Item[] Rewards;
 
     private Player pl;
+
+    public Transform ReplaceOnUnlock;
+
+    [HideInInspector]
+    public bool Unlocked;
+
+   
     public void UpdateBP()
     {
+        CleanBP();
         pl = GameObject.Find("Player").GetComponent<Player>();
 
         _transform = GetComponent<Transform>();
@@ -29,12 +37,21 @@ public class Blueprint : MonoBehaviour
         
     }
 
+    void CleanBP()
+    {
+        ObjectList = new List<ObjectOnBoard>();
+    }
+
+
+
     void SaveToBlueprint()
     {
         Vector3 StartPlace = new Vector3(0, 0, 0);
 
         ObjectList = new List<ObjectOnBoard>();
         ObjectOrder = new List<int>();
+
+        if (Unlocked && ReplaceOnUnlock != null) _transform = ReplaceOnUnlock;
 
         if (ObjectList.Count == _transform.childCount) return;
 
