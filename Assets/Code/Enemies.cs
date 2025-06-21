@@ -211,7 +211,7 @@ public class Enemies : MonoBehaviour
         StatsControll Enemy_Stats = Enemy.GetComponent<StatsControll>();
 
         Enemy_Stats.enabled = true;
-        Enemy_Stats.BuildedStructure = true;
+       // Enemy_Stats.BuildedStructure = true;
         Enemy_Stats.SpawnPointName = name;
 
         _constr.ConstructedStructures.Add(new ObjectOnBoard(Enemy_Stats.DatabaseID, Enemy.transform.position, Enemy.name, Enemy, Enemy.GetComponent<StatsControll>(), Enemy.GetComponent<PubObject>()));
@@ -225,7 +225,7 @@ public class Enemies : MonoBehaviour
              
             for (int x = Random.Range(-1,2); x <2; x++)
             {
-                int y = 1;
+                int y = 0;
 
                 float XPOS = 0.5f * x - 0.5f*y;
                 float YPOS = 0.25f * y + 0.25f * x;
@@ -235,7 +235,7 @@ public class Enemies : MonoBehaviour
                 if (transform.position + new Vector3(XPOS, YPOS, 0) == transform.position) x++;
 
                 XPOS = 0.5f * x - 0.5f * y;
-                YPOS = 0.25f * y + 0.25f * x;
+                YPOS = 0.25f * y + 0.25f * x-1f;
 
 
                 if (TileBase.GetTile(TileBase.WorldToCell(transform.position + new Vector3(XPOS, YPOS, 0))) != null)

@@ -58,7 +58,7 @@ public class Item {
 
     public bool CanStack = false;
     public bool Poop = false;
-
+    public bool CantBeSold = false;
     public bool Structure;
     public enum StructureType {Building, Tiles, Farms, Decoration, Protection };
     public StructureType _StructureType;

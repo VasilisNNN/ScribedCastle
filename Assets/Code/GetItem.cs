@@ -212,7 +212,7 @@ public class GetItem : MonoBehaviour {
         if (inv.showinvent) return;
 
 
-        if (pl.coll_obj.Contains(gameObject) || pl.MouseOB.GetComponent<MouseController>().ObjectColl(gameObject))
+        if (pl.coll_obj.Contains(gameObject) || pl.GetMouseOBCollList().Contains(gameObject))
         {
 
             GetComponent<Animator>().SetBool("Start", true);
@@ -273,7 +273,39 @@ public class GetItem : MonoBehaviour {
     }
     void Update()
     {
-      
+
+
+
+
+
+        if (pl.IM.R2 && Constr.CurrentMerchantID != _Stats.DatabaseID)
+        {
+
+           //
+
+        }
+
+        if (pl.IM.R2 && Constr.CurrentMerchantID == _Stats.DatabaseID)
+        {
+
+
+            inv.crafting = true;
+            inv.PauseInventory = true;
+            inv.ChooseTopSegmentSlot = true;
+
+            inv.PlaySoundsPitched(inv.UIOpen, 1);
+            inv.CraftingUIOB.GetComponent<ItemsSlotsUI>().CloseUI();
+            inv.CraftingUIOB.GetComponent<ItemsSlotsUI>().CurrentRow = 0;
+            inv.Choose.transform.position = inv.CraftingUIOB.GetComponent<ItemsSlotsUI>().Slots[0].Slot[0].transform.position;
+            inv.UpdateInvFolder();
+
+            inv.CurrentCraftingTable = GetComponent<GetItem>();
+            inv.CraftingUIOB.GetComponent<ItemsSlotsUI>().StartUI();
+            inv.showinvent = true;
+            inv.inventjustopenned = Time.fixedTime + 0.01f;
+            pl.IM.ActionDelay = Time.fixedTime + 0.15f;
+        }
+
 
 
 
@@ -352,23 +384,28 @@ public class GetItem : MonoBehaviour {
 
         if (!Destroying)
         {
-            if (pl.MouseOB.GetComponent<MouseController>().ObjectColl(gameObject) && !pl.CollidingItems.Contains(gameObject) && CanBePickedByMouse)
+            if (pl.GetMouseOBCollList().Contains(gameObject) && !pl.CollidingItems.Contains(gameObject) && CanBePickedByMouse)
             {
                 pl.CollidingItems.Add(gameObject);
 
             }
 
-            if (!pl.MouseOB.GetComponent<MouseController>().ObjectColl(gameObject) && pl.CollidingItems.Contains(gameObject))
+            if (!pl.GetMouseOBCollList().Contains(gameObject) && pl.CollidingItems.Contains(gameObject))
             {
                 pl.CollidingItems.Remove(gameObject);
 
             }
         }
 
-        if (( (pl.coll_obj.Contains(gameObject) && pl.IM.enter_b ) || (pl.IM.ZLKey && _Stats.DatabaseID == 112) || (pl.IM.LeftMouseButtonDown && pl.MouseOB.GetComponent<MouseController>().ObjectColl(gameObject) && CanBePickedByMouse)) && !pl.Chatting && pl.MutationTimer < Time.fixedTime && !Constr.ChooseMouseObject)
+
+
+        if (( (pl.coll_obj.Contains(gameObject) && pl.IM.enter_b ) || (pl.IM.ZLKey && _Stats.DatabaseID == 112) ||
+             
+            (pl.IM.LeftMouseButtonDown && pl.GetMouseOBCollList().Contains(gameObject) && CanBePickedByMouse)) && 
+            !pl.Chatting && pl.MutationTimer < Time.fixedTime && !Constr.ChooseMouseObject)
         {
 
-            if (!inv.showjournal && !inv.showinvent  && !Constr.Building && pl.MutationTimer < Time.fixedTime && pl.IM.ActionDelay < Time.fixedTime && !pl.MouseOB.GetComponent<MouseController>().UIColl(inv.EscapeInventory))
+            if (!inv.showjournal && !inv.showinvent  && !Constr.Building && pl.MutationTimer < Time.fixedTime && pl.IM.ActionDelay < Time.fixedTime && !pl.GetMouseOBCollList().Contains(inv.EscapeInventory))
             {
                 if (Crafting)
                 {
@@ -382,6 +419,7 @@ public class GetItem : MonoBehaviour {
                     inv.Choose.transform.position = inv.CraftingUIOB.GetComponent<ItemsSlotsUI>().Slots[0].Slot[0].transform.position;
                     inv.UpdateInvFolder();
 
+                    Constr.CurrentMerchantID = _Stats.DatabaseID;
 
                     /*
                     if (pl.inv.Choose.transform.position.y < 700)
@@ -414,7 +452,7 @@ public class GetItem : MonoBehaviour {
 
             Vector2 Pos = pl._transform.position;
 
-            if (pl.MouseOB.GetComponent<MouseController>().ObjectColl(gameObject)) Pos = pl.IM.MousePosition;
+            if (pl.GetMouseOBCollList().Contains(gameObject)) Pos = pl.IM.MousePosition;
 
 
 

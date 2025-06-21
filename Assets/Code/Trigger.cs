@@ -160,7 +160,7 @@ public class Trigger : MonoBehaviour
         NeededBuildings();
 
 
-        if (!pl.coll_obj.Contains(gameObject) && !pl.MouseOB.GetComponent<MouseController>().ObjectColl(gameObject))
+        if (!pl.coll_obj.Contains(gameObject) && !pl.MouseUI.GetComponent<MouseController>().ObjectColl(gameObject))
         {
             if (!DoOnes)
             {
@@ -177,7 +177,7 @@ public class Trigger : MonoBehaviour
 
         }
 
-        if(IgnorePlayerCollision && pl.coll_obj.Contains(gameObject) && !pl.MouseOB.GetComponent<MouseController>().ObjectColl(gameObject))
+        if(IgnorePlayerCollision && pl.coll_obj.Contains(gameObject) && !pl.MouseUI.GetComponent<MouseController>().ObjectColl(gameObject))
             return;
 
         if (!OnEnter)
@@ -263,8 +263,6 @@ public class Trigger : MonoBehaviour
         if (ShakeCamera > 0) pl.MainCamera.GetComponent<CameraBor>().CamShakeTimer = ShakeCamera;
 
 
-        if (Damage > 0)
-            pl.ReceiveDamage(Damage);
 
         if (Damage < 0)
             pl.Heal(Damage*-1, "HealEffect");

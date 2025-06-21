@@ -55,8 +55,8 @@ public class Achivements : MonoBehaviour
 
 
 #if UNITY_STANDALONE
-        steammanager = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/SteamManager"));
-        steammanager.name = "SteamManager";
+       // steammanager = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/SteamManager"));
+       // steammanager.name = "SteamManager";
 #endif
 
 

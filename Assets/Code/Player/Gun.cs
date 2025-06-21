@@ -658,7 +658,7 @@ public class Gun : MonoBehaviour
 
         if (pl.IM.MouseMode)
         {
-            TilePos = constr.Tile.WorldToCell(pl.MainCamera.ScreenToWorldPoint(pl.MouseOB.transform.position));
+            TilePos = constr.Tile.WorldToCell(pl.MainCamera.ScreenToWorldPoint(pl.MouseUI.transform.position));
         }
 
         if (DigObject == null) return;

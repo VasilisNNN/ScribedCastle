@@ -13,7 +13,7 @@ using TMPro;
 
 
 
-
+[Serializable]
 public class TilesOnBoard
 {
     public int xPOS;
@@ -27,7 +27,7 @@ public class TilesOnBoard
         Name = name;
     }
 }
-
+[Serializable]
 public class TrashOnBoard
 {
     public Vector2 Place;
@@ -182,13 +182,6 @@ public class Constructor : MonoBehaviour
     private Transform CanvasTransform;
     private QuestDatabase QD;
  
- 
-    private int OnBoardCount;
-
-
-    
-    private long SaveEnd;
-
 
     private Vector2 ConstructorObjectPosition;
 
@@ -239,12 +232,16 @@ public class Constructor : MonoBehaviour
 
     public bool CanScrollCamera;
     private StatsControll FO;
-    private ObjectOnBoard[] OBOnBoardArray;
+
+    public int[] MerchantsIds;
+    private int CurrentMerchant;
+    public int CurrentMerchantID { get; set; }
+    private TextMeshProUGUI MerchantNameText;
+
+
     private float distanceX, distanceY, orthographicSizeTimes2_5, minimalalpha;
 
     private PubObject PO;
-
-    public MouseController MouseC { get; private set; }
 
     public int LastBuildingConstructed { get; private set; }
 
@@ -280,6 +277,9 @@ public class Constructor : MonoBehaviour
     private CollList _CollList;
     void Start()
     {
+        CurrentMerchantID = MerchantsIds[0];
+        MerchantNameText = GameObject.Find("MerchantNameText").GetComponent<TextMeshProUGUI>();
+
         _CollList = GetComponent<CollList>();
         gameObject.AddComponent<TextDatabase>();
         textdatabase = GetComponent<TextDatabase>();
@@ -459,8 +459,7 @@ public class Constructor : MonoBehaviour
    
         GameStarted = true;
         
-        MouseC = GameObject.Find("MouseOB").GetComponent<MouseController>();
-
+     
         
         PopulateGrid();
         UpdateObjectsInRange();
@@ -475,28 +474,28 @@ public class Constructor : MonoBehaviour
 
      
 
-        if (AllPeople < 0) AllPeople = 0;
-        if (AllTables < 0) AllTables = 0;
         
-       DirectControlls();
+        DirectControlls();
+
+        if (SL.Saving || SL.Loading) return;
         
-        if (!SL.Saving && !SL.Loading)
-        {
-            ExplosionDestroy();
+        ExplosionDestroy();
            
-            UIVARS();
-            GAMESPEEDMENU();
+        UIVARS();
+        GAMESPEEDMENU();
 
             
-            PopulateGrid();
-            UpdateObjectsInRange();
+        PopulateGrid();
+        UpdateObjectsInRange();
 
          
             
-            BuildingDestroingApplyBrush();
+        BuildingDestroingApplyBrush();
 
-            
-        }
+        ScrollThroughMerchants();
+
+
+        
 
 
 
@@ -621,8 +620,8 @@ public class Constructor : MonoBehaviour
                    pl.inv.ONOFF( FO.gameObject, false);
                     PO.Draw = false;
                 }
-                
 
+            
                 return;
             }
         }
@@ -894,6 +893,8 @@ public class Constructor : MonoBehaviour
         if (Comfort > ComfortMax) Comfort = ComfortMax;
         if (Comfort < ComfortMin) Comfort = ComfortMin;
 
+        if (AllPeople < 0) AllPeople = 0;
+        if (AllTables < 0) AllTables = 0;
 
         if (pl.inv.GetItem(9) != null)
             Money = pl.inv.GetItem(9).Count;
@@ -947,7 +948,7 @@ public class Constructor : MonoBehaviour
         {
             if (!IM.joystick)
             {
-                if ((MouseC.UIColl(GameObject.Find("CloseBigTips")) && IM.LeftMouseButtonDown) || IM.exit_b || IM.menu_b || IM.enter_b)
+                if ((pl.GetMouseCollList().Contains(GameObject.Find("CloseBigTips")) && IM.LeftMouseButtonDown) || IM.exit_b || IM.menu_b || IM.enter_b)
                 {
                     UnsetBigTips();
                 }
@@ -955,11 +956,11 @@ public class Constructor : MonoBehaviour
             }
             else
             {
-                if (( IM.menu_b || IM.exit_b || IM.enter_b) && TipsPause.activeInHierarchy && IM.ActionDelay < Time.fixedTime)
+                if (( IM.menu_b || IM.exit_b || IM.enter_b)&& TutorialPause && TipsPause.activeInHierarchy && IM.ActionDelay < Time.fixedTime)
                 {
 
                     TipsPause.SetActive(false);
-                    TutorialPause = false;
+                 
 
                     OnUIDelay = Time.fixedTime + 0.1f;
                     IM.ActionDelay = Time.fixedTime + 0.1f;
@@ -1034,7 +1035,7 @@ public class Constructor : MonoBehaviour
         if (spriteRenderer != null)
         {
             spriteRenderer.sortingLayerName = lLayer;
-            spriteRenderer.sortingOrder = (int)(obj.transform.position.y * -200) + 5;
+            spriteRenderer.sortingOrder = (int)(obj.transform.position.y * -200) + 5 + (int)(obj.transform.position.x * -200) + 5;
         }
 
 
@@ -1093,9 +1094,9 @@ public class Constructor : MonoBehaviour
         (Map.GetTile(new Vector3Int(FinalXPos, FinalYPos, 0)) == null && Map == GreyMap)))
 
         {
-            print("GREEEEN");
+        
             SetColorAndAlpha(_transform.GetChild(0).gameObject, new Color(0.1f, 1, 0.1f, 0.7f));
-            //  print(c);
+          
             canbuild = true;
         }
         else
@@ -1232,7 +1233,7 @@ public class Constructor : MonoBehaviour
 
 
 
-        if (OBOnTile != null || Map.GetTile(new Vector3Int(XPos, YPos - 1, 0)) == null 
+        if (OBOnTile != null || Map.GetTile(new Vector3Int(XPos, YPos , 0)) == null 
              || _menu.MenuONOFF || show_questbook  )
             return;
 
@@ -1245,7 +1246,7 @@ public class Constructor : MonoBehaviour
         Floors--;
 
      
-        if (Map.GetTile(new Vector3Int(XPos, YPos - 1, 0)) == SL.KitchenBrush[0] && _transform.childCount > 0)
+        if (Map.GetTile(new Vector3Int(XPos, YPos , 0)) == SL.KitchenBrush[0] && _transform.childCount > 0)
         KitchenFloors -= _transform.GetChild(0).GetComponent<PubObject>().kitchenfloors;
         StatsControll _StatsControll = _transform.GetChild(0).GetComponent<StatsControll>();
 
@@ -1257,16 +1258,16 @@ public class Constructor : MonoBehaviour
 
         for (int i = 0; i < TOnBoard.Count; i++)
         {
-            if(XPos == TOnBoard[i].xPOS && (YPos-1) == TOnBoard[i].yPOS)
+            if(XPos == TOnBoard[i].xPOS && (YPos) == TOnBoard[i].yPOS)
                 TOnBoard.RemoveAt(i);
         }
 
-        PitsTileBase.SetTile(new Vector3Int(XPos, YPos - 1, 0), null);
+        PitsTileBase.SetTile(new Vector3Int(XPos, YPos , 0), null);
 
-        Map.SetTile(new Vector3Int(XPos, YPos - 1, 0), null);
+        Map.SetTile(new Vector3Int(XPos, YPos , 0), null);
 
         if(PlaceWaterOnTileDestroy)
-        WaterMap.SetTile(new Vector3Int(XPos, YPos - 1, 0), WaterBase);
+        WaterMap.SetTile(new Vector3Int(XPos, YPos , 0), WaterBase);
 
 
         GameObject DestroyedOB = FindConstructedObject(ConstructorObjectPosition.x + "_" + ConstructorObjectPosition.y);
@@ -1531,6 +1532,8 @@ public class Constructor : MonoBehaviour
             if (objecttobuild.GetComponent<GetItem>() != null)
                 objecttobuild.GetComponent<GetItem>().enabled = false;
 
+            if (objecttobuild.GetComponent<Character>() != null)
+                objecttobuild.GetComponent<Character>().enabled = true;
         }
         else
         {
@@ -1594,6 +1597,8 @@ public class Constructor : MonoBehaviour
         if (objecttobuild.GetComponent<Animator>() != null)
             objecttobuild.GetComponent<Animator>().enabled = true;
 
+        if (objecttobuild.GetComponent<Character>() != null)
+            objecttobuild.GetComponent<Character>().enabled = true; 
 
         if (objecttobuild.GetComponent<GetItem>() != null)
             objecttobuild.GetComponent<GetItem>().enabled = true;
@@ -1704,9 +1709,9 @@ public class Constructor : MonoBehaviour
 
 
 
-        if (MouseC.UIColl(GameObject.Find("CloseBigTips")) ||
-           MouseC.UIColl(pl.inv.InventoryButton) ||
-           MouseC.UIColl(pl.inv.JournalButton))
+        if (pl.GetMouseCollList().Contains(GameObject.Find("CloseBigTips")) ||
+               pl.GetMouseCollList().Contains(pl.inv.InventoryButton) ||
+               pl.GetMouseCollList().Contains(pl.inv.JournalButton))
         {
 
             ChildOnMouse.position = new Vector3(_transform.GetChild(0).position.x, _transform.position.y + 0.5f, _transform.GetChild(0).position.z);
@@ -1804,7 +1809,7 @@ public class Constructor : MonoBehaviour
         if (IM.CamMove)
         {
             SetColorAndAlpha(_transform.GetChild(0).gameObject, new Color(1, 0.1f, 0.1f, 0.7f));
-            ChildOnMouse.position = new Vector3(ChildOnMouse.position.x, _transform.position.y, ChildOnMouse.position.z);
+            ChildOnMouse.position = new Vector3(ChildOnMouse.position.x, _transform.position.y + 0.5f, ChildOnMouse.position.z);
 
             return;
         }
@@ -1890,7 +1895,9 @@ public class Constructor : MonoBehaviour
 
             GameObject objecttobuild = Instantiate<GameObject>(ChildOnMouse.gameObject);
             PubObject _PubObject = objecttobuild.GetComponent<PubObject>();
-            
+            if(objecttobuild.GetComponent<Animator>()!=null)
+            objecttobuild.GetComponent<Animator>().enabled = false;
+
             if (BuildEffect == null)
             {
                 BuildEffect = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Effects/BuildEffect"));
@@ -1931,7 +1938,7 @@ public class Constructor : MonoBehaviour
         {
            
             SetColorAndAlpha(_transform.GetChild(0).gameObject, new Color(1, 0.1f, 0.1f, 0.7f));
-            ChildOnMouse.position = new Vector3(ChildOnMouse.position.x, _transform.position.y, ChildOnMouse.position.z);
+            ChildOnMouse.position = new Vector3(ChildOnMouse.position.x, _transform.position.y + 0.5f, ChildOnMouse.position.z);
 
         }
 
@@ -1957,6 +1964,8 @@ public class Constructor : MonoBehaviour
 
     bool CostObjectCheck(int ID)
     {
+        return true;
+
         bool result = false;
         if (pl.inv.GetItem(9) == null) return false;
 
@@ -2096,37 +2105,6 @@ public class Constructor : MonoBehaviour
     }
 
 
-    void CrowdedControl()
-    {
-        int crowdedInt = 0;
-
-        foreach (var table in Tables)
-        {
-            if (table == null) continue;
-
-            var pubObject = table.GetComponent<PubObject>();
-
-            if (pubObject.Crowded)
-            {
-                crowdedInt = 1;
-            }
-
-            foreach (var client in pubObject.Clients)
-            {
-                if (client == null) continue;
-
-                var clientComponent = client.GetComponent<Client>();
-
-                if (!clientComponent.Hungry)
-                {
-                    int cost = clientComponent.Dish.Cost + 5 + (Comfort - crowdedInt * 5);
-                    MinIncome += cost;
-                    MaxIncome += cost;
-                }
-            }
-        }
-    }
-
 
     public void SetColorAndAlpha(GameObject ob,Color _color)
     {
@@ -2237,7 +2215,7 @@ public class Constructor : MonoBehaviour
 
     
 
-        if (Building && IM.ActionDelay < Time.fixedTime && !inv.blueprintshow)
+        if (Building  && !inv.blueprintshow)
         {
           
             if ( IM.menu_b || (IM.exit_b && !IM.joystick) || IM.inventory_b )
@@ -2267,14 +2245,29 @@ public class Constructor : MonoBehaviour
         if (Building && !_menu.MenuONOFF && !show_questbook )
         {
           
-            if (_transform.position.y > _min.y && _transform.position.x < _max.x && ((IM._horizontal > 0 && IM._horizontalPush && _menu.ScrollDelay < Time.fixedTime) || (IM.DPADX > 0 && IM._horizontal_DPAD_Push && _menu.ScrollDelay < Time.fixedTime)))
+            if (_transform.position.x < _max.x && ((IM._horizontal > 0 && IM._horizontalPush && _menu.ScrollDelay < Time.fixedTime) || (IM.DPADX > 0 && IM._horizontal_DPAD_Push && _menu.ScrollDelay < Time.fixedTime)))
             {
-                YPos--;
+                XPos++;
                 if(IM.joystick)
                 _menu.ScrollDelay = Time.fixedTime + 0.1f;
             }
 
-            if (_transform.position.y < _max.y && _transform.position.x > _min.x && ((IM._horizontal < 0 && IM._horizontalPush && _menu.ScrollDelay < Time.fixedTime) || (IM.DPADX < 0 && IM._horizontal_DPAD_Push && _menu.ScrollDelay < Time.fixedTime)) )
+            if (_transform.position.x > _min.x && ((IM._horizontal < 0 && IM._horizontalPush && _menu.ScrollDelay < Time.fixedTime) || (IM.DPADX < 0 && IM._horizontal_DPAD_Push && _menu.ScrollDelay < Time.fixedTime)) )
+            {
+                XPos--;
+                if (IM.joystick)
+                    _menu.ScrollDelay = Time.fixedTime + 0.1f;
+            }
+
+
+            if (_transform.position.y > _min.y && ((IM._vertical < 0 && IM._verticalPush && _menu.ScrollDelay < Time.fixedTime) || (IM.DPADY < 0 && IM._vertical_DPAD_Push && _menu.ScrollDelay < Time.fixedTime)))
+            {
+                YPos--;
+                if (IM.joystick)
+                    _menu.ScrollDelay = Time.fixedTime + 0.1f;
+            }
+
+            if (_transform.position.y < _max.y && ((IM._vertical > 0 && IM._verticalPush && _menu.ScrollDelay < Time.fixedTime) || (IM.DPADY > 0 && IM._vertical_DPAD_Push && _menu.ScrollDelay < Time.fixedTime)) )
             {
                 YPos++;
                 if (IM.joystick)
@@ -2282,20 +2275,10 @@ public class Constructor : MonoBehaviour
             }
 
 
-            if (_transform.position.y > _min.y && _transform.position.x > _min.x && ((IM._vertical < 0 && IM._verticalPush && _menu.ScrollDelay < Time.fixedTime) || (IM.DPADY < 0 && IM._vertical_DPAD_Push && _menu.ScrollDelay < Time.fixedTime)))
-            {
-                XPos--;
-                if (IM.joystick)
-                    _menu.ScrollDelay = Time.fixedTime + 0.1f;
-            }
-
-            if (_transform.position.y < _max.y && _transform.position.x < _max.x && ((IM._vertical > 0 && IM._verticalPush && _menu.ScrollDelay < Time.fixedTime) || (IM.DPADY > 0 && IM._vertical_DPAD_Push && _menu.ScrollDelay < Time.fixedTime)) )
-            {
-                XPos++;
-                if (IM.joystick)
-                    _menu.ScrollDelay = Time.fixedTime + 0.1f;
-            }
-
+            if (_transform.position.y > _max.y) YPos--;
+            if (_transform.position.y < _min.y) YPos++;
+            if (_transform.position.x > _max.x) XPos--;
+            if (_transform.position.x < _min.x) XPos++;
         }
 
         
@@ -2643,7 +2626,9 @@ public class Constructor : MonoBehaviour
            
          
         }
-        if (inv.GetItemInDatabase(FO.DatabaseID).Structure && !Building)
+
+
+        if (!Building)
             FO.SetColorAndMaterial(1, FO.StartMaterial);
 
         if (FO.InvisTimer - 0.8f > Time.fixedTime)
@@ -2926,6 +2911,8 @@ public class Constructor : MonoBehaviour
 
     public void UnsetBigTips()
     {
+        if (!TutorialPause) return;
+
         if(pl!=null && pl.inv!=null && TipsPause!=null)
         TipsPause.SetActive(false);
         TutorialPause = false;
@@ -3214,6 +3201,9 @@ public class Constructor : MonoBehaviour
             GameObject obj = Instantiate<GameObject>(target.transform.GetChild(i).gameObject);
             obj.transform.parent = _object.transform;
             obj.transform.localPosition = target.transform.GetChild(i).transform.localPosition;
+          
+       
+            
         }
        
     }
@@ -3396,6 +3386,26 @@ public class Constructor : MonoBehaviour
         isRandomised = true;
         */
     }
+
+    void ScrollThroughMerchants()
+    {
+        if (!inv.crafting)
+            return;
+
+        MerchantNameText.text = inv.GetItemInDatabase(CurrentMerchantID).itemNames[_menu.Language];
+
+        if (!IM.R2) return;
+        
+        if (CurrentMerchant < MerchantsIds.Length-1)
+            CurrentMerchant++;
+        else CurrentMerchant = 0;
+
+        CurrentMerchantID = MerchantsIds[CurrentMerchant];
+        
+    
+    }
+
+
 
     void ScroolCamera()
     {

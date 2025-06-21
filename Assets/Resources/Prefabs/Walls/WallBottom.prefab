@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 7169894017281787818}
   - component: {fileID: 7169894017281787813}
   - component: {fileID: 4923263894273827844}
-  - component: {fileID: 7993975731792202404}
   - component: {fileID: 1911024782127351716}
   - component: {fileID: 8723616248568076219}
+  - component: {fileID: -7152612851306380747}
   m_Layer: 0
   m_Name: WallBottom
   m_TagString: Flipping
@@ -114,35 +114,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.81, y: 0.45}
   m_EdgeRadius: 0
---- !u!60 &7993975731792202404
-PolygonCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7169894017281787812}
-  m_Enabled: 0
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.25}
-    oldSize: {x: 1, y: 2}
-    newSize: {x: 4, y: 4}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Points:
-    m_Paths:
-    - - {x: -0.51240015, y: 0.008816838}
-      - {x: -0.005199194, y: -0.24991477}
-      - {x: 0.52080023, y: -0.0037686825}
-      - {x: -0.0009989738, y: 0.2547226}
 --- !u!114 &1911024782127351716
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -247,3 +218,32 @@ MonoBehaviour:
   AddRightBG: 0
   AddLeftFG: 0
   AddRightFG: 0
+--- !u!60 &-7152612851306380747
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7169894017281787812}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.25}
+    oldSize: {x: 1, y: 2}
+    newSize: {x: 4, y: 4}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: -0.48722267, y: 0.50397456}
+      - {x: -0.47098303, y: -0.49329734}
+      - {x: 0.48723042, y: -0.48214126}
+      - {x: 0.48996246, y: 0.51489013}

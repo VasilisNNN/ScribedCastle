@@ -24,7 +24,7 @@ public class Blueprint : MonoBehaviour
     [HideInInspector]
     public bool Unlocked;
 
-   
+    public int DatabaseID;
     public void UpdateBP()
     {
         CleanBP();

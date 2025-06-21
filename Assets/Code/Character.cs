@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-//[System.Serializable]
+
 
 public class  Character : MonoBehaviour
 {
@@ -98,23 +98,27 @@ public class  Character : MonoBehaviour
         pl.Characters.Add(gameObject);
 
 
-        ChattingObject = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/ChattingSine"));
-        ChattingObject.name = "ChattingSine";
-        ChattingObject.transform.position = new Vector3(transform.position.x, transform.position.y+0.2f,1);
-        ChattingObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
-
+       
         ChattingUIObject = GameObject.Find("Chatting");
-     
-
+        
 
         StartMaterial = GetComponent<SpriteRenderer>().material;
         WhiteMaterial = Resources.Load<Material>("Materials/DamageLight");
-        ChattingObject.transform.Find("QuestItem").gameObject.SetActive(false);
-        
-
+   
         name += SceneManager.GetActiveScene().name;
     }
-    
+
+    private void Start()
+    {
+        ChattingObject = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/ChattingSine"));
+        ChattingObject.name = "ChattingSine";
+        ChattingObject.transform.position = new Vector3(transform.position.x, transform.position.y + 0.2f, 1);
+        ChattingObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
+        pl.menu.ONOFFUI(ChattingObject.transform, false);
+        ChattingObject.transform.Find("QuestItem").gameObject.SetActive(false);
+
+
+    }
     private void Update()
     {
         DamageControll();
@@ -177,14 +181,7 @@ public class  Character : MonoBehaviour
         }
 
 
-        if (pl.GetComponent<Gun>().GunOB != null)
-        {
-            if (Enemy && pl.GetComponent<Gun>().GunOB.GetComponent<CollList>().GetCollList().Contains(gameObject) && DamageTime < Time.fixedTime)
-            {
-
-                DamageTime = Time.fixedTime + 0.5f;
-            }
-        }
+       
     }
 
 
@@ -220,31 +217,6 @@ public class  Character : MonoBehaviour
 
         UIAlphaAndColor();
 
-
-      
-        /* if (pl.coll_obj.Contains(gameObject) && pl.IM.enter_b && Chatting && pl.Chatting && pl.ChattingObject != null)
-         {
-             if (Quest_End_Item_ID>-1 && pl.inv.CheckItem(Quest_End_Item_ID))
-             {
-
-                 pl.inv.DoneQuest(QuestID);
-
-                 if (Quest_End_Item_ID > -1)
-                 {
-                     if (pl.inv.GetItemInDatabase(Quest_End_Item_ID)._type == Item.type.item)
-                     {
-                         pl.inv.ReduceItemCount(Quest_End_Item_ID, 1);
-                         Quest_End_Item_ID = -1;
-                     }
-                 }
-
-
-             }
-         }*/
-
-
-
-
         if (QuestID > -1)
         {
             if (pl.inv.CheckQuestDone(QuestID) && DialogID_QuestDone_NoItem>-1)
@@ -253,16 +225,10 @@ public class  Character : MonoBehaviour
             }
         }
 
-        /*if (pl.coll_obj.Contains(gameObject) && pl.IM.enter_b && Chatting && pl.Chatting && pl.ChattingObject == gameObject)
-        {
-            if (!ChattingUIObject.GetComponent<Image>().enabled)
-            {
-                pl.ChattingObject = null;
-                pl.Chatting = false;
-            }
-        }*/
+        if (pl.menu.MenuONOFF || pl.inv.showjournal || pl.inv.blueprintshow || pl.inv.showinvent)
+            return;
 
-        if (!pl.menu.MenuONOFF && !pl.inv.showjournal && !pl.inv.blueprintshow && !pl.inv.showinvent && (pl.coll_obj.Contains(gameObject) && ((( pl.IM.enter_b || (pl.IM.LeftMouseButtonDown &&pl.MouseOB.GetComponent<MouseController>().ObjectColl(gameObject))) && !ChattingOnColl)|| ChattingOnColl)) && Chatting && !pl.Chatting && pl.ChattingObject == null)
+        if ( (( pl.IM.enter_b || pl.IM.LeftMouseButtonDown) && pl.GetMouseOBCollList().Contains(gameObject)) && Chatting && !pl.Chatting && pl.ChattingObject == null)
         {
             if (QuestID > -1 && Quest_End_Item_ID > -1)
             {
@@ -294,7 +260,8 @@ public class  Character : MonoBehaviour
 
         }
 
-        if (pl.Chatting && !pl.inv.blueprintshow && !pl.inv.showjournal && !pl.inv.showinvent && pl.coll_obj.Contains(gameObject) && (pl.IM.exit_b||pl.IM.menu_b) )
+        if (pl.Chatting && !pl.inv.blueprintshow && !pl.inv.showjournal && !pl.inv.showinvent && 
+             (pl.IM.exit_b||pl.IM.menu_b) )
         {
             pl.IM.ActionDelay = Time.fixedTime + 0.5f;
             pl.Chatting = false;
@@ -304,42 +271,42 @@ public class  Character : MonoBehaviour
         }
 
 
-        if (pl.coll_obj.Contains(gameObject) && ChattingUIObject.GetComponent<Dialog>().LastLine)
+        if (( pl.GetMouseOBCollList().Contains(gameObject)) && ChattingUIObject.GetComponent<Dialog>().LastLine)
+        {
+            if (QuestID > -1)
             {
-                if (QuestID > -1)
+                if (!pl.inv.CheckQuestDone(QuestID))
                 {
-                    if (!pl.inv.CheckQuestDone(QuestID))
-                    {
-                        pl.inv.AddQuest(QuestID);
+                    pl.inv.AddQuest(QuestID);
 
-                        ChattingUIObject.GetComponent<Dialog>().LastLine = false;
-                    }
+                    ChattingUIObject.GetComponent<Dialog>().LastLine = false;
                 }
+            }
+
+        }
+
+        if (pl.ChattingObject== gameObject && 
+        !ChattingUIObject.GetComponent<Image>().enabled)
+        {
+            if (pl.Chatting && pl.ChattingObject == gameObject)
+            {
+                pl.menu.ONOFFUI(ChattingUIObject.transform, false);
+
+            ChattingUIObject.GetComponent<Dialog>().ResetDialog();
+
+            if (DestroyOnDialogEnd)
+            {
+                Destroy(ChattingObject);
+                Destroy(gameObject);
+
 
             }
 
-            if ((!pl.coll_obj.Contains(gameObject) && pl.ChattingObject!=null) || 
-            !ChattingUIObject.GetComponent<Image>().enabled)
-            {
-                if (pl.Chatting && pl.ChattingObject == gameObject)
-                {
-                    pl.menu.ONOFFUI(ChattingUIObject.transform, false);
-
-                ChattingUIObject.GetComponent<Dialog>().ResetDialog();
-
-                if (DestroyOnDialogEnd)
-                {
-                    Destroy(ChattingObject);
-                    Destroy(gameObject);
-
-
-                }
-
-                pl.Chatting = false;
-                    pl.ChattingObject = null;
-                }
-
+            pl.Chatting = false;
+                pl.ChattingObject = null;
             }
+
+        }
         
 
 
@@ -350,6 +317,9 @@ public class  Character : MonoBehaviour
     {
         float uibordershow = 1;
 
+        SpriteRenderer CO_SPRT = ChattingObject.GetComponent<SpriteRenderer>();
+
+
         if (!GetComponent<SpriteRenderer>().enabled)
         {
 
@@ -357,7 +327,7 @@ public class  Character : MonoBehaviour
                 ChattingObject.transform.Find("ENTER_B").GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
 
 
-            ChattingObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
+            CO_SPRT.color = new Color(1, 1, 1, 0);
             ChattingObject.transform.Find("QuestItem").GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
 
             return;
@@ -368,28 +338,30 @@ public class  Character : MonoBehaviour
 
         ChattingObject.transform.position = new Vector3(transform.position.x, transform.position.y + 0.2f, 1);
 
-            if (Mathf.Abs(transform.position.x - pl.transform.position.x) < uibordershow && Mathf.Abs(transform.position.y - pl.transform.position.y) < uibordershow)
+        Vector3 Mousepos = pl.MouseOB.transform.position;
+   
+            if (Mathf.Abs(transform.position.x - Mousepos.x) < uibordershow && Mathf.Abs(transform.position.y - Mousepos.y) < uibordershow)
             {
                 float maxalpha = 1;
-                if (!pl.coll_obj.Contains(gameObject)) maxalpha = 0.3f;
+                if (!pl.GetMouseOBCollList().Contains(gameObject)) maxalpha = 0.3f;
                 else maxalpha = 1;
 
 
 
-            if (ChattingObject.GetComponent<SpriteRenderer>().color.a < maxalpha)
-                ChattingObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, ChattingObject.GetComponent<SpriteRenderer>().color.a + 3 * Time.deltaTime);
-            else ChattingObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, maxalpha);
+            if (CO_SPRT.color.a < maxalpha)
+                CO_SPRT.color = new Color(1, 1, 1, CO_SPRT.color.a + 3 * Time.deltaTime);
+            else CO_SPRT.color = new Color(1, 1, 1, maxalpha);
 
 
                 if (ChattingObject.transform.Find("QuestItem").GetComponent<SpriteRenderer>().color.a < 1)
-                    ChattingObject.transform.Find("QuestItem").GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, ChattingObject.GetComponent<SpriteRenderer>().color.a + 3 * Time.deltaTime);
+                    ChattingObject.transform.Find("QuestItem").GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, CO_SPRT.color.a + 3 * Time.deltaTime);
 
 
             }
-            else if (ChattingObject.GetComponent<SpriteRenderer>().color.a > 0)
+            else if (CO_SPRT.color.a > 0)
             {
-                ChattingObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, ChattingObject.GetComponent<SpriteRenderer>().color.a - 3 * Time.deltaTime);
-                ChattingObject.transform.Find("QuestItem").GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, ChattingObject.GetComponent<SpriteRenderer>().color.a - 3 * Time.deltaTime);
+            CO_SPRT.color = new Color(1, 1, 1, CO_SPRT.color.a - 3 * Time.deltaTime);
+                ChattingObject.transform.Find("QuestItem").GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, CO_SPRT.color.a - 3 * Time.deltaTime);
             }
 
             if (ChattingObject.transform.Find("ENTER_B") != null)

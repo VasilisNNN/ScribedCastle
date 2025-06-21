@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 using TMPro;
 
 [System.Serializable]
-
 public class TutorialPhase
 {
     public GameObject[] PhaseObjects;
@@ -79,7 +78,7 @@ public class TutorialPhase
 
 
 
-        if (pl.IM.enter_b || pl.IM.exit_b || (pl.menu.UIColl(GameObject.Find("CloseBigTips")) && pl.IM.LeftMouseButtonDown) || Const.TutorialPause == false)
+        if (pl.IM.enter_b  || (pl.menu.UIColl(GameObject.Find("CloseBigTips")) && pl.IM.LeftMouseButtonDown) || Const.TutorialPause == false)
         {
             if (Phase == 0)
             {

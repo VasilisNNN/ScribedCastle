@@ -19,10 +19,7 @@ public class MovementControll : MonoBehaviour
     public int[] PickSpecificItem;
 
 
-    public bool Client;
     public bool Enemy;
-    public bool Waitress;
-    public bool Cook;
 
     public bool Soldier;
 
@@ -38,8 +35,8 @@ public class MovementControll : MonoBehaviour
 
     private float PoisonDelay;
 
-    private float MoveTimer, OnTheTableWaiting, ToiletTimer, ActionTimer, PoisonTimer, PayTimer, SearchForTargetsTimer;
-    private bool InTheToilet;
+    private float MoveTimer, OnTheTableWaiting, ActionTimer, PoisonTimer, SearchForTargetsTimer;
+
 
     private Constructor Const;
     private Player pl;
@@ -57,7 +54,7 @@ public class MovementControll : MonoBehaviour
     public float MoveDelayMax = 0.2f;
 
 
-    private GameObject BloodEffect_0, BloodEffect_1, MoneyDifference;
+    private GameObject BloodEffect_0;
 
     private List<GameObject> DishesObjects = new List<GameObject>();
     private float SoldierDelay;
@@ -103,8 +100,14 @@ public class MovementControll : MonoBehaviour
 
     private Vector2 maxpos = new Vector2(2, 2);
     public bool NoAudioOnItems;
+
+    private Animator Anim;
+    private string CurrentAnimName;
+    private float AnimFade;
+
     void Start()
     {
+        Anim = GetComponent<Animator>();
 
         CM = GetComponent<CharacterMove>();
         _transform = transform;
@@ -135,7 +138,6 @@ public class MovementControll : MonoBehaviour
         Const = GameObject.Find("Constructor").GetComponent<Constructor>();
 
 
-        PayTimer = 60 + Random.Range(-5, 10);
         ActionTimer = 0;
 
         RT = GameObject.Find("Grid").transform.Find("Floor").GetComponent<Tilemap>();
@@ -143,14 +145,11 @@ public class MovementControll : MonoBehaviour
         Brush.Add(null);
 
         int max = 100;
-        ToiletTimer = 300 + Random.Range(0, 100);
+    
         PoisonDelay = 10;
 
         BloodEffect_0 = Resources.Load<GameObject>("Prefabs/Effects/BloodEffect_0");
-        BloodEffect_1 = Resources.Load<GameObject>("Prefabs/Effects/BloodEffect_1");
-
-        MoneyDifference = Resources.Load<GameObject>("Prefabs/UI/MoneyDifference");
-
+      
 
         if (Enemy) constr.Enemies.Add(new ObjectOnBoard(GetComponent<StatsControll>().DatabaseID, transform.position, name, gameObject, GetComponent<StatsControll>(), GetComponent<PubObject>()));
 
@@ -161,6 +160,7 @@ public class MovementControll : MonoBehaviour
     private void Update()
     {
         UpdateMoveControll();
+        Animations();
     }
 
 
@@ -171,6 +171,20 @@ public class MovementControll : MonoBehaviour
         SetMoveToObject(pl.gameObject);
         FollowTimer = Time.fixedTime + FollowTimerDelay;
     }
+
+    void Animations()
+    {
+        if (Anim == null) return;
+        
+        if (AnimFade > Time.fixedTime)
+            Anim.CrossFade(CurrentAnimName, 0.2f, 0);
+        else
+            Anim.Play(CurrentAnimName, 0);
+        
+
+    }
+
+
 
 
     void UpdateMoveControll()
@@ -187,14 +201,7 @@ public class MovementControll : MonoBehaviour
 
         if (Const.Game_SPEED <= 0) return;
 
-        /* if (MoveToObject != null && !CM.PathComlitionCheck())
-         {
-             print(name  + " UnSetMoveToObject");
-             UnSetMoveToObject();
-         }*/
-
-
-
+    
         if (Enemy)
             EnemyMove();
 
@@ -222,7 +229,7 @@ public class MovementControll : MonoBehaviour
                     if (SelfDestroyOnlyDamagingPlayer)
                         Stats.HP = 0;
 
-                    pl.ReceiveDamage(MinDamage);
+               
                 }
             }
             else if (pl.coll_obj.Contains(gameObject))
@@ -231,20 +238,10 @@ public class MovementControll : MonoBehaviour
                 if (SelfDestroyOnlyDamagingPlayer)
                     Stats.HP = 0;
 
-                pl.ReceiveDamage(MinDamage);
+          
             }
 
 
-
-            if (GetComponent<Tail>() != null)
-            {
-                for (int i = 0; i < GetComponent<Tail>().TailObjs.Count; i++)
-                {
-                    if (pl.coll_obj.Contains(GetComponent<Tail>().TailObjs[i]))
-                        pl.ReceiveDamage(MinDamage);
-
-                }
-            }
 
 
 
@@ -278,15 +275,11 @@ public class MovementControll : MonoBehaviour
                 if (Stats.Payed)
                     MoveBetweenStructures();
             }
-            if (Client)
-                ClientMove();
+         
         }
 
 
         if (MoveBetweenA_B) MoveBetweenAB();
-
-        if (Client) ToTheToilet();
-
 
 
 
@@ -325,7 +318,6 @@ public class MovementControll : MonoBehaviour
 
 
 
-        ToiletTimer -= Time.deltaTime * Const.Game_SPEED;
 
         MoveTimer -= Time.deltaTime * Const.Game_SPEED;
 
@@ -335,7 +327,6 @@ public class MovementControll : MonoBehaviour
 
         ActionTimer -= Time.deltaTime * Const.Game_SPEED;
 
-        PayTimer -= Time.deltaTime * Const.Game_SPEED;
         SearchForTargetsTimer -= Time.deltaTime * Const.Game_SPEED;
 
 
@@ -364,161 +355,9 @@ public class MovementControll : MonoBehaviour
     }
 
 
-
-    void ToTheToilet()
-    {
-
-        if (ToiletTimer >= 0)
-            return;
-
-        GameObject[] Toilets = GameObject.FindGameObjectsWithTag("Toilet");
-
-        if (Toilets.Length <= 0)
-        {
-            MakeAPoop();
-            return;
-        }
+    
 
 
-        if (MoveToObject == null)
-        {
-
-
-
-
-            for (int i = 0; i < Toilets.Length; i++)
-            {
-                if (!Toilets[i].GetComponent<StatsControll>().Occupied && Toilets[i].transform.parent == null)
-                {
-                    SetMoveToObject(Toilets[i]);
-
-                    InTheToilet = true;
-                    break;
-                }
-            }
-
-
-        }
-
-
-
-        if (!MTO_StatsControll.Occupied)
-        {
-            WalkToTheTarget();
-
-        }
-        else
-        {
-            if (CheckToiletOccupation(Toilets))
-            {
-                for (int i = 0; i < Toilets.Length; i++)
-                {
-                    if (!Toilets[i].GetComponent<StatsControll>().Occupied && Toilets[i].transform.parent == null)
-                    {
-                        SetMoveToObject(Toilets[i]);
-
-                        InTheToilet = true;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-
-                MakeAPoop();
-            }
-
-        }
-
-
-    }
-
-    void MakeAPoop()
-    {
-
-        if (constr.AllPoop < constr.MaxPoop)
-        {
-            DropObject(pl.inv.GetItemInDatabase(9999).ObjectPrefs);
-            constr.AllPoop++;
-        }
-
-
-        ToiletTimer = pl.DayNight.DayLength / 1.5f;
-
-
-    }
-
-    void FromTheToilet()
-    {
-        if (!InTheToilet) return;
-
-        if (MoveToObject == null)
-            return;
-
-
-        if (MTO_StatsControll != null)
-            MTO_StatsControll.Occupied = false;
-        if (MoveToObject.GetComponent<AudioSource>() != null)
-            MoveToObject.GetComponent<AudioSource>().Play();
-
-
-
-        InTheToilet = false;
-
-        print("FromTheToilet " + name);
-        ToiletTimer = pl.DayNight.DayLength / 1.5f;
-
-
-    }
-
-    bool CheckToiletOccupation(GameObject[] Toilets)
-    {
-
-
-        for (int i = 0; i < Toilets.Length; i++)
-        {
-            if (!Toilets[i].GetComponent<StatsControll>().Occupied && Toilets[i].transform.parent == null)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    void TakeASit()
-    {
-        if (MoveToObject == null)
-            return;
-
-        if (!MoveToObject.GetComponent<PubObject>().Table)
-            return;
-
-        if (_transform.position != MoveToObject.transform.position)
-            return;
-
-        for (int i = 0; i < MoveToObject.GetComponent<PubObject>().Sits.Count; i++)
-        {
-            if (MoveToObject.GetComponent<PubObject>().Sits[i].Num == 0)
-            {
-                MoveToObject.GetComponent<PubObject>().Sits[i].Num = 1;
-                break;
-            }
-        }
-
-    }
-
-
-
-    void ClientMove()
-    {
-        Vector2 MoveSpeed = new Vector2(0.5f, 0.25f);
-
-
-
-        TakeASit();
-
-    }
 
 
 
@@ -740,11 +579,7 @@ public class MovementControll : MonoBehaviour
     void ItemPickerMove()
     {
 
-        if (Waitress)
-        {
-            WaitressMove();
-            return;
-        }
+       
 
         if (Const.DroppedItems.Count <= 0) return;
 
@@ -787,65 +622,7 @@ public class MovementControll : MonoBehaviour
 
     }
 
-    void WaitressMove()
-    {
-
-        if (CarringDish != null)
-        {
-            for (int i = 0; i < TargetGameObjects.Length; i++)
-            {
-
-                SearchForTargets(TargetGameObjects[i], 0);
-            }
-            return;
-
-        }
-
-
-        if (Const.DroppedItems.Count <= 0)
-            return;
-
-
-        for (int i = 0; i < Const.DroppedItems.Count; i++)
-        {
-            //  print(name + "Waitress 2");
-            if (Const.DroppedItems[i] != null)
-            {
-
-                if (PickSpecificItem.Length <= 0)
-                {
-                    if (MoveToObject != Const.DroppedItems[i] && pl.inv.GetItemInDatabase(Const.DroppedItems[i].GetComponent<GetItem>().item[0]).Dish && !Const.DroppedItems[i].GetComponent<GetItem>().Crafting)
-                    {
-                        // print(name + "Waitress 4");
-                        SetMoveToObject(Const.DroppedItems[i]);
-
-
-                    }
-                }
-                else
-                {
-                    for (int j = 0; j < PickSpecificItem.Length; j++)
-                    {
-                        if (MoveToObject != Const.DroppedItems[i] && !Const.DroppedItems[i].GetComponent<GetItem>().Crafting && PickSpecificItem[j] == Const.DroppedItems[i].GetComponent<GetItem>().item[0])
-                            SetMoveToObject(Const.DroppedItems[i]);
-                    }
-                }
-            }
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-    }
-
+  
 
     void WalkToTheTarget()
     {
@@ -888,36 +665,9 @@ public class MovementControll : MonoBehaviour
         Vector2 MoveSpeed = new Vector2(0.5f, 0.25f);
 
 
+       
 
-        if (MoveToObject != null)
-        {
-
-            float minborder = 0.33f;
-
-            if (Mathf.Abs(_transform.position.x - MoveToObject.transform.position.x) > minborder || Mathf.Abs(_transform.position.y - MoveToObject.transform.position.y) > minborder)
-            {
-                WalkToTheTarget();
-            }
-
-            if (Mathf.Abs(_transform.position.x - MoveToObject.transform.position.x) <= minborder && Mathf.Abs(_transform.position.y - MoveToObject.transform.position.y) <= minborder)
-            {
-
-                OnThePoint();
-
-            }
-
-            if (MTO_PubObject != null)
-            {
-                if (MTO_PubObject.wall > 0 && CollWithMoveToObject())
-                {
-
-                    OnThePoint();
-
-                }
-            }
-
-        }
-        else
+        if (MoveToObject == null)
         {
             if (!ItemPicker && !MoveBetweenA_B)
             {
@@ -927,10 +677,47 @@ public class MovementControll : MonoBehaviour
                     for (int i = 0; i < TargetGameObjects.Length; i++)
                         SearchForTargets(TargetGameObjects[i], 0);
 
-
+                FadeToAnim("Start");
 
             }
+            
+           
+
+            return;
         }
+
+
+
+        float minborder = 0.33f;
+
+        if (Mathf.Abs(_transform.position.x - MoveToObject.transform.position.x) > minborder || 
+            Mathf.Abs(_transform.position.y - MoveToObject.transform.position.y) > minborder)
+        {
+            WalkToTheTarget();
+        }
+
+
+        if (Mathf.Abs(_transform.position.x - MoveToObject.transform.position.x) <= minborder &&
+            Mathf.Abs(_transform.position.y - MoveToObject.transform.position.y) <= minborder)
+        {
+
+            OnThePoint();
+
+        }
+        else 
+        {
+            FadeToAnim("Start");
+         
+
+         
+        }
+
+        if (MTO_PubObject == null) return;
+        
+        /*if (MTO_PubObject.wall <= 0 ||! CollWithMoveToObject()) return;
+        OnThePoint();
+        */
+       
     }
 
 
@@ -938,9 +725,8 @@ public class MovementControll : MonoBehaviour
     {
 
         ObjectOfOccupation = MoveToObject;
-
-        if (Cook)
-            CheckItemForCooking();
+        
+        FadeToAnim("OnThePoint");
 
         if (Soldier)
         {
@@ -1025,7 +811,6 @@ public class MovementControll : MonoBehaviour
 
         if (MoveToObject != null)
         {
-            if (Client && MoveToObject.tag == "Toilet") FromTheToilet();
             bool table = false;
             if (MTO_PubObject != null) table = MTO_PubObject.Table;
 
@@ -1091,24 +876,19 @@ public class MovementControll : MonoBehaviour
         GameObject MoveToOB = null;
 
 
-        if (Const.OBOnBoard.Count > 0)
+        if (Const.OBOnBoard.Count <= 0) return;
+        
+        maxpos = new Vector2(99999, 99999);
+
+        for (int i = 0; i < Const.OBOnBoard.Count; i++)
         {
-            maxpos = new Vector2(99999, 99999);
-
-            for (int i = 0; i < Const.OBOnBoard.Count; i++)
-            {
-                if (MoveToObject != null && MTO_StatsControll != null)
-                    if (MTO_StatsControll.DatabaseID == Target.GetComponent<StatsControll>().DatabaseID) break;
+            if (MoveToObject != null && MTO_StatsControll != null)
+                if (MTO_StatsControll.DatabaseID == Target.GetComponent<StatsControll>().DatabaseID) break;
 
 
-                CheckAndSetTheTarget(i, Target, ref MoveToOB);
-
-            }
-
+            CheckAndSetTheTarget(i, Target, ref MoveToOB);
 
         }
-
-
 
 
     }
@@ -1235,7 +1015,7 @@ public class MovementControll : MonoBehaviour
     {
         //Character brings item to us
 
-        if (Cook || (Stats.CanBeHungry && Stats.Satiety <= 0) || MoveToObject == null || !BringsPickedItemToThePlayer || Waitress)
+        if ((Stats.CanBeHungry && Stats.Satiety <= 0) || MoveToObject == null || !BringsPickedItemToThePlayer )
             return;
 
         if (MTO_StatsControll != null)
@@ -1368,13 +1148,7 @@ public class MovementControll : MonoBehaviour
             return;
 
 
-        if (Cook)
-        {
-
-            CookItemProduction();
-            return;
-        }
-
+     
        
         if (!ItemPicker || MTO_GetItem.item.Length <= 0)
             return;
@@ -1390,18 +1164,9 @@ public class MovementControll : MonoBehaviour
 
         for (int i = 0; i < MTO_GetItem.item.Length; i++)
         {
-            if (!Waitress)
-            {
-                pl.inv.AddItem(MTO_GetItem.item[i], MTO_GetItem.itemcount[i], pl.inv.GetItemInDatabase(MTO_GetItem.item[i]).Durability, transform.position);
-            }
-            else
-            {
+           CarringDish = pl.inv.DeepCopyItem(MTO_GetItem.item[0], 1, pl.inv.GetItemInDatabase(MTO_GetItem.item[0]).Durability);
 
-
-                CarringDish = pl.inv.DeepCopyItem(MTO_GetItem.item[0], 1, pl.inv.GetItemInDatabase(MTO_GetItem.item[0]).Durability);
-
-              
-            }
+            
         }
 
 
@@ -1421,181 +1186,9 @@ public class MovementControll : MonoBehaviour
         UnSetMoveToObject();
     }
 
-    void CookItemProduction()
-    {
-
-        if (!MTO_GetItem.Oven)
-            return;
+    
 
 
-        for (int i = 0; i < MTO_GetItem.item.Length; i++)
-        {
-            int GetItemID = MTO_GetItem.item[i];
-            int itemn = 0;
-            int[] NeededItemsIDs = pl.inv.GetItemInDatabase(GetItemID).NeedItemsIDs;
-
-            if (CheckIfItemCanBeCooked(NeededItemsIDs, pl.inv.GetItemInDatabase(GetItemID).NeedItemsCounts))
-            {
-                DropCookedItem(NeededItemsIDs, pl.inv.GetItemInDatabase(GetItemID).NeedItemsCounts, MTO_GetItem.item[i]);
-                break;
-            }
-
-            ActionTimer = ActionDelay;
-        }
-
-
-    }
-
-    void DropCookedItem(int[] NeededItemsIDs, int[] NeededItemsCounts, int dropppedItemID)
-    {
-
-
-        for (int n = 0; n < NeededItemsIDs.Length; n++)
-        {
-            if (pl.inv.GetItem(NeededItemsIDs[n]) != null)
-            {
-                if (pl.inv.GetItem(NeededItemsIDs[n]).Count >= NeededItemsCounts[n])
-                {
-                    pl.inv.ReduceItemCount(NeededItemsIDs[n], NeededItemsCounts[n]);
-                }
-                else
-                {
-                    for (int i = 0; i < MTO_PubObject.DishesOnTable.Count; i++)
-                    {
-                        if (MTO_PubObject.DishesOnTable[i].itemID == NeededItemsIDs[n])
-                            if (MTO_PubObject.DishesOnTable[i].Count >= NeededItemsCounts[n])
-                                MTO_PubObject.DishesOnTable[i].Count -= NeededItemsCounts[n];
-                    }
-
-                }
-            }
-            else
-            {
-                for (int i = 0; i < MTO_PubObject.DishesOnTable.Count; i++)
-                {
-                    RemoveDishesOnTable(i, NeededItemsCounts[n]);
-                }
-            }
-        }
-
-        pl.inv.DropItemInSameSpotNOAUDIO(_transform.position, 1, new int[1] { dropppedItemID }, pl.inv.GetItemInDatabase(dropppedItemID).Durability);
-        ActionTimer = ActionDelay;
-
-    }
-
-
-
-
-
-
-    void CheckItemForCooking()
-    {
-
-        int itemneededall = 0;
-
-        for (int i = 0; i < MTO_GetItem.item.Length; i++)
-        {
-            int GetItemID = MTO_GetItem.item[i];
-            int itemn = 0;
-            int[] NeededItemsIDs = pl.inv.GetItemInDatabase(GetItemID).NeedItemsIDs;
-
-
-            if (CheckIfItemCanBeCooked(NeededItemsIDs, pl.inv.GetItemInDatabase(GetItemID).NeedItemsCounts))
-                itemneededall++;
-        }
-
-        if (itemneededall <= 0)
-        {
-
-            constr.AddLogPartOnes("You dont have enough resources for cook to make a dish", "У вас недостатньо ресурсів, щоб приготувати страву", "料理を作るのに十分な資源がない。", gameObject);
-
-        }
-        else constr.RemoveLogPart("You dont have enough resources for cook to make a dish");
-
-
-    }
-
-    bool CheckIfItemCanBeCooked(int[] NeededItemsIDs, int[] NeedItemsCounts)
-    {
-        int itemn = 0;
-
-        for (int n = 0; n < NeededItemsIDs.Length; n++)
-        {
-            if (pl.inv.GetItem(NeededItemsIDs[n]) != null)
-            {
-                if (pl.inv.GetItem(NeededItemsIDs[n]).Count >= NeedItemsCounts[n])
-                {
-                    itemn++;
-                }
-                else
-                {
-                    for (int i = 0; i < MTO_PubObject.DishesOnTable.Count; i++)
-                    {
-                        if (MTO_PubObject.DishesOnTable[i].itemID == NeededItemsIDs[n])
-                            if (MTO_PubObject.DishesOnTable[i].Count >= NeedItemsCounts[n])
-                                itemn++;
-                    }
-
-                }
-            }
-            else
-            {
-                for (int i = 0; i < MTO_PubObject.DishesOnTable.Count; i++)
-                {
-                    if (MTO_PubObject.DishesOnTable[i].itemID == NeededItemsIDs[n])
-                        if (MTO_PubObject.DishesOnTable[i].Count >= NeedItemsCounts[n])
-                            itemn++;
-                }
-            }
-        }
-
-        if (itemn >= NeededItemsIDs.Length) return true;
-        else return false;
-    }
-
-
-
-    void TriggerOffScreenF()
-    {
-        BoxCollider2D Box = GetComponent<BoxCollider2D>();
-
-        if (Box == null) return;
-
-        if (!TriggerOFF_OffScreen)
-        {
-
-            if (Box != null) Box.isTrigger = true;
-            return;
-        }
-
-
-
-        if (CollWithOtherObject())
-        {
-            if (Mathf.Abs(transform.position.x - pl.transform.position.x) < pl.MainCamera.orthographicSize * 2 &&
-                        Mathf.Abs(transform.position.y - pl.transform.position.y) < pl.MainCamera.orthographicSize)
-                Box.isTrigger = true;
-            else
-                Box.isTrigger = false;
-
-
-        }
-        else
-        {
-
-            if (CM != null)
-            {
-                if (CM.LegsAnim != null)
-                {
-                    Box.isTrigger = true;
-
-                }
-            }
-
-        }
-
-
-    }
 
     public void UnSetMoveToObject()
     {
@@ -1617,29 +1210,6 @@ public class MovementControll : MonoBehaviour
         maxpos = new Vector2(9999999999, 999999999);
 
     }
-
-
-    bool CheckPrefabsName(string prefabname, string objectname)
-    {
-        bool tf = false;
-
-        int count =0;
-        for (int i = 0; i < prefabname.Length; i++)
-        {
-            if (objectname.Length > i)
-            {
-                if (objectname[i] == prefabname[i])
-                    count++;
-            }
-            
-        }
-        if (count >= prefabname.Length * 0.6f) tf = true;
-
-        
-        return tf;
-    }
-
-
 
 
     void AddDishesOnTable(Item additem)
@@ -1664,7 +1234,14 @@ public class MovementControll : MonoBehaviour
         
     }
 
+    void FadeToAnim(string n)
+    {
+        if (CurrentAnimName == n) return;
+        AnimFade = Time.fixedTime+ 1f;
+        CurrentAnimName = n;
 
+        print("fade to anim");
+    }
 
     void RemoveDishesOnTable(int i, int count)
     {

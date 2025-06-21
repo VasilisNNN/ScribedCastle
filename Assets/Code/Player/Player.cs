@@ -7,32 +7,13 @@ using UnityEngine.SceneManagement;
 using Pathfinding;
 using TMPro;
 
-public class Square
-{
-    public float X1 { get; set; }
-    public float Y1 { get; set; }
-    public float X2 { get; set; }
-    public float Y2 { get; set; }
-    public float X3 { get; set; }
-    public float Y3 { get; set; }
-   
 
-    public bool IsPointInside(float x, float y)
-    {
-        float area = 0.5f * Mathf.Abs(X1 * (Y2 - Y3) + X2 * (Y3 - Y1) + X3 * (Y1 - Y2));
-        float area1 = 0.5f * Mathf.Abs(X1 * (y - Y1) + x * (Y1 - Y2) + X2 * (Y2 - y));
-        float area2 = 0.5f * Mathf.Abs(x * (Y2 - Y3) + X2 * (Y3 - y) + X3 * (y - Y2));
-        float area3 = 0.5f * Mathf.Abs(X1 * (Y3 - y) + X3 * (y - Y1) + x * (Y1 - Y3));
-
-        float sumOfAreas = area1 + area2 + area3;
-
-        return Mathf.Abs(sumOfAreas - area) < 0.000001; // Adjust the tolerance as needed
-    }
-}
 
 
 
 public class Player : MonoBehaviour {
+
+    public static Player Instance { get; private set; }
     public bool CutSceenMode { get; set; }
 
     public int MaxHP { get; set; }
@@ -171,7 +152,7 @@ public class Player : MonoBehaviour {
 
     public Camera MainCamera { get; set; }
 
-    public GameObject MouseOB { get; set; }
+    public GameObject MouseUI { get; set; }
 
     public List<GameObject> CollidingItems;
     public List<GameObject> CollidingCharacter;
@@ -229,6 +210,8 @@ public class Player : MonoBehaviour {
 
     private int testint = 0;
     public bool TEST { get; set; }
+
+    private bool AddTestitems;
     public float FadeInDelay { get; set; }
 
     public bool CanFlip = true;
@@ -237,9 +220,17 @@ public class Player : MonoBehaviour {
     private float StaminaSlotWidth = 15;
 
     public new Vector2 FlippingRange = new Vector2(10, 7);
+    [HideInInspector]
+    public GameObject MouseOB;
+
 
     private void Awake()
     {
+        if (Instance == null)
+            Instance = this;
+
+        TEST = true;
+
         DayNight = GameObject.Find("DayAndNight").GetComponent<DayAndNight>();
         inv = GetComponent<Inventory>();
 
@@ -254,8 +245,11 @@ public class Player : MonoBehaviour {
 
 
         HungerAlphaSide = 1;
-        MouseOB = GameObject.Find("MouseOB");
+        MouseUI = GameObject.Find("MouseUI");
 
+
+        MouseOB = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Objects/MouseOB"));
+        MouseOB.name = "MouseOB";
 
         MainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
         mat = Resources.Load<Material>("Shaders/FadeMaterial");
@@ -327,7 +321,6 @@ public class Player : MonoBehaviour {
         SaveTexture = Resources.Load<Texture2D>("Sprites/UI/Flopy");
      
         
-        
         _transform = transform;
         PlayerAnim = GetComponent<Animator>();
         Bodyanim = transform.Find("Body").Find("BodySPRT").GetComponent<Animator>();
@@ -363,7 +356,9 @@ public class Player : MonoBehaviour {
         //PlayerPrefs.DeleteAll();
 
 
-     
+
+
+
 
     }
 
@@ -373,16 +368,24 @@ public class Player : MonoBehaviour {
     }
 
 
-    private void OnGUI()
-    {
-        if(TEST)
-        GUI.Box(new Rect(Screen.width - 200, Screen.height - 100, 200, 100), "TEST", inv.skin.customStyles[0]);
-    }
 
     void Update()
     {
-       
-        if(!StartLoading)
+        if (!AddTestitems && TEST)
+        {
+
+            inv.AddItem(9, 9999, 99, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
+            inv.AddItem(980, 999, 99, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
+            inv.AddItem(1000, 999, 99, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
+            inv.AddItem(1015, 999, 99, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
+
+            AddTestitems = true;
+
+        }
+
+
+
+        if (!StartLoading)
         TimerOnTheScene += Time.deltaTime;
 
 
@@ -403,9 +406,6 @@ public class Player : MonoBehaviour {
 
         if (SliderHPUI)
             DrawHPSliders();
-
-        HungerIncreaser();
-
 
         objectsInRange.Clear();
 
@@ -430,71 +430,25 @@ public class Player : MonoBehaviour {
 
         // if (Input.GetKeyDown(KeyCode.LeftControl)&&Input.GetKeyDown(KeyCode.D))
         // devmode = !devmode;
-      
-        
-      /*  if (IM.enter_b && IM._horizontal>0) testint ++;
-            
-        
 
-        if (testint == 5)
-        {
-            TEST = true;
-           
-        }
-        else TEST = false;
-        */
+
+        /*  if (IM.enter_b && IM._horizontal>0) testint ++;
+
+
+
+          if (testint == 5)
+          {
+              TEST = true;
+
+          }
+          else TEST = false;
+          */
 
         if (TEST)
         {
-            if (IM.RightTrigger)
-            {
-                int thisloc = 0;
 
-                for (int i = 0; i < menu.SL.LocationsNames.Length; i++)
-                {
-                    if (menu.SL.LocationsNames[i] == SceneManager.GetActiveScene().name) thisloc = i;
-                }
-
-
-                if (thisloc < menu.SL.LocationsNames.Length - 1) thisloc++;
-
-                menu.CurrentSlotNumber = 6;
-
-                menu.CurrentSlotLocations[menu.CurrentSlotNumber] = SceneManager.GetActiveScene().name;
-
-
-                menu.SL.ThisLocationIsCreated();
-                
-                menu.TransitionToTheScene(menu.SL.LocationsNames[thisloc], true);
-                
-
-            }
-
-            if (IM.LeftTrigger)
-            {
-                int thisloc = 0;
-
-                for (int i = 0; i < menu.SL.LocationsNames.Length; i++)
-                {
-                    if (menu.SL.LocationsNames[i] == SceneManager.GetActiveScene().name) thisloc = i;
-                }
-
-
-                if (thisloc>0) thisloc--;
-
-                menu.CurrentSlotNumber = 6;
-
-                menu.CurrentSlotLocations[menu.CurrentSlotNumber] = SceneManager.GetActiveScene().name;
-
-
-                menu.SL.ThisLocationIsCreated();
-
-                menu.TransitionToTheScene(menu.SL.LocationsNames[thisloc], true);
-               
-
-            }
-
-            if (TEST && IM.inventory_b)
+           
+            if (Input.GetKeyDown(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.A))
             {
 
                 for (int i = 0; i < inv.database.items.Count; i++)
@@ -506,60 +460,20 @@ public class Player : MonoBehaviour {
                 }
 
             }
-        }
 
-
-
-        if (Input.GetKeyDown(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.A))
-        {
-
-            for (int i = 0; i < inv.database.items.Count; i++)
+            if (Input.GetKeyDown(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Equals))
             {
-                if (inv.database.items[i].CanStack)
-                    inv.AddItem(inv.database.items[i].itemID, 999, inv.database.items[i].Durability, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
-                else
-                    inv.AddItem(inv.database.items[i].itemID, 1, inv.database.items[i].Durability, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
+
+                inv.AddItem(9, 999, 99999, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
+
+
             }
 
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Equals))
-        {
-
-            inv.AddItem(9, 999, 99999, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
-            
-
-        }
 
 
-
-
-        if (devmode)
-        {
-            if (Input.GetKeyDown(KeyCode.F12))
-            {
-                float bgvol = PlayerPrefs.GetFloat("BG_V");
-                float objvol = PlayerPrefs.GetFloat("Objects_V");
-                float mastervol = PlayerPrefs.GetFloat("Master_V");
-              //  int bossfights = PlayerPrefs.GetInt("BossFights");
-
-                PlayerPrefs.DeleteAll();
-
-              //  PlayerPrefs.SetInt("BossFights", bossfights);
-                PlayerPrefs.SetFloat("Master_V", mastervol);
-                PlayerPrefs.SetFloat("Objects_V", objvol);
-                PlayerPrefs.SetFloat("BG_V", bgvol);
-
-
-                PlayerPrefs.SetInt("FirstRun", 0);
-
-
-                SceneManager.LoadScene("Menu");
-            }
-           
-        }
-
-
+  
 
 
         if (_gameover)
@@ -575,13 +489,13 @@ public class Player : MonoBehaviour {
         {
             Anim();
         }
-        
-        
+
+        MousePlayerMove();
         if (!_gameover && !menu.MenuONOFF && !_constr.Building && !StartLoading)
         {
             HandleInput();
             Timer();
-            MousePlayerMove();
+     
           
         }
 
@@ -672,7 +586,6 @@ public class Player : MonoBehaviour {
     {
 
 
-        BulletsControll();
         CollRemoval();
 
 
@@ -681,26 +594,6 @@ public class Player : MonoBehaviour {
     }
 
 
-
-    void BulletsControll()
-    {
-        for (int j = 0; j < GameObject.FindGameObjectsWithTag("Bullet").Length; j++)
-        {
-            GameObject b = GameObject.FindGameObjectsWithTag("Bullet")[j].gameObject;
-            
-            if (b.GetComponent<CollList>().GetCollList().Contains(gameObject)  && b.GetComponent<Bullet>().DamagePlayer && Invinc < Time.fixedTime)
-            {
-                ReceiveDamage(b.GetComponent<Bullet>().Damage);
-
-            
-
-                BlowThisSmall(b);
-        
-            }
-    
-            
-        }
-    }
 
 
 
@@ -1087,7 +980,7 @@ public class Player : MonoBehaviour {
         }
         else
         {
-            ApplyLayerOrder(obj, layerName, out parentLayerOrder, layerBuffer, boxCollider.bounds.min.y);
+            ApplyLayerOrder(obj, layerName, out parentLayerOrder, layerBuffer, boxCollider.bounds.min.y, boxCollider.bounds.min.x);
         }
 
         layerPlus = parentLayerOrder;
@@ -1113,236 +1006,14 @@ public class Player : MonoBehaviour {
         }
     }
 
-    string TriangleCollision(GameObject obj)
-    {
-
-        bool FG = false;
-        bool BG = false;
-        string LLayer = StartLayer;
-
-        BoxCollider2D PlayerBox = GetComponent<BoxCollider2D>();
-        BoxCollider2D _boxcollider = obj.GetComponent<BoxCollider2D>();
-
-        PubObject PO = obj.GetComponent<PubObject>();
-        Bounds BoxBounds = _boxcollider.bounds;
-
-        if (PO == null)
-        {
-
-            if (_boxcollider.bounds.min.y < PlayerBox.bounds.min.y)
-                LLayer = ForG;
-            else
-                LLayer = StartLayer;
-
-            return LLayer;
-
-
-        }
-      
-
-
-        Vector2 playerpos = new Vector2(_transform.position.x + side*0.1f, _transform.position.y - 0.15f);
-
-        Square triangleLeftBG0 = new Square()
-        {
-            X1 = BoxBounds.center.x,
-            Y1 = BoxBounds.min.y,
-            X2 = BoxBounds.min.x,
-            Y2 = BoxBounds.min.y,
-            X3 = BoxBounds.min.x,
-            Y3 = BoxBounds.min.y + (BoxBounds.center.x - BoxBounds.min.x) / 2
-        };
-
-
-        Square triangleRightBG0 = new Square()
-        {
-            X1 = BoxBounds.center.x,
-            Y1 = BoxBounds.min.y,
-            X2 = BoxBounds.max.x,
-            Y2 = BoxBounds.min.y,
-            X3 = BoxBounds.max.x,
-            Y3 = BoxBounds.min.y + (BoxBounds.max.x - BoxBounds.center.x) / 2
-        };
-
-
-
-
-        Square triangleLeftFG0 = new Square()
-        {
-            X1 = BoxBounds.center.x,
-            Y1 = BoxBounds.max.y,
-            X2 = BoxBounds.min.x,
-            Y2 = BoxBounds.max.y,
-            X3 = BoxBounds.min.x,
-            Y3 = BoxBounds.max.y - (BoxBounds.center.x - BoxBounds.min.x) / 2
-        };
-
-
-        Square triangleRightFG0 = new Square()
-        {
-            X1 = BoxBounds.center.x,
-            Y1 = BoxBounds.max.y,
-            X2 = BoxBounds.max.x,
-            Y2 = BoxBounds.max.y,
-            X3 = BoxBounds.max.x,
-            Y3 = BoxBounds.max.y - (BoxBounds.center.x - BoxBounds.min.x) / 2
-        };
-
-
-
-        bool isInsideBGLeft0 = triangleLeftBG0.IsPointInside(playerpos.x, playerpos.y);
-
-
-
-        bool isInsideBGRight0 = triangleRightBG0.IsPointInside(playerpos.x, playerpos.y);
-
-        bool isInsideFGLeft0 = triangleLeftFG0.IsPointInside(playerpos.x, playerpos.y);
-
-        bool isInsideFGRight0 = triangleRightFG0.IsPointInside(playerpos.x, playerpos.y);
-
-
-        if (isInsideBGLeft0) PO.AddLeftBG = 0.5f;
-
-        if (isInsideBGRight0) PO.AddRightBG = 0.5f;
-
-        if (isInsideFGLeft0) PO.AddLeftFG = 0.5f;
-
-        if (isInsideFGRight0) PO.AddRightFG = 0.5f;
-
-        Square triangleLeftBG = new Square()
-        {
-            X1 = BoxBounds.center.x,
-            Y1 = BoxBounds.min.y,
-            X2 = BoxBounds.min.x - PO.AddLeftBG,
-            Y2 = BoxBounds.min.y,
-            X3 = BoxBounds.min.x - PO.AddLeftBG,
-            Y3 = BoxBounds.min.y + (PO.AddLeftBG + BoxBounds.center.x - BoxBounds.min.x) / 2
-        };
-
-
-        Square triangleRightBG = new Square()
-        {
-            X1 = BoxBounds.center.x,
-            Y1 = BoxBounds.min.y,
-            X2 = BoxBounds.max.x + PO.AddRightBG,
-            Y2 = BoxBounds.min.y,
-            X3 = BoxBounds.max.x + PO.AddRightBG,
-            Y3 = BoxBounds.min.y + (PO.AddRightBG + BoxBounds.max.x - BoxBounds.center.x) / 2
-        };
-
-
-
-
-        Square triangleLeftFG = new Square()
-        {
-            X1 = BoxBounds.center.x,
-            Y1 = BoxBounds.max.y,
-            X2 = BoxBounds.min.x - PO.AddLeftFG,
-            Y2 = BoxBounds.max.y,
-            X3 = BoxBounds.min.x - PO.AddLeftFG,
-            Y3 = BoxBounds.max.y - (PO.AddLeftFG + BoxBounds.center.x - BoxBounds.min.x) / 2
-        };
-
-
-        Square triangleRightFG = new Square()
-        {
-            X1 = BoxBounds.center.x,
-            Y1 = BoxBounds.max.y,
-            X2 = BoxBounds.max.x + PO.AddRightFG,
-            Y2 = BoxBounds.max.y,
-            X3 = BoxBounds.max.x + PO.AddRightFG,
-            Y3 = BoxBounds.max.y - (PO.AddRightFG + BoxBounds.center.x - BoxBounds.min.x) / 2
-        };
-
-
-        // Check if point P(3, 3) is inside the triangle
-
-
-        PO.isInsideBGLeft = triangleLeftBG.IsPointInside(playerpos.x, playerpos.y);
-
-
-
-        PO.isInsideBGRight = triangleRightBG.IsPointInside(playerpos.x, playerpos.y);
-
-        PO.isInsideFGLeft = triangleLeftFG.IsPointInside(playerpos.x, playerpos.y);
-
-        PO.isInsideFGRight = triangleRightFG.IsPointInside(playerpos.x, playerpos.y);
-
-
-
-        if (!PO.isInsideBGLeft && !PO.isInsideBGRight && !PO.isInsideFGLeft && !PO.isInsideFGRight)
-        {
-            FG = BG = false;
-            PO.AddLeftBG = PO.AddRightBG = 0;
-            PO.AddLeftFG = PO.AddRightFG = 0;
-
-
-           
-        }
-
-        if ((PO.isInsideBGLeft || PO.isInsideBGRight) && !FG) BG = true;
-        if ((PO.isInsideFGLeft || PO.isInsideFGRight) && !BG) FG = true;
-
-
-        if (FG) BG = false;
-        if (BG) FG = false;
-
-
-
-        Debug.DrawLine(new Vector3(triangleLeftBG.X1, triangleLeftBG.Y1), new Vector3(triangleLeftBG.X2, triangleLeftBG.Y2), Color.red);
-        Debug.DrawLine(new Vector3(triangleLeftBG.X2, triangleLeftBG.Y2), new Vector3(triangleLeftBG.X3, triangleLeftBG.Y3), Color.red);
-        Debug.DrawLine(new Vector3(triangleLeftBG.X3, triangleLeftBG.Y3), new Vector3(triangleLeftBG.X1, triangleLeftBG.Y1), Color.red);
-
-
-
-        Debug.DrawLine(new Vector3(triangleLeftFG.X1, triangleLeftFG.Y1), new Vector3(triangleLeftFG.X2, triangleLeftFG.Y2), Color.red);
-        Debug.DrawLine(new Vector3(triangleLeftFG.X2, triangleLeftFG.Y2), new Vector3(triangleLeftFG.X3, triangleLeftFG.Y3), Color.red);
-        Debug.DrawLine(new Vector3(triangleLeftFG.X3, triangleLeftFG.Y3), new Vector3(triangleLeftFG.X1, triangleLeftFG.Y1), Color.red);
-
-        Debug.DrawLine(new Vector3(triangleRightBG.X1, triangleRightBG.Y1), new Vector3(triangleRightBG.X2, triangleRightBG.Y2), Color.red);
-        Debug.DrawLine(new Vector3(triangleRightBG.X2, triangleRightBG.Y2), new Vector3(triangleRightBG.X3, triangleRightBG.Y3), Color.red);
-        Debug.DrawLine(new Vector3(triangleRightBG.X3, triangleRightBG.Y3), new Vector3(triangleRightBG.X1, triangleRightBG.Y1), Color.red);
-
-
-
-        Debug.DrawLine(new Vector3(triangleRightFG.X1, triangleRightFG.Y1), new Vector3(triangleRightFG.X2, triangleRightFG.Y2), Color.red);
-        Debug.DrawLine(new Vector3(triangleRightFG.X2, triangleRightFG.Y2), new Vector3(triangleRightFG.X3, triangleRightFG.Y3), Color.red);
-        Debug.DrawLine(new Vector3(triangleRightFG.X3, triangleRightFG.Y3), new Vector3(triangleRightFG.X1, triangleRightFG.Y1), Color.red);
-
-
-
-       
-        if (FG)
-        {
-            LLayer = ForG;
-        }
-        else if (BG)
-        {
-
-            LLayer = StartLayer;
-        }
-
-        if (!BG && !FG)
-        {
-            if (_transform.position.y - 0.2f > _boxcollider.bounds.center.y)
-            {
-
-                LLayer = ForG;
-            }
-            else LLayer = StartLayer;
-        }
-
-        return LLayer;
-    }
-
 
    
 
-    void ApplyLayerOrder(GameObject ob, string larename, out int outorder, int layerbuffer, float ypos)
+    void ApplyLayerOrder(GameObject ob, string larename, out int outorder, int layerbuffer, float ypos, float xpos)
     {
         ob.GetComponent<SpriteRenderer>().sortingLayerName = larename;
-        ob.GetComponent<SpriteRenderer>().sortingOrder = (int)(ypos * layerbuffer);
-        outorder = (int)(ypos * layerbuffer);
+        ob.GetComponent<SpriteRenderer>().sortingOrder = (int)(ypos * layerbuffer) + (int)(xpos);
+        outorder = (int)(ypos * layerbuffer) + (int)(xpos );
 
 
     }
@@ -1491,46 +1162,8 @@ public class Player : MonoBehaviour {
 
 
 
-    public void ReceiveDamage(int damage)
-    {
-        if (_gameover || MutationTimer > Time.fixedTime) return;
-        if (Invinc < Time.fixedTime && DashTimer < Time.fixedTime)
-        {
-            
-            HP -= damage;
-            PlaySoundsPitched(DamageClips[Random.Range(0, DamageClips.Count)],1);
-
-            Invinc = Time.fixedTime + 1;
-
-            if (Showdamage)
-                inv.ADDPickedName(damage.ToString(), 1,1, _transform.position);
-        }
-
-    }
-
-     void HungerIncreaser()
-     {
-        if (HungerDamage <= 0) return;
-        if (Hunger >= MaxHunger) _constr.AddLogPartOnes("You are starving!", "Ти вмираєш з голоду!", "あなたは飢えている！", gameObject);
-        else _constr.RemoveLogPart("You are starving!");
-
-        if (HungerTimer < Time.fixedTime && !StartLoading && !menu.MenuONOFF)
-        {
-            if (Hunger < MaxHunger)
-            {
-                Hunger++;
-                HungerTimer = Time.fixedTime + (DayNight.DayLength / MaxHunger) / 2;
-            }
-            else
-            {
-                ReceiveDamage(HungerDamage);
-                HungerTimer = Time.fixedTime + (DayNight.DayLength / MaxHunger) / 4;
-            }
-
-           
-        }
-
-     }
+ 
+    
 
     public void PlaySoundsPitched(AudioClip AC,float pitch)
     {
@@ -2102,17 +1735,32 @@ public class Player : MonoBehaviour {
     {
         if (IM.RightMouseButton)
         {
-            Vector2 Move =  MainCamera.ScreenToWorldPoint(MouseOB.transform.position)  - _transform.position  ;
+            Vector2 Move =  MainCamera.ScreenToWorldPoint(MouseUI.transform.position)  - _transform.position  ;
             
             _normalHSpeed = Move.normalized.x * SpeedMultiplier;
             _normalVSpeed = Move.normalized.y * SpeedMultiplier;
 
         }
 
+        MouseOB.transform.position = MainCamera.ScreenToWorldPoint(MouseUI.transform.position);
 
-     
+
+
     }
 
+    public List<GameObject> GetMouseCollList()
+    {
+
+        return MouseUI.GetComponent<CollList>().coll_obj;
+    }
+
+    public List<GameObject> GetMouseOBCollList()
+    {
+
+        return MouseOB.GetComponent<CollList>().coll_obj;
+    }
+
+    
     public void RescanInBounds(Bounds bound)
     {
         AstarPath.active.UpdateGraphs(bound);

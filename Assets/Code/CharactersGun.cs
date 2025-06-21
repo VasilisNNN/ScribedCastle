@@ -77,7 +77,7 @@ public class CharactersGun : MonoBehaviour
 
     
 
-        if (pl.MouseOB.GetComponent<MouseController>().ObjectColl(gameObject))
+        if (pl.GetMouseCollList().Contains(gameObject))
             lineRenderer.enabled = true;
         else lineRenderer.enabled = false;
 

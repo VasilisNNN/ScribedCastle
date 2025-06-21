@@ -376,18 +376,7 @@ public class CharacterMove : MonoBehaviour
         }
 
 
-        if (pl.coll_obj.Contains(gameObject) && !WallObsticleCheck(pl.gameObject))
-        {
-            if ((GetComponent<StatsControll>() != null && GetComponent<MovementControll>()==null))
-            {
-                if (GetComponent<StatsControll>().Damage > 0)
-                {
-                    pl.ReceiveDamage(GetComponent<StatsControll>().Damage);
-                    GetComponent<StatsControll>().HP = 0;
-                }
-            }
-        }
-
+      
 
         if (path == null)
         {

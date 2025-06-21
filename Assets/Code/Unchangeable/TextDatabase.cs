@@ -624,8 +624,50 @@ new StringList[1]{
                        })
 
 }
+
+
 ));
 
+
+        textEN.Add(
+new TextA(20, "Note",
+new string[1] { "Note" },
+new StringList[1]{
+                      new StringList(new string[]{
+                       "The tower with glass has to be constructed. It is almost glass everywhere.",
+                       "Only the second tower in the first row and the fourth in the third are arch walls.",
+                       "The top of the tower is the regular church rooftop."
+                       })
+
+}
+));
+
+
+        textEN.Add(
+new TextA(21, "Note",
+new string[1] { "Note" },
+new StringList[1]{
+                      new StringList(new string[]{
+                       "The story is about a secret society. So hidden that it can not provide even a description of the building.",
+                       "But I know what it is. Pay attention to the middle column in the first row. There is some glass in the first and second middle segments.",
+                       "You also need Thin columns for the middle segments everywhere except the middle one on the back. That column assembled of the regular secret society walls."
+                       })
+
+}
+));
+
+
+        textEN.Add(
+new TextA(22, "Note",
+new string[1] { "Note" },
+new StringList[1]{
+                      new StringList(new string[]{
+                       "This one is tricky. You will need Thieves walls, Base castle wall, Golden wall, Fat column, Church rooftop, and Sphere column.",
+                       "Put golden walls in the middle, where only one floor is preserved. The rest of the square walls are thieves' walls, and everything else can be recognized by its silhouettes."
+                       })
+
+}
+));
 
         for (int i = 0; i < textJP.Count; i++)
         {

@@ -21,6 +21,7 @@ public class GamepadUI : MonoBehaviour
 
     private void Awake()
     {
+
         IMG = GetComponent<Image>();
         SPRT = GetComponent<SpriteRenderer>();
 
@@ -42,6 +43,8 @@ public class GamepadUI : MonoBehaviour
             SPRT.sprite = GamepadSPRT;
 #endif
 
+     
+
     }
 
     void Start()
@@ -54,12 +57,12 @@ public class GamepadUI : MonoBehaviour
     
     void Update()
     {
-        /*
+        
         if (IMG != null)
             IMG.enabled = false;
         if (SPRT != null)
             SPRT.enabled = false;
-            */
+            
 
 #if UNITY_STANDALONE
         if (!IM.joystick)

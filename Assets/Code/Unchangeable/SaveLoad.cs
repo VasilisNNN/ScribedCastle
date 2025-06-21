@@ -5,10 +5,7 @@ using System.IO;
 using System;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
-using System.Runtime.InteropServices.ComTypes;
-using System.Data.SqlClient;
 using System.Drawing;
-using UnityEditor;
 
 
 #if UNITY_PS5|| UNITY_PS4
@@ -45,7 +42,7 @@ public class StartStart
 
 }
 
-[System.Serializable]
+
 public class SaveLoad : MonoBehaviour
 {
     [HideInInspector]
@@ -113,8 +110,8 @@ public class SaveLoad : MonoBehaviour
     public nn.account.UserHandle userHandle;
     public nn.account.Uid userId;
     [HideInInspector]
-    public string mountName = "LetsCastleSave";
-    private string fileName = "LetsCastleSaveData";
+    public string mountName = "ScribedCSave";
+    private string fileName = "ScribedCSaveData";
 
     private string filePath;
     private nn.fs.FileHandle fileHandle = new nn.fs.FileHandle();
@@ -128,8 +125,8 @@ public class SaveLoad : MonoBehaviour
 #if UNITY_PS5|| UNITY_PS4
     
     [HideInInspector]
-    public string mountName = "LetsCastleSave";
-    private string fileName = "LetsCastleSaveData";
+    public string mountName = "ScribedCSave";
+    private string fileName = "ScribedCSaveData";
 
 
     private const int saveDataVersion = 1;
@@ -193,42 +190,40 @@ public class SaveLoad : MonoBehaviour
 
 #if UNITY_SWITCH
 
-        mountName = "LetsCastleSave";
-        fileName = "LetsCastleSaveData";
+        mountName = "ScribedCSave";
+        fileName = "ScribedCSaveData";
 
         filePath = string.Format("{0}:/{1}", mountName, fileName);
 #endif
 
-
+        print("saveload start 0");
         if (GameObject.Find("PathFinding") != null)
             AP = GameObject.Find("PathFinding").GetComponent<AstarPath>();
-
+        print("saveload start 01");
         if (GameObject.Find("TUTORIAL") != null) _Tutorial = GameObject.Find("TUTORIAL").GetComponent<Tutorial>();
-
-         TopBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Top Scafolds") };
-
+        print("saveload start 02");
+        TopBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Top Scafolds") };
+        print("saveload start 03");
         KitchenBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/KitchenFloor") };
-        FloorBrush = new TileBase[11] {
-            Resources.Load<TileBase>("Brushes/Floor"),
-            Resources.Load<TileBase>("Brushes/Floor2"),
-            Resources.Load<TileBase>("Brushes/Floor3"),
-            Resources.Load<TileBase>("Brushes/Floor4"),
-            Resources.Load<TileBase>("Brushes/Pit"),
-            Resources.Load<TileBase>("Brushes/Road"),
-            Resources.Load<TileBase>("Brushes/Grass floor"),
-            Resources.Load<TileBase>("Brushes/Ground"),
-            Resources.Load<TileBase>("Brushes/Sand"),
-            Resources.Load<TileBase>("Brushes/Rock"),
-            Resources.Load<TileBase>("Brushes/WaterDitch"),
+        
+        FloorBrush = new TileBase[] {
+            Resources.Load<RuleTile>("Brushes/Floor"),
+            Resources.Load<RuleTile>("Brushes/Stone floor"),
+            Resources.Load<RuleTile>("Brushes/Road"),
+            Resources.Load<RuleTile>("Brushes/GrassRegular"),
+            Resources.Load<RuleTile>("Brushes/Mud"),
+            Resources.Load<RuleTile>("Brushes/Sand"),
+            Resources.Load<RuleTile>("Brushes/Rock"),
+            Resources.Load<RuleTile>("Brushes/Dark sand"),
         };
 
-
+        print("saveload start 1");
         BaseBrush = new TileBase[1] {
-            Resources.Load<TileBase>("Brushes/Isometric/Ground")
+            Resources.Load<TileBase>("Brushes/Ground")
             };
 
         GrassBrush = new TileBase[1] {
-            Resources.Load<TileBase>("Brushes/Grass")
+            Resources.Load<TileBase>("Brushes/GrassRegular")
             };
 
         PitBrush = new TileBase[2] {
@@ -237,7 +232,7 @@ public class SaveLoad : MonoBehaviour
             };
 
 
-
+        print("saveload start 2");
         for (int i = 0; i < 100; i++)
             BPConstructed.Add(0);
 
@@ -247,14 +242,14 @@ public class SaveLoad : MonoBehaviour
         LocationsMenu.Add("ChoosePlayer_Tutorial");
         LocationsMenu.Add("Intro_Tutorial");
         LocationsMenu.Add("Intro");
-
+        print("saveload start 3");
 
         LocationsNames = new string[6] { "Tutorial", "Main location", "Winter", "Spring", "Summer", "Autumn" };
         
         CreateLocationOnStart = new int[LocationsNames.Length];
 
 
-
+        print("saveload start 4");
         if (GameObject.Find("Grid") != null)
         {
             if (GameObject.Find("Grid").GetComponent<GenerateMap>() != null)
@@ -265,7 +260,7 @@ public class SaveLoad : MonoBehaviour
 
         }
 
-
+        print("saveload start 5");
         if (GenMap == null)
         {
             if (GameObject.Find("FadeIn") != null)
@@ -286,7 +281,7 @@ public class SaveLoad : MonoBehaviour
 
         TileNames = new string[3721];
 
-    
+        print("saveload start 6");
         _menu = GameObject.Find("Constructor").GetComponent<MenuCustom>();
         _constr = GameObject.Find("Constructor").GetComponent<Constructor>();
 
@@ -294,7 +289,7 @@ public class SaveLoad : MonoBehaviour
         _DayAndNight = GameObject.Find("DayAndNight").GetComponent<DayAndNight>();
 
         LoadingState = 0;
-
+        print("saveload start 7");
 #if UNITY_PS5 || UNITY_PS4
 
         PS_SaveMain = GetComponent<SonySaveDataMain>();
@@ -1885,8 +1880,7 @@ public class SaveLoad : MonoBehaviour
         if (_constr == null)
         {
 
-            if (GameObject.Find("FogOfWar") != null)
-                GameObject.Find("FogOfWar").GetComponent<FogOfWar>().OnLoad();
+       
 
             Loading = false;
 
@@ -1951,9 +1945,6 @@ public class SaveLoad : MonoBehaviour
         LoadTimer = (int)((_constr.TOnBoard.Count * 3 + _constr.OBOnBoard.Count * 5 + 11) / 32);
 
 
-
-        if (GameObject.Find("FogOfWar") != null)
-            GameObject.Find("FogOfWar").GetComponent<FogOfWar>().OnLoad();
 
         Loading = false;
     }
@@ -2450,12 +2441,11 @@ public class SaveLoad : MonoBehaviour
     void SetObjectsOnBoard()
     {
         if (_menu.FirstStart == 0) return;
-        OnScreenLog.Add("SetObjectsOnBoard 0");
+ 
 
 
         for (int i = 0; i < ConstructedStructures_Count; i++)
         {
-            OnScreenLog.Add("SetObjectsOnBoard 1 / ConstructedStructures_Count: " + ConstructedStructures_Count);
             GameObject n = null;
 
             if (OB_names[i] != "")
@@ -2567,15 +2557,12 @@ public class SaveLoad : MonoBehaviour
 
         if (inv.GetItemInDatabase(OB_IDs[i]).ObjectPrefs == null)
         {
-            OnScreenLog.Add("NO PREFAB OBJECT!!!!! ID: " + OB_IDs[i]);
             return;
         }
-        OnScreenLog.Add("CreateGroundObject 0 ");
-
+       
         if (ParentOB == null)
         {
-            OnScreenLog.Add("CreateGroundObject 1 ");
-
+          
             n = Instantiate<GameObject>(inv.GetItemInDatabase(OB_IDs[i]).ObjectPrefs);
             n.name = OB_names[i];
             PubObject _pubObject = n.GetComponent<PubObject>();
@@ -2599,11 +2586,6 @@ public class SaveLoad : MonoBehaviour
                 _pubObject.TrueName.Add(OB_names[i]);
             }
 
-
-            if (n.GetComponent<Products>() != null)
-            {
-                n.GetComponent<Products>().enabled = true;
-            }
 
 
             if (_polygonCollider2D != null)
@@ -2629,9 +2611,7 @@ public class SaveLoad : MonoBehaviour
         }
 
         if (ParentOB.GetComponent<MovementControll>() != null) return;
-
-        OnScreenLog.Add("CreateGroundObject 2 ");
-        n = Instantiate<GameObject>(inv.GetItemInDatabase(OB_IDs[i]).ObjectPrefs);
+         n = Instantiate<GameObject>(inv.GetItemInDatabase(OB_IDs[i]).ObjectPrefs);
 
         n.name = OB_xpos[i] + "_" + OB_ypos[i];
         PubObject _PubObject = n.GetComponent<PubObject>();
@@ -2898,8 +2878,7 @@ public class SaveLoad : MonoBehaviour
 
     void PS5_LoadAllVariables(ref BinaryReader reader)
     {
-        OnScreenLog.Add("PS5_LoadAllVariables Position " + reader.BaseStream.Position);
-
+       
         /*
         if (_constr == null)
         {

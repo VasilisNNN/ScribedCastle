@@ -20,8 +20,7 @@ public class GenerateMoney : MonoBehaviour
     public bool OnOccupation;
     void Start()
     {
-        MouseOB = GameObject.Find("MouseOB");
-
+    
         constr = GameObject.Find("Constructor").GetComponent<Constructor>();
         pl = GameObject.Find("Player").GetComponent<Player>();
 

@@ -62,12 +62,11 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
-    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMipmapLimit: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -90,7 +89,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 32
+  spritePixelsToUnits: 256
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -106,12 +105,11 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 1
-  swizzle: 50462976
   cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 256
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 0
@@ -120,7 +118,7 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
     androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 1
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Standalone
     maxTextureSize: 256
@@ -132,7 +130,7 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
     androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 1
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Nintendo Switch
     maxTextureSize: 256
@@ -193,6 +191,18 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: PS5
+    maxTextureSize: 256
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -201,9 +211,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 192
-        width: 64
-        height: 64
+        y: 1536
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -221,10 +231,10 @@ TextureImporter:
       name: WandEffect_1
       rect:
         serializedVersion: 2
-        x: 64
-        y: 192
-        width: 64
-        height: 64
+        x: 512
+        y: 1536
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -242,10 +252,10 @@ TextureImporter:
       name: WandEffect_2
       rect:
         serializedVersion: 2
-        x: 128
-        y: 192
-        width: 64
-        height: 64
+        x: 1024
+        y: 1536
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -263,10 +273,10 @@ TextureImporter:
       name: WandEffect_3
       rect:
         serializedVersion: 2
-        x: 192
-        y: 192
-        width: 64
-        height: 64
+        x: 1536
+        y: 1536
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -285,9 +295,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 128
-        width: 64
-        height: 64
+        y: 1024
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -305,10 +315,10 @@ TextureImporter:
       name: WandEffect_5
       rect:
         serializedVersion: 2
-        x: 64
-        y: 128
-        width: 64
-        height: 64
+        x: 507
+        y: 1027
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -326,10 +336,10 @@ TextureImporter:
       name: WandEffect_6
       rect:
         serializedVersion: 2
-        x: 128
-        y: 128
-        width: 64
-        height: 64
+        x: 1024
+        y: 1026
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -347,10 +357,10 @@ TextureImporter:
       name: WandEffect_7
       rect:
         serializedVersion: 2
-        x: 192
-        y: 128
-        width: 64
-        height: 64
+        x: 1536
+        y: 1024
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -369,9 +379,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 64
-        width: 64
-        height: 64
+        y: 513
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -389,10 +399,10 @@ TextureImporter:
       name: WandEffect_9
       rect:
         serializedVersion: 2
-        x: 79
-        y: 80
-        width: 32
-        height: 41
+        x: 634
+        y: 597
+        width: 253
+        height: 318
       alignment: 9
       pivot: {x: 0.5, y: 0.2}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -410,10 +420,10 @@ TextureImporter:
       name: WandEffect_10
       rect:
         serializedVersion: 2
-        x: 114
-        y: 80
-        width: 32
-        height: 41
+        x: 929
+        y: 599
+        width: 224
+        height: 315
       alignment: 9
       pivot: {x: 0.5, y: 0.2}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -431,10 +441,10 @@ TextureImporter:
       name: WandEffect_11
       rect:
         serializedVersion: 2
-        x: 149
-        y: 80
-        width: 32
-        height: 41
+        x: 1197
+        y: 599
+        width: 256
+        height: 316
       alignment: 9
       pivot: {x: 0.5, y: 0.2}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -490,6 +500,48 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: WandEffect_14
+      rect:
+        serializedVersion: 2
+        x: 1468
+        y: 599
+        width: 256
+        height: 317
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4ae2268f8316c204f8caa7e2f134371b
+      internalID: 1986797512
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WandEffect_15
+      rect:
+        serializedVersion: 2
+        x: 1752
+        y: 600
+        width: 296
+        height: 323
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d3a3f72c56bb98c42b641c0b1bff7f7f
+      internalID: 113354199
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -507,6 +559,8 @@ TextureImporter:
       WandEffect_11: -5983671664953133018
       WandEffect_12: -2095607834235731320
       WandEffect_13: -1535814286624756042
+      WandEffect_14: 1986797512
+      WandEffect_15: 113354199
       WandEffect_2: -3344799303526752728
       WandEffect_3: -4652458683821077712
       WandEffect_4: -271557678688746289
@@ -515,8 +569,9 @@ TextureImporter:
       WandEffect_7: 4484556594512491385
       WandEffect_8: -62589556166814424
       WandEffect_9: -7374448385268801824
-  mipmapLimitGroupName: 
+  spritePackingTag: 
   pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

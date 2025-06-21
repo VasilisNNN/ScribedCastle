@@ -53,19 +53,28 @@ public class BlueprintMenu : MonoBehaviour
     private GameObject EscapeBlueprint;
 
     private BlueprintDatabase BData;
+    private Transform BlueprintNameBG, BlueprintBG;
     private TextMeshProUGUI BlueprintNameText, BlueprintDescText;
     private float partWidth = 80;
 
-
+    private int FadePosition;
+    private GameObject FadeCursor;
     void Start()
     {
         BData = gameObject.AddComponent<BlueprintDatabase>();
         BlueprintNameText = GameObject.Find("BlueprintNameText").GetComponent<TextMeshProUGUI>();
         BlueprintDescText = GameObject.Find("BlueprintDescText").GetComponent<TextMeshProUGUI>();
+
+        BlueprintNameBG = GameObject.Find("BlueprintNameBG").GetComponent<Transform>();
+
+        BlueprintBG = GameObject.Find("BlueprintBG").GetComponent<Transform>();
+
         EscapeBlueprint = GameObject.Find("EscapeBlueprint");
 
         BlueprintText = transform.Find("BlueprintText").GetComponent<TextMeshProUGUI>();
         LastBlueprint = -1;
+
+        FadeCursor = transform.Find("FadeCursor").gameObject;
 
         StatsOBJ = GameObject.Find("Stats");
         AS = GetComponent<AudioSource>();
@@ -270,21 +279,21 @@ public class BlueprintMenu : MonoBehaviour
      
         for (int i = 0; i < Rewards.Count; i++)
         {
-          
+            TextMeshProUGUI TMesh = Rewards[i].transform.Find("Text").GetComponent<TextMeshProUGUI>();
 
 
-            Rewards[i].transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "";
+            TMesh.text = "";
 
             if(menu.Language ==0)
-            Rewards[i].transform.Find("Text").GetComponent<TextMeshProUGUI>().text += "Reward: ";
+                TMesh.text += "Reward: ";
             if (menu.Language == 1)
-                Rewards[i].transform.Find("Text").GetComponent<TextMeshProUGUI>().text += "Нагорода: ";
+                TMesh.text += "Нагорода: ";
 
             if (menu.Language == 2)
-                Rewards[i].transform.Find("Text").GetComponent<TextMeshProUGUI>().text += "報酬: ";
+                TMesh.text += "報酬: ";
 
             for (int j = 0; j < BP[i].Rewards.Length; j++)
-                Rewards[i].transform.Find("Text").GetComponent<TextMeshProUGUI>().text += inv.GetItemInDatabase(BP[i].Rewards[j].itemID).itemNames[menu.Language] + " x" + BP[i].Rewards[j].Count;
+                TMesh.text += inv.GetItemInDatabase(BP[i].Rewards[j].itemID).itemNames[menu.Language] + " x" + BP[i].Rewards[j].Count + "\n";
         }
     }
 
@@ -323,8 +332,9 @@ void MoveBlueprints()
             if (BlueFloorObjects[i].transform.Find("BluePrintDone") != null)
                 BlueFloorObjects[i].transform.Find("BluePrintDone").GetComponent<RectTransform>().anchoredPosition = new Vector2(BlueFloorObjects[i].GetComponent<RectTransform>().anchoredPosition.x + BPSlotWidth / 3, BlueFloorObjects[i].GetComponent<RectTransform>().anchoredPosition.y - BPSlotWidth / 3);
 
+            if (menu.SL.BPConstructed[i] != 0) return;
 
-            if (ReadObject(BP[i].ObjectList) && menu.SL.BPConstructed[i] == 0 && BP[i].Rewards.Length>0)
+            if (ReadObject(BP[i].ObjectList)  && BP[i].Rewards.Length>0)
             {
           
                 for (int r = 0; r < BP[i].Rewards.Length; r++)
@@ -416,18 +426,64 @@ void MoveBlueprints()
     }
     void LayersAnimation()
     {
+        Vector2 pos = pl.IM.MousePosition;
+        float pw = partWidth;
+
+
+        if (!pl.IM.MouseMode)
+        {
+            if (pl.IM._vertical > 0 && FadePosition < 6 && pl.IM.ActionDelay < Time.fixedTime)
+            {
+                FadePosition++;
+                pl.IM.ActionDelay = Time.fixedTime + 0.1f;
+            }
+            if (pl.IM._vertical < 0 && FadePosition > -6 && pl.IM.ActionDelay < Time.fixedTime)
+            {
+                FadePosition--;
+                pl.IM.ActionDelay = Time.fixedTime + 0.1f;
+            }
+
+       
+#if UNITY_SWITCH
+            pw = partWidth / 2 + partWidth/6;
+#endif
+
+            pos = new Vector2(0, BluePrintObjects[CurrentBP].GetComponent<RectTransform>().position.y + FadePosition * pw);
+
+            FadeCursor.GetComponent<RectTransform>().position = 
+               
+                new Vector2(BluePrintObjects[CurrentBP].GetComponent<RectTransform>().position.x + pw * 5, BluePrintObjects[CurrentBP].GetComponent<RectTransform>().position.y + FadePosition * pw );
+
+
+        }
 
 
         int CountCount = BluePrintObjects[CurrentBP].transform.childCount;
 
-        if (Mathf.Abs(BluePrintObjects[CurrentBP].GetComponent<RectTransform>().position.x - pl.IM.MousePosition.x) > 500 ||
-            Mathf.Abs(BluePrintObjects[CurrentBP].GetComponent<RectTransform>().position.y - pl.IM.MousePosition.y) > 300)
+        if (pl.IM.MouseMode)
         {
-            for (int i = 0; i < CountCount; i++)
-                ChangePartColor(i, 1);
-            
-            return;
+            FadeCursor.SetActive(false);
+            if ((Mathf.Abs(BluePrintObjects[CurrentBP].GetComponent<RectTransform>().position.x - pos.x) > 500) ||
+                Mathf.Abs(BluePrintObjects[CurrentBP].GetComponent<RectTransform>().position.y - pos.y) > 300)
+            {
+                for (int i = 0; i < CountCount; i++)
+                    ChangePartColor(i, 1);
+
+                return;
+            }
         }
+        else
+        {
+            FadeCursor.SetActive(true);
+            if (Mathf.Abs(FadePosition) >= 6)
+            {
+                for (int i = 0; i < CountCount; i++)
+                    ChangePartColor(i, 1);
+
+                return;
+            }
+        }
+
 
 
         if (DisassembleTimer > Time.fixedTime)
@@ -442,20 +498,21 @@ void MoveBlueprints()
                 ChangePartColor(i, 1);
             return;
         }
-
+        
         for (int i = 0; i < CountCount; i++)
         {
+           
             if (!BP[CurrentBP].ObjectList[i].hasParrent)
             {
             
-                if (Mathf.Abs(pl.IM.MousePosition.y - BluePrintObjects[CurrentBP].transform.GetChild(i).GetComponent<RectTransform>().position.y) < partWidth / 2)
+                if (Mathf.Abs(pos.y - BluePrintObjects[CurrentBP].transform.GetChild(i).GetComponent<RectTransform>().position.y) < pw/2)
                     ChangePartColor(i, 1);
                 else ChangePartColor(i, 0);
             }
             else
             {
 
-                if (Mathf.Abs((pl.IM.MousePosition.y + BP[CurrentBP].ObjectList[i].orderinParrent * partWidth) - BluePrintObjects[CurrentBP].transform.GetChild(i).GetComponent<RectTransform>().position.y) < partWidth/2)
+                if (Mathf.Abs((pos.y + BP[CurrentBP].ObjectList[i].orderinParrent * pw) - BluePrintObjects[CurrentBP].transform.GetChild(i).GetComponent<RectTransform>().position.y) < pw/2)
                     ChangePartColor(i, 1);
                 else ChangePartColor(i, 0);
             }
@@ -534,13 +591,13 @@ void MoveBlueprints()
       
 
         if (pl.menu.Language==0)
-            BlueprintText.text = "Queens Orders";
+            BlueprintText.text = "Orders to scribe";
 
         if (pl.menu.Language ==1)
-            BlueprintText.text = "Накази Королеви";
+            BlueprintText.text = "Замовлення для малювання";
 
         if (pl.menu.Language == 2)
-            BlueprintText.text = "クイーンズ・オーダー";
+            BlueprintText.text = "";
 
 
         if (CurrentBP == 0)
@@ -559,7 +616,7 @@ void MoveBlueprints()
 
                 menu.ONOFFUI(RightArrow.transform, true);
 
-     
+         
                 CurrentBP--;
                 pl.PlaySoundsPitched(AC[Random.Range(0, AC.Length)], 0.8f + CurrentBP * (0.2f / BP.Count));
 
@@ -581,7 +638,7 @@ void MoveBlueprints()
 
                 menu.ONOFFUI(LeftArrow.transform, true);
 
-          
+       
                 CurrentBP++;
                 pl.PlaySoundsPitched(AC[Random.Range(0, AC.Length)], 0.8f + CurrentBP * (0.2f/ BP.Count));
                 ResetAllPositions();
@@ -590,12 +647,19 @@ void MoveBlueprints()
                 ScrollDelay = Time.fixedTime + 0.2f;
             }
         }
+        //BP[CurrentBP].DatabaseID = CurrentBP;
 
-       
+
             MoveBlueprints();
 
-        BlueprintNameText.text = BData.items[CurrentBP].itemNames[menu.Language];
-        BlueprintDescText.text = BData.items[CurrentBP].itemDesc[menu.Language];
+        BlueprintNameText.text = BData.items[BP[CurrentBP].DatabaseID].itemNames[menu.Language];
+        BlueprintDescText.text = BData.items[BP[CurrentBP].DatabaseID].itemDesc[menu.Language];
+
+        BlueprintNameBG.SetAsLastSibling();
+        BlueprintBG.SetAsLastSibling();
+        BlueprintNameText.transform.SetAsLastSibling();
+        BlueprintDescText.transform.SetAsLastSibling();
+        BlueprintText.transform.SetAsLastSibling();
 
         if (menu.IM.space_b || (menu.UIColl(PlayButton) && menu.IM.LeftMouseButtonDown) || menu.IM.enter_b)
         {
@@ -613,6 +677,7 @@ void MoveBlueprints()
         if ( menu.IM.exit_b || menu.IM.menu_b)
         {
 
+            FadePosition = 6;
             inv.ONOFF(StatsOBJ, true);
             ResetAllPositions();
                 menu.ONOFFUI(transform, false);
@@ -642,8 +707,9 @@ void MoveBlueprints()
     {
         if (showbp)
         {
-            if ((pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(EscapeBlueprint) && pl.IM.LeftMouseButtonDown) || menu.IM.exit_b)
+            if ((pl.GetMouseCollList().Contains(EscapeBlueprint) && pl.IM.LeftMouseButtonDown) || menu.IM.exit_b)
             {
+                FadePosition = 6;
                 showbp = false;
                 pl.menu.PlayAudio(pl.menu.MenuChooseMove);
 

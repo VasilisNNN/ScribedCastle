@@ -209,7 +209,7 @@ TextureImporter:
         width: 256
         height: 512
       alignment: 9
-      pivot: {x: 0.5, y: 0.23}
+      pivot: {x: 0.5, y: 0.25}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -226,11 +226,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 256
-        y: 768
+        y: 512
         width: 256
-        height: 256
+        height: 512
       alignment: 9
-      pivot: {x: 0.5, y: 0.23}
+      pivot: {x: 0.5, y: 0.25}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -243,15 +243,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Banks_2
+      name: PriestHouse
       rect:
         serializedVersion: 2
         x: 512
-        y: 768
+        y: 512
         width: 256
-        height: 256
+        height: 512
       alignment: 9
-      pivot: {x: 0.5, y: 0.23}
+      pivot: {x: 0.5, y: 0.25}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -295,10 +295,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Banks_2: -1709003054
       Banks_3: 291623846
       Guard_0: -1510469239
       KnightBuilding_1: -1025264444
+      PriestHouse: -1709003054
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

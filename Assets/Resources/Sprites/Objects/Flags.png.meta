@@ -80,12 +80,11 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
-    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMipmapLimit: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -108,7 +107,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 32
+  spritePixelsToUnits: 256
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -124,12 +123,11 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 1
-  swizzle: 50462976
   cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 256
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 0
@@ -138,7 +136,7 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
     androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 1
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Standalone
     maxTextureSize: 256
@@ -150,7 +148,7 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
     androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 1
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: iPhone
     maxTextureSize: 256
@@ -223,6 +221,18 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: PS5
+    maxTextureSize: 256
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -230,10 +240,10 @@ TextureImporter:
       name: Flags_0
       rect:
         serializedVersion: 2
-        x: 3
-        y: 112
-        width: 10
-        height: 14
+        x: 20
+        y: 892
+        width: 88
+        height: 120
       alignment: 9
       pivot: {x: 0.1, y: 0.025}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -251,10 +261,10 @@ TextureImporter:
       name: Flags_1
       rect:
         serializedVersion: 2
-        x: 16
-        y: 112
-        width: 10
-        height: 14
+        x: 124
+        y: 892
+        width: 88
+        height: 120
       alignment: 9
       pivot: {x: 0.1, y: 0.025}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -272,10 +282,10 @@ TextureImporter:
       name: Flags_2
       rect:
         serializedVersion: 2
-        x: 29
-        y: 112
-        width: 10
-        height: 14
+        x: 228
+        y: 892
+        width: 88
+        height: 120
       alignment: 9
       pivot: {x: 0.1, y: 0.025}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -293,10 +303,10 @@ TextureImporter:
       name: Flags_3
       rect:
         serializedVersion: 2
-        x: 42
-        y: 112
-        width: 10
-        height: 14
+        x: 332
+        y: 892
+        width: 88
+        height: 120
       alignment: 9
       pivot: {x: 0.1, y: 0.025}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -314,10 +324,10 @@ TextureImporter:
       name: Flags_4
       rect:
         serializedVersion: 2
-        x: 55
-        y: 112
-        width: 10
-        height: 14
+        x: 436
+        y: 892
+        width: 88
+        height: 120
       alignment: 9
       pivot: {x: 0.1, y: 0.025}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -335,10 +345,10 @@ TextureImporter:
       name: Flags_5
       rect:
         serializedVersion: 2
-        x: 68
-        y: 112
-        width: 10
-        height: 14
+        x: 540
+        y: 892
+        width: 88
+        height: 120
       alignment: 9
       pivot: {x: 0.1, y: 0.025}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -356,10 +366,10 @@ TextureImporter:
       name: Flags_6
       rect:
         serializedVersion: 2
-        x: 81
-        y: 112
-        width: 10
-        height: 14
+        x: 644
+        y: 892
+        width: 88
+        height: 120
       alignment: 9
       pivot: {x: 0.1, y: 0.025}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -377,10 +387,10 @@ TextureImporter:
       name: Flags_7
       rect:
         serializedVersion: 2
-        x: 94
-        y: 112
-        width: 10
-        height: 14
+        x: 748
+        y: 892
+        width: 88
+        height: 120
       alignment: 9
       pivot: {x: 0.1, y: 0.025}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -413,8 +423,9 @@ TextureImporter:
       Flags_5: 1651796706
       Flags_6: -1702950247
       Flags_7: -107522186
-  mipmapLimitGroupName: 
+  spritePackingTag: 
   pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

@@ -2,15 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
-using Unity.SaveData.PS5.Core;
-using Unity.SaveData.PS5.Mount;
-using Unity.SaveData.PS5.Info;
-using Unity.SaveData.PS5.Dialog;
-using Unity.SaveData.PS5.Initialization;
 
-
-
-using Unity.SaveData.PS5;
 
 using UnityEngine.SceneManagement;
 
@@ -19,45 +11,27 @@ public class LoadScene : MonoBehaviour
     public string LoadSceneName;
     private float Loadtimer;
 
-#if UNITY_PS5 || UNITY_PS4
- //   private SonySaveDataMain PS_SaveMain;
-#endif
-
 
 #if UNITY_SWITCH
     public nn.account.UserHandle userHandle;
     public nn.account.Uid userId;
 
-    private string mountName = "LetsCastleSave";
-    private const string fileName = "LetsCastleSaveData";
+    private string mountName = "ScribedCSave";
+    private const string fileName = "ScribedCSaveData";
     private string filePath;
 
     private const int datasize = 128;
 #endif
 
 
-#if UNITY_PS5 || UNITY_PS4
 
-    SonySaveDataDialogs m_Dialogs;
-#endif
 
     private void Start()
     {
 
         Loadtimer = Time.fixedTime + 0.5f;
 
-#if UNITY_PS5 || UNITY_PS4
 
-       // PS_SaveMain = GetComponent<SonySaveDataMain>();
-
-        /*if (!PS_SaveMain.StartLoad)
-        {
-            PS_SaveMain.StartLoad = true;
-        }*/
-
-       // PS_SaveMain.InitializeSaveData();
-
-#endif
 
 #if UNITY_SWITCH
         nn.account.Account.Initialize();

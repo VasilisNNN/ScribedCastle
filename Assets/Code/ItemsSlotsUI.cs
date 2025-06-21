@@ -27,8 +27,8 @@ public class ItemsSlotsUI : MonoBehaviour
 
     private AudioClip TakeItemClip, ClickClip;
     private GameObject AttackEffect;
-    private GameObject MouseOB, ItemOnChoose;
-
+    private GameObject ItemOnChoose;
+    private Image ItemOnChooseIMG;
 
     private Upgrades UP;
 
@@ -54,9 +54,9 @@ public class ItemsSlotsUI : MonoBehaviour
         FolderButtons.Add(transform.Find("StoneFolderButton").gameObject);
 
         UP = GetComponent<Upgrades>();
-        MouseOB = GameObject.Find("MouseOB");
+       
         ItemOnChoose = GameObject.Find("ChooseUI").transform.Find("ItemOnChoose").gameObject;
-
+        ItemOnChooseIMG = GameObject.Find("ChooseUI").transform.Find("ItemOnChoose").GetComponent<Image>();
         Const = GameObject.Find("Constructor").GetComponent<Constructor>();
 
         ClickClip = Resources.Load<AudioClip>("Sound/UI/Click_0");
@@ -198,8 +198,7 @@ public class ItemsSlotsUI : MonoBehaviour
             if (ItemUpgrade != null)
             {
                 pl.inv.ONOFF(ItemUpgrade, false);
-                ItemUpgrade.transform.Find("Status").GetComponent<Image>().color = new Color(1, 1, 1, 0);
-
+             
                 ItemUpgrade.GetComponent<Image>().color = new Color(1, 1, 1, 0);
             }
             return;
@@ -226,14 +225,6 @@ public class ItemsSlotsUI : MonoBehaviour
           
 
 
-            Image IMG = ItemUpgrade.transform.Find("Status").GetComponent<Image>();
-         
-            IMG.color = new Color(1, 1, 1, 1);
-
-
-        pl.inv.SetStatus(pl.inv.GetItemInDatabase(Slots[r].items[i].itemID), ref IMG);
-
-
      
         
     }
@@ -245,7 +236,7 @@ public class ItemsSlotsUI : MonoBehaviour
         if (pl.IM.ActionDelay >= Time.fixedTime ||
             EnterDelay >= Time.fixedTime ||
             Slots[CurrentRow].items[CurrentSlot].itemID <= -1 ||
-            pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(pl.inv.EscapeInventory) ||
+            pl.GetMouseCollList().Contains(pl.inv.EscapeInventory) ||
           pl.inv.GetItemInDatabase(Slots[CurrentRow].items[CurrentSlot].itemID).CanNOTBeRemovedFromTheBody)
             return;
 
@@ -256,20 +247,20 @@ public class ItemsSlotsUI : MonoBehaviour
             if (pl.IM.exit_b || pl.IM.RightMouseButtonDown || pl.IM.RightTrigger)
                DropItemFromSlots();
 
-            if (pl.IM.enter_b_hold || (pl.IM.LeftMouseButton && pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(Slots[CurrentRow].Slot[CurrentSlot])))
+            if (pl.IM.enter_b_hold || (pl.IM.LeftMouseButton && pl.GetMouseCollList().Contains(Slots[CurrentRow].Slot[CurrentSlot])))
             {
-                if (!pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(pl.inv.CraftingCross))
+                if (!pl.GetMouseCollList().Contains(pl.inv.CraftingCross))
                 {
                     CraftItem(Slots[CurrentRow].items[CurrentSlot].itemID);
                 }
             }
 
-            if (pl.IM.enter_b || (pl.IM.LeftMouseButtonDown && pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(Slots[CurrentRow].Slot[CurrentSlot])))
+            if (pl.IM.enter_b || (pl.IM.LeftMouseButtonDown && pl.GetMouseCollList().Contains(Slots[CurrentRow].Slot[CurrentSlot])))
             {
                 SetBufferItemFromBody();
             }
 
-            if (pl.IM.enter_b_hold || (pl.IM.LeftMouseButton && pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(Slots[CurrentRow].Slot[CurrentSlot])))
+            if (pl.IM.enter_b_hold || (pl.IM.LeftMouseButton && pl.GetMouseCollList().Contains(Slots[CurrentRow].Slot[CurrentSlot])))
             {
                 
                 ProgressiveActionDelay();
@@ -290,11 +281,11 @@ public class ItemsSlotsUI : MonoBehaviour
         if ((pl.inv.BufferItem._type == Item.type.weapon && Slots[CurrentRow].items[CurrentSlot]._type == Item.type.weapon || pl.inv.BufferItem._bodypart != null) && pl.inv.BufferItem.itemID > -1)
         {
 
-            if (pl.IM.enter_b_hold || (pl.IM.LeftMouseButton && pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(Slots[CurrentRow].Slot[CurrentSlot])))
+            if (pl.IM.enter_b_hold || (pl.IM.LeftMouseButton && pl.GetMouseCollList().Contains(Slots[CurrentRow].Slot[CurrentSlot])))
             {
 
-                if (pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(Slots[CurrentRow].Slot[CurrentSlot]) &&
-                    !pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(pl.inv.CraftingCross))
+                if (pl.GetMouseCollList().Contains(Slots[CurrentRow].Slot[CurrentSlot]) &&
+                    !pl.GetMouseCollList().Contains(pl.inv.CraftingCross))
                 {
                     int BodyID = Slots[CurrentRow].items[CurrentSlot].itemID;
 
@@ -305,7 +296,7 @@ public class ItemsSlotsUI : MonoBehaviour
 
             }
 
-            if (pl.IM.enter_b || (pl.IM.LeftMouseButtonDown && pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(Slots[CurrentRow].Slot[CurrentSlot])))
+            if (pl.IM.enter_b || (pl.IM.LeftMouseButtonDown && pl.GetMouseCollList().Contains(Slots[CurrentRow].Slot[CurrentSlot])))
             {
 
                 if (CompairBodyparts(pl.inv.BufferItem._bodypart, UP.Slots[CurrentRow].items[CurrentSlot]._bodypart))
@@ -328,15 +319,15 @@ public class ItemsSlotsUI : MonoBehaviour
                 if (pl.IM.exit_b || pl.IM.RightMouseButtonDown || pl.IM.RightTrigger)
                     DropItemFromSlots();
 
-                if (pl.IM.enter_b_hold || (pl.IM.LeftMouseButton && pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(Slots[CurrentRow].Slot[CurrentSlot])))
+                if (pl.IM.enter_b_hold || (pl.IM.LeftMouseButton && pl.GetMouseCollList().Contains(Slots[CurrentRow].Slot[CurrentSlot])))
                 {
-                    if (!pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(pl.inv.CraftingCross))
+                    if (!pl.GetMouseCollList().Contains(pl.inv.CraftingCross))
                     {
                         CraftItem(Slots[CurrentRow].items[CurrentSlot].itemID);
                     }
                 }
 
-                if (pl.IM.enter_b || (pl.IM.LeftMouseButtonDown && pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(Slots[CurrentRow].Slot[CurrentSlot])))
+                if (pl.IM.enter_b || (pl.IM.LeftMouseButtonDown && pl.GetMouseCollList().Contains(Slots[CurrentRow].Slot[CurrentSlot])))
                 {
                     SetBufferItemFromBody();
 
@@ -362,12 +353,12 @@ public class ItemsSlotsUI : MonoBehaviour
             pl.inv.ToolTip.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "";
             
             // pl.inv.ToolTip.transform.position = new Vector3(99999, 99999, 0);
-            pl.inv.Choose.transform.position = pl.MouseOB.transform.position;
+            pl.inv.Choose.transform.position = pl.MouseUI.transform.position;
         }
         
         Add_Item_ToUpperSegment();
 
-        if ((pl.IM.enter_b || pl.IM.LeftMouseButtonDown) && !pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(pl.inv.EscapeInventory) && pl.IM.ActionDelay < Time.fixedTime && !pl.inv.crafting && pl.inv.BufferItem.itemID > -1 && EnterDelay < Time.fixedTime && Slots[CurrentRow].items[CurrentSlot].itemID == -1)
+        if ((pl.IM.enter_b || pl.IM.LeftMouseButtonDown) && !pl.GetMouseCollList().Contains(pl.inv.EscapeInventory) && pl.IM.ActionDelay < Time.fixedTime && !pl.inv.crafting && pl.inv.BufferItem.itemID > -1 && EnterDelay < Time.fixedTime && Slots[CurrentRow].items[CurrentSlot].itemID == -1)
         AddItemToTheSlot();
 
 
@@ -378,7 +369,7 @@ public class ItemsSlotsUI : MonoBehaviour
         }
 
         if (pl.inv.MouseCollideWithSlots())
-        ItemOnChoose.GetComponent<Image>().color = new Color(1, 1, 1, 1);
+        ItemOnChooseIMG.color = new Color(1, 1, 1, 1);
         
 
     }
@@ -393,7 +384,7 @@ public class ItemsSlotsUI : MonoBehaviour
 
         SelectFolder();
 
-        List<GameObject> MouseOBCollList = pl.MouseOB.GetComponent<CollList>().GetCollList();
+        List<GameObject> MouseOBCollList = pl.GetMouseCollList();
        
         if (pl.inv.GetCurrentItem() != null && !pl.inv.ChooseTopSegmentSlot && pl.inv.GetCurrentItem().itemID > -1 && !MouseOBCollList.Contains(pl.inv.EscapeInventory)
                 && !MouseOBCollList.Contains(pl.inv.LeftArrow) && !MouseOBCollList.Contains(pl.inv.RightArrow) &&
@@ -463,7 +454,7 @@ public class ItemsSlotsUI : MonoBehaviour
 
         for (int i = 0; i < FolderButtons.Count; i++)
         {
-            if (pl.MouseOB.GetComponent<CollList>().coll_obj.Contains(FolderButtons[i]) && (pl.IM.LeftMouseButtonDown || pl.IM.enter_b))
+            if (pl.GetMouseCollList().Contains(FolderButtons[i]) && (pl.IM.LeftMouseButtonDown || pl.IM.enter_b))
             {
                 pl.PlaySoundsPitched(ClickClip, 1);
                 FolderButtons[i].transform.Find("NewItemTag").gameObject.SetActive(false);
@@ -477,7 +468,7 @@ public class ItemsSlotsUI : MonoBehaviour
         if (!pl.inv.PauseInventory) return;
 
 
-        if ((pl.IM.LeftTrigger || ((pl.IM.enter_b || pl.IM.LeftMouseButtonDown) && pl.MouseOB.GetComponent<CollList>().coll_obj.Contains(LeftFolder))) && pl.IM.ActionDelay < Time.fixedTime && CurrentFolder > 0)
+        if ((pl.IM.LeftTrigger || ((pl.IM.enter_b || pl.IM.LeftMouseButtonDown) && pl.GetMouseCollList().Contains(LeftFolder))) && pl.IM.ActionDelay < Time.fixedTime && CurrentFolder > 0)
         {
             pl.PlaySoundsPitched(ClickClip, 0.8f + CurrentFolder * 0.05f);
             CurrentFolder--;
@@ -487,7 +478,7 @@ public class ItemsSlotsUI : MonoBehaviour
             pl.IM.ActionDelay = 0.1f;
         }
 
-        if ((pl.IM.RightTrigger || ((pl.IM.enter_b || pl.IM.LeftMouseButtonDown) && pl.MouseOB.GetComponent<CollList>().coll_obj.Contains(RightFolder))) && pl.IM.ActionDelay < Time.fixedTime && CurrentFolder < FolderButtons.Count - 1)
+        if ((pl.IM.RightTrigger || ((pl.IM.enter_b || pl.IM.LeftMouseButtonDown) && pl.GetMouseCollList().Contains(RightFolder))) && pl.IM.ActionDelay < Time.fixedTime && CurrentFolder < FolderButtons.Count - 1)
         {
             pl.PlaySoundsPitched(ClickClip, 0.8f + CurrentFolder * 0.05f);
             CurrentFolder++;
@@ -736,8 +727,8 @@ public class ItemsSlotsUI : MonoBehaviour
                 CurrentRow = Slots.Length - 1;
 
                 pl.inv.ONOFF(gameObject, true);
-                ItemOnChoose.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/Items/" + pl.inv.GetCurrentItem().itemNames[0]);
-                ItemOnChoose.GetComponent<Image>().enabled = true;
+                ItemOnChooseIMG.sprite = Resources.Load<Sprite>("Sprites/Items/" + pl.inv.GetCurrentItem().itemNames[0]);
+                ItemOnChooseIMG.enabled = true;
                 pl.inv.PauseInventory = true;
 
                 pl.inv.BufferItem = pl.inv.DeepCopyItem(pl.inv.GetCurrentItem().itemID, count, pl.inv.GetCurrentItem().Durability);
@@ -768,8 +759,8 @@ public class ItemsSlotsUI : MonoBehaviour
             CurrentRow = Slots.Length - 1;
 
             pl.inv.ONOFF(gameObject, true);
-            ItemOnChoose.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/Items/" + pl.inv.GetCurrentItem().itemNames[0]);
-            ItemOnChoose.GetComponent<Image>().enabled = true;
+            ItemOnChooseIMG.sprite = Resources.Load<Sprite>("Sprites/Items/" + pl.inv.GetCurrentItem().itemNames[0]);
+            ItemOnChooseIMG.enabled = true;
             pl.inv.PauseInventory = true;
 
             if (pl.inv.BufferItem.itemID > -1) pl.inv.AddItem(pl.inv.BufferItem.itemID, 1, pl.inv.BufferItem.Durability, pl._transform.position);
@@ -877,9 +868,9 @@ public class ItemsSlotsUI : MonoBehaviour
 
         if (!CanPickTopItems) return;
 
-        ItemOnChoose.GetComponent<Image>().sprite =
+        ItemOnChooseIMG.sprite =
         Resources.Load<Sprite>("Sprites/Items/" + pl.inv.GetItemInDatabase(Slots[CurrentRow].items[CurrentSlot].itemID).itemNames[0]);
-        ItemOnChoose.GetComponent<Image>().enabled = true;
+        ItemOnChooseIMG.enabled = true;
 
         if (UP != null)
         {
@@ -906,9 +897,9 @@ public class ItemsSlotsUI : MonoBehaviour
             return;
         }
 
-        ItemOnChoose.GetComponent<Image>().sprite =
+        ItemOnChooseIMG.sprite =
         Resources.Load<Sprite>("Sprites/Items/" + pl.inv.GetItemInDatabase(Slots[CurrentRow].items[CurrentSlot].itemID).itemNames[0]);
-        ItemOnChoose.GetComponent<Image>().enabled = true;
+        ItemOnChooseIMG.enabled = true;
 
         if (UP != null)
         {
@@ -945,7 +936,7 @@ public class ItemsSlotsUI : MonoBehaviour
             for (int i = 0; i < Slots[r].Slot.Length; i++)
             {
 
-                if (pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(Slots[r].Slot[i]))
+                if (pl.GetMouseCollList().Contains(Slots[r].Slot[i]))
                 {
                     result++;
                 }
@@ -1003,10 +994,10 @@ public class ItemsSlotsUI : MonoBehaviour
 
         if (pl.inv.BufferItem.itemID > -1)
         {
-            ItemOnChoose.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/Items/" + pl.inv.BufferItem.itemNames[0]);
-            ItemOnChoose.GetComponent<Image>().enabled = true;
+            ItemOnChooseIMG.sprite = Resources.Load<Sprite>("Sprites/Items/" + pl.inv.BufferItem.itemNames[0]);
+            ItemOnChooseIMG.enabled = true;
         }
-        else ItemOnChoose.GetComponent<Image>().enabled = false;
+        else ItemOnChooseIMG.enabled = false;
 
 
         if (pl.inv.Choose.activeInHierarchy && ItemOnChoose.activeInHierarchy)
@@ -1046,7 +1037,7 @@ public class ItemsSlotsUI : MonoBehaviour
         {
             for (int y = 0; y < Slots[x].Slot.Length; y++)
             {
-                if (MouseOB.GetComponent<CollList>().GetCollList().Contains(Slots[x].Slot[y]))
+                if (pl.GetMouseCollList().Contains(Slots[x].Slot[y]))
                 {
                     if (CurrentRow != x || CurrentSlot != y)
                     {
@@ -1076,7 +1067,7 @@ public class ItemsSlotsUI : MonoBehaviour
         {
             if (pl.inv.BufferItem._bodypart == null)
             {
-                ItemOnChoose.GetComponent<Image>().color = new Color(1, 0.1f, 0.1f, 1);
+                ItemOnChooseIMG.color = new Color(1, 0.1f, 0.1f, 1);
                 return;
             }
 
@@ -1100,17 +1091,17 @@ public class ItemsSlotsUI : MonoBehaviour
 
         if (i > 0)
         {
-            ItemOnChoose.GetComponent<Image>().color = new Color(0.8f, 1, 0.8f, 1);
+            ItemOnChooseIMG.color = new Color(0.8f, 1, 0.8f, 1);
         }
-        else ItemOnChoose.GetComponent<Image>().color = new Color(1, 0.1f, 0.1f, 1);
+        else ItemOnChooseIMG.color = new Color(1, 0.1f, 0.1f, 1);
 
     }
 
     public void StartUI()
     {
         showthis = true;
-        ItemOnChoose.GetComponent<Image>().sprite = null;
-        ItemOnChoose.GetComponent<Image>().enabled = false;
+        ItemOnChooseIMG.sprite = null;
+        ItemOnChooseIMG.enabled = false;
 
         UpdateCraftingFolder();
         print(name);
@@ -1129,8 +1120,8 @@ public class ItemsSlotsUI : MonoBehaviour
 
             pl.menu.ONOFFUI(pl.inv.EscapeInventory.transform, false);
 
-            ItemOnChoose.GetComponent<Image>().sprite = null;
-            ItemOnChoose.GetComponent<Image>().enabled = false;
+            ItemOnChooseIMG.sprite = null;
+            ItemOnChooseIMG.enabled = false;
             pl.IM.ActionDelay = Time.fixedTime + 0.1f;
             pl.menu.MenuActionDelay = Time.fixedTime + 0.1f;
 
@@ -1170,7 +1161,7 @@ public class ItemsSlotsUI : MonoBehaviour
                 if (!pl.IM.MouseMode)
                     pl.inv.Choose.transform.position = new Vector3(99999, 99999, 999);
                 else
-                    pl.inv.Choose.transform.position = pl.MouseOB.transform.position;
+                    pl.inv.Choose.transform.position = pl.MouseUI.transform.position;
 
 
                 // pl.inv.ToolTip.transform.position = new Vector3(99999, 99999, 0);
@@ -1201,7 +1192,7 @@ public class ItemsSlotsUI : MonoBehaviour
             GameObject Slot = Slots[row].Slot[slot];
 
             
-            Image StatusImage = null;
+    
             Image IconImage = null;
             Image CraftingslotsImage = null;
 
@@ -1209,7 +1200,7 @@ public class ItemsSlotsUI : MonoBehaviour
 
             if (Slot.transform.childCount > 0)
             {
-                StatusImage = Slot.transform.GetChild(0).Find("Status").GetComponent<Image>();
+             
                 IconImage = Slot.transform.GetChild(0).GetComponent<Image>();
             }
 
@@ -1221,13 +1212,10 @@ public class ItemsSlotsUI : MonoBehaviour
 
             Slots[row].items[slot] = new Item();
 
-            if (StatusImage != null)
-                StatusImage = Slot.transform.GetChild(0).Find("Status").GetComponent<Image>();
+     
             if (IconImage != null)
                 IconImage = Slot.transform.GetChild(0).GetComponent<Image>();
 
-            if (Slot.transform.childCount > 0)
-                StatusImage.enabled = false;
 
             CraftingslotsImage.color = new Color(1, 0.5f, 0.5f, 1);
 
@@ -1270,9 +1258,7 @@ public class ItemsSlotsUI : MonoBehaviour
                 IconImage.sprite = Resources.Load<Sprite>("Sprites/Items/" + CraftingFolder[i].itemNames[0]);
             Slot.transform.GetChild(0).transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "x " + pl.inv.CurrentCraftingTable.itemcount[i];
 
-            pl.inv.SetStatus(CraftingFolder[i], ref StatusImage);
-
-                  
+            
             }
         }
 

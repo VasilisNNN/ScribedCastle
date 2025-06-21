@@ -89,9 +89,10 @@ public class InputMode : MonoBehaviour
 
         public bool LeftTrigger { get; set; }
         public bool RightTrigger { get; set; }
-    
 
-        public bool LeftMouseButton { get; set; }
+    public bool R2 { get; set; }
+    public bool L2 { get; set; }
+    public bool LeftMouseButton { get; set; }
         public bool LeftMouseButtonDown { get; set; }
         public bool RightMouseButton { get; set; }
     public bool RightMouseButtonDown { get; set; }
@@ -421,6 +422,8 @@ public class InputMode : MonoBehaviour
         LeftTrigger = Input.GetButtonDown("LeftTrigger");
         RightTrigger = Input.GetButtonDown("RightTrigger");
 
+        R2 = Input.GetKeyDown(KeyCode.T);
+        L2 = Input.GetKeyDown(KeyCode.R);
 
         //LeftMenu = Input.GetKeyDown(KeyCode.Z);
         QuestBook = Input.GetKeyDown(KeyCode.Q);
@@ -537,7 +540,10 @@ public class InputMode : MonoBehaviour
         LeftTrigger = npadState.GetButtonDown(NpadButton.L);
         SideButton = npadState.GetButtonDown(NpadButton.X);
 
-
+        if(npadState.GetButtonDown(NpadButton.StickR))
+        MouseScroll=1;
+          if(npadState.GetButtonDown(NpadButton.StickL))
+        MouseScroll=-1;
 
         if (npadState.GetButton(NpadButton.StickLUp)) _vertical = 1;
         else if (npadState.GetButton(NpadButton.StickLDown)) _vertical = -1;
@@ -641,7 +647,8 @@ public class InputMode : MonoBehaviour
         BKey = npadState.GetButtonDown(NpadButton.X);
         OKey = npadState.GetButtonDown(NpadButton.ZR);
         ZLKey = npadState.GetButtonDown(NpadButton.ZL);
-
+        R2 = npadState.GetButtonDown(NpadButton.ZR);
+        L2 = npadState.GetButtonDown(NpadButton.ZL);
 
         /*
           if (Mathf.Abs(npadState.analogStickR.y) < 100)
@@ -671,7 +678,7 @@ public class InputMode : MonoBehaviour
 #endif
     }
 
-   
+
 
     void PS5GamepadControlls()
     {
@@ -705,6 +712,9 @@ public class InputMode : MonoBehaviour
     
         _vertical = CurrentGamepad.GetThumbstickLeft.y * -1;
         _horizontal = CurrentGamepad.GetThumbstickLeft.x;
+
+        R2 =  CurrentGamepad.IsR2Pressed;
+        L2 = CurrentGamepad.IsL2Pressed;
 
 
         /*

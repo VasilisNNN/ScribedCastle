@@ -191,7 +191,7 @@ public class MenuCustom : MonoBehaviour
 
         MenuAllTransform = GameObject.Find("MenuAll").transform;
         OptionsAllTransform = GameObject.Find("OptionsAll").transform;
-        MouseObject = GameObject.Find("MouseOB");
+        MouseObject = GameObject.Find("MouseUI");
 
         ResDropDown = GameObject.Find("ResDropdown");
 
@@ -471,19 +471,7 @@ public class MenuCustom : MonoBehaviour
         if (SL.Saving || SL.Loading) return;
 
 
-        if (SceneManager.GetActiveScene().name == "StartMenu")
-        {
-            if (IM.LeftMouseButtonDown || IM.enter_b || IM.exit_b)
-            {
-                if (!MenuAllObject.GetComponent<Animator>().GetBool("Finish"))
-                {
-                    MenuAllObject.GetComponent<Animator>().SetBool("Finish", true);
-                    GameObject.Find("MenuStart").GetComponent<Animator>().SetBool("Finish", true);
-                    //ActionDelay = Time.fixedTime + 0.2f;
-                }
-            }
-
-        }
+       
 
 
         if (IM.joystick)
@@ -820,7 +808,7 @@ public class MenuCustom : MonoBehaviour
             }
         }
 
-        if (_modes)
+       /* if (_modes)
         {
             Modes();
             ChooseUITransfrom.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
@@ -831,7 +819,7 @@ public class MenuCustom : MonoBehaviour
             ChooseUITransfrom.GetComponent<RectTransform>().sizeDelta = new Vector3(320, 100, 0);
 
 
-        }
+        }*/
 
         if (_modes) return;
             
@@ -1295,7 +1283,7 @@ public class MenuCustom : MonoBehaviour
                     {
 
                         CurrentSlotNumber = i;
-                        OnScreenLog.Add("Loading CurrentSlotNumber " + CurrentSlotNumber);
+    
 
                         FirstStart = 1;
                         FirstLanguage = 1;

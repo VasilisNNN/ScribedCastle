@@ -77,7 +77,7 @@ public class UnlockItems : MonoBehaviour
         inv.GetItemInDatabase(ID).Locked = false;
         
         pl.menu.CurrentSlotNumber = 6;
-        OnScreenLog.Add("!!!! Unlock ITEM ");
+       
         pl.menu.CurrentSlotLocations[pl.menu.CurrentSlotNumber] = SceneManager.GetActiveScene().name;
         
         SL.Save(true);

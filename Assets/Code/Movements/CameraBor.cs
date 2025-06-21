@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using UnityEngine.U2D;
 public class CameraBor : MonoBehaviour {
 
 	private float timer = 0;
@@ -47,10 +47,12 @@ public class CameraBor : MonoBehaviour {
     private int CamSide = 1;
     private Vector3 CamStartPos;
 
-
+    private PixelPerfectCamera PixelCam; 
     private void Awake()
 	{
-        
+
+        PixelCam = GetComponent<PixelPerfectCamera>();
+
         _constr = GameObject.Find("Constructor").GetComponent<Constructor>();
         pl = GameObject.Find("Player").GetComponent<Player>();
 
@@ -63,9 +65,6 @@ public class CameraBor : MonoBehaviour {
 			Margin.y = 0.2f;
 		}
       
-  
-        /*Smoothing.x = 2f;
-		Smoothing.y = 2f;*/
 		isFollowing = true;
 	}
 	public void Start()
@@ -80,7 +79,6 @@ public class CameraBor : MonoBehaviour {
 
         isFollowing = true;
 	  Application.targetFrameRate = 60;
-		//if(Player!=null) 
 	
 	
 
@@ -89,17 +87,21 @@ public class CameraBor : MonoBehaviour {
 
 	public void Update()
 	{
-        if (_constr.TutorialPause || pl.menu.MenuONOFF) return;
+        if (_constr.TutorialPause || pl.menu.MenuONOFF || pl.inv.showinvent || pl.inv.showjournal || pl.inv.blueprintshow) return;
+
+
+        if (pl.IM.MouseScroll > 0.1 && PixelCam.assetsPPU < 256) PixelCam.assetsPPU+=10;
+        if (pl.IM.MouseScroll < -0.1 && PixelCam.assetsPPU>80) PixelCam.assetsPPU-=10;
 
         CamShake();
 
         if (DirectMove && !pl.StartLoading) MoveCameraOnTheField();
 
-        if (MoveinaWayOfMovemement && !_constr.Building && !pl.inv.showinvent && !pl.inv.showjournal && !pl.inv.blueprintshow && !pl.menu.MenuONOFF)
+        if (MoveinaWayOfMovemement && !_constr.Building )
         {
            
-            Vector2 XBorder = new Vector2(Screen.width / 10, Screen.width - Screen.width / 10);
-            Vector2 YBorder = new Vector2(Screen.height / 8, Screen.height - Screen.height / 8);
+            Vector2 XBorder = new Vector2(Screen.width / 12, Screen.width - Screen.width / 12);
+            Vector2 YBorder = new Vector2(Screen.height / 18, Screen.height - Screen.height / 18);
 
             Vector2 MousePos = new Vector2(0, 0);
             

@@ -20,11 +20,12 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMasterTextureLimit: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -47,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 256
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -63,6 +64,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
   cookieLightType: 0
   platformSettings:
   - serializedVersion: 3
@@ -101,6 +103,30 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Nintendo Switch
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Windows Store Apps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -108,12 +134,12 @@ TextureImporter:
       name: Peasant_0
       rect:
         serializedVersion: 2
-        x: 27
-        y: 663
-        width: 233
-        height: 255
+        x: 10
+        y: 832
+        width: 158
+        height: 177
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -129,12 +155,12 @@ TextureImporter:
       name: Peasant_1
       rect:
         serializedVersion: 2
-        x: 289
-        y: 663
-        width: 233
-        height: 255
+        x: 180
+        y: 835
+        width: 158
+        height: 176
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -150,12 +176,12 @@ TextureImporter:
       name: Peasant_2
       rect:
         serializedVersion: 2
-        x: 100
-        y: 512
-        width: 118
-        height: 133
+        x: 366
+        y: 825
+        width: 156
+        height: 181
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -163,6 +189,69 @@ TextureImporter:
       bones: []
       spriteID: 06c9013a5ca892946ae823755c1c64a0
       internalID: 1583981662
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Peasant_3
+      rect:
+        serializedVersion: 2
+        x: 537
+        y: 825
+        width: 156
+        height: 181
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 759d550f6e3ddb741948ed41845e9fb0
+      internalID: 622452752
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Peasant_4
+      rect:
+        serializedVersion: 2
+        x: 31
+        y: 44
+        width: 61
+        height: 96
+      alignment: 9
+      pivot: {x: 0.73018724, y: 0.87000173}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 349aae4524316694ebca1578f567e05c
+      internalID: -118964468
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Peasant_5
+      rect:
+        serializedVersion: 2
+        x: 131
+        y: 66
+        width: 103
+        height: 122
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2983355955b975448893a71c05b26f2f
+      internalID: -1904210641
       vertices: []
       indices: 
       edges: []
@@ -181,9 +270,11 @@ TextureImporter:
       Peasant_0: -1614217311
       Peasant_1: 1050959318
       Peasant_2: 1583981662
-  spritePackingTag: 
+      Peasant_3: 622452752
+      Peasant_4: -118964468
+      Peasant_5: -1904210641
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

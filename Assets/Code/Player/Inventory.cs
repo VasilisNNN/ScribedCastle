@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Tilemaps;
 using TMPro;
+using System.Linq;
 
 public class Inventory : MonoBehaviour
 {
@@ -52,7 +53,7 @@ public class Inventory : MonoBehaviour
     private Vector2 ScreenBorder;
     private Texture2D ChoiseTexture;
 
-
+    private List<GameObject> PickedText = new List<GameObject>();
     private List<string> Picked = new List<string>();
     private List<float> PickedX = new List<float>();
     private List<float> PickedY = new List<float>();
@@ -175,6 +176,17 @@ public class Inventory : MonoBehaviour
     void Awake()
     {
 
+        for (int i = 0; i < 10; i++)
+        {
+            PickedText.Add(Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/PickedText"), GameObject.Find("Canvas").transform));
+            PickedX.Add(9999);
+            PickedY.Add(999);
+            PickedSlide.Add(0);
+            Picked.Add("");
+            PickedSpeeds.Add(0);
+
+
+        }
         EscapeInventory = GameObject.Find("EscapeInventory");
 
         BufferItem = new Item();
@@ -357,49 +369,24 @@ public class Inventory : MonoBehaviour
 
         if (BlueprintMenu != null) blueprintshow = BlueprintMenu.GetComponent<BlueprintMenu>().showbp;
 
-     
-        if (!showinvent && !showjournal && !blueprintshow)
-        {
-            crafting = false;
 
-            if (pl.Chatting)
-            {
+        ShowControlls();
 
-                ONOFF(Controlls, false);
-                ONOFF(NewQuest, false);
-                DrawInvNo = false;
-            }
-            else
-            {
-                if (!DrawInvNo)
-                {
-                    ONOFF(Controlls, true);
-                    ONOFF(NewQuest, NewQuestBool);
-                    DrawInvNo = true;
-                }
-
-            }
-        }
 
         if (pl.IM._vertical > 0.5f || pl.IM._vertical < -0.5f)
         {
-
-
             if (pl.inv.CurrentItem < 0)
                 pl.inv.CurrentItem = 0;
         }
 
-
-
-
-        if (Quest_YSlider != 0) Quest_YPos = 0;
-
-
+        if (Quest_YSlider != 0) 
+            Quest_YPos = 0;
+        
         Crafting();
         Journal();
 
         ExitFromInventory();
-
+        ShowPicketItems();
 
 
         if (pl.GetComponent<Achivements>()!=null) 
@@ -442,12 +429,20 @@ public class Inventory : MonoBehaviour
 
     void Start_Close_Inventory()
     {
-        if (!pl.StartLoading && ((_menu.UIColl(InventoryButton) && pl.IM.LeftMouseButtonDown && InventoryButton.GetComponent<Image>().enabled) || pl.IM.inventory_b) && IM.ActionDelay < Time.fixedTime && !showjournal && !pl.menu.MenuONOFF && !pl.Chatting && !ShowAch && !_constr.TutorialPause)
+        if (IM.ActionDelay > Time.fixedTime ||
+            showjournal ||
+            pl.menu.MenuONOFF ||
+            pl.Chatting ||
+            ShowAch ||
+            _constr.TutorialPause || 
+            pl.StartLoading)
+            return;
+
+
+        if ((_menu.UIColl(InventoryButton) && pl.IM.LeftMouseButtonDown && InventoryButton.GetComponent<Image>().enabled) || pl.IM.inventory_b) 
         {
             showinvent = !showinvent;
             
-          
-
             if (!showinvent)
             {
                 PlaySoundsPitched(UIOpen,0.8f);
@@ -459,9 +454,6 @@ public class Inventory : MonoBehaviour
                 SlotSlide = 0;
 
                 SetSlots();
-                //we need to remove buffer item here
-
-                //if()
             }
 
             _constr.ChooseMouseObject = false;
@@ -480,32 +472,12 @@ public class Inventory : MonoBehaviour
             IM.ActionDelay = Time.fixedTime + 0.2f;
         }
     }
+
+
+
     void ONOFF_Inventory()
     {
-        if (showinvent)
-        {
-            if (!DrawINV)
-            {
-
-                _constr.DeActivateBuildingNOINV();
-
-           
-                ONOFF(GameObject.Find("ButtonsUI"), false);
-
-               
-                
-                ONOFF(Controlls, false);
-                DrawInventory(true);
-
-               // if (_constr != null)
-                  //  _constr.UnsetBigTips();
-
-
-
-                DrawINV = true;
-            }
-        }
-        else
+        if (!showinvent)
         {
             if (DrawINV)
             {
@@ -515,12 +487,24 @@ public class Inventory : MonoBehaviour
                 RightArrow.SetActive(false);
 
                 ONOFF(GameObject.Find("ButtonsUI"), true);
-                
+
                 ONOFF(Controlls, true);
                 DrawInventory(false);
                 DrawINV = false;
             }
+            return;
         }
+
+        if (DrawINV) return;
+        
+        _constr.DeActivateBuildingNOINV();
+        ONOFF(GameObject.Find("ButtonsUI"), false);
+        ONOFF(Controlls, false);
+        DrawInventory(true);
+        DrawINV = true;
+
+
+
     }
 
     void ScrollThroughInventory()
@@ -614,7 +598,7 @@ public class Inventory : MonoBehaviour
 
         for (int i = 0; i < FolderButtons.Count; i++)
         {
-            if (pl.MouseOB.GetComponent<CollList>().coll_obj.Contains(FolderButtons[i]) && (pl.IM.LeftMouseButtonDown || pl.IM.enter_b))
+            if (pl.GetMouseCollList().Contains(FolderButtons[i]) && (pl.IM.LeftMouseButtonDown || pl.IM.enter_b))
             {
                 pl.PlaySoundsPitched(ClickClip, 1);
                 FolderButtons[i].transform.Find("NewItemTag").gameObject.SetActive(false);
@@ -630,7 +614,7 @@ public class Inventory : MonoBehaviour
 
         if (!showinvent ) return;
 
-        if ((pl.IM.LeftTrigger || ((pl.IM.enter_b || pl.IM.LeftMouseButtonDown) && pl.MouseOB.GetComponent<CollList>().coll_obj.Contains(LeftFolder))) && IM.ActionDelay < Time.fixedTime && CurrentFolder > 0)
+        if ((pl.IM.LeftTrigger || ((pl.IM.enter_b || pl.IM.LeftMouseButtonDown) && pl.GetMouseCollList().Contains(LeftFolder))) && IM.ActionDelay < Time.fixedTime && CurrentFolder > 0)
         {
             pl.PlaySoundsPitched(ClickClip, 0.8f + CurrentFolder * 0.05f);
             CurrentFolder--;
@@ -643,7 +627,7 @@ public class Inventory : MonoBehaviour
             IM.ActionDelay = 0.1f;
         }
 
-        if ((pl.IM.RightTrigger || ((pl.IM.enter_b || pl.IM.LeftMouseButtonDown) && pl.MouseOB.GetComponent<CollList>().coll_obj.Contains(RightFolder))) && IM.ActionDelay < Time.fixedTime && CurrentFolder < FolderButtons.Count - 1)
+        if ((pl.IM.RightTrigger || ((pl.IM.enter_b || pl.IM.LeftMouseButtonDown) && pl.GetMouseCollList().Contains(RightFolder))) && IM.ActionDelay < Time.fixedTime && CurrentFolder < FolderButtons.Count - 1)
         {
             pl.PlaySoundsPitched(ClickClip, 0.8f + CurrentFolder * 0.05f);
             CurrentFolder++;
@@ -745,46 +729,37 @@ public class Inventory : MonoBehaviour
         }
         if (inventoryFolder[x] == null) return;
 
-        if (inventoryFolder[x].itemID > -1)
-        {
-            if (slots[x].transform.Find("Item") == null)
-            {
-                GameObject ItemOB = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/Item"), slots[x].transform);
-                ItemOB.GetComponent<RectTransform>().position = slots[x].GetComponent<RectTransform>().position;
-
-                ItemOB.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/Items/" + inventoryFolder[x].itemNames[0]);
-                ItemOB.GetComponent<Image>().color = new Color(1, 1, 1, 1);
-
-
-
-
-
-                ItemOB.name = "Item";
-
-                if (inventoryFolder[x].CanStack)
-                    slots[x].transform.Find("Item").transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "x " + inventoryFolder[x].Count;
-
-            }
-            else
-            {
-                Image IMG = slots[x].transform.Find("Item").transform.Find("Status").GetComponent<Image>();
-
-
-                slots[x].transform.Find("Item").transform.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/Items/" + inventoryFolder[x].itemNames[0]);
-                slots[x].transform.Find("Item").transform.GetComponent<Image>().color = new Color(1, 1, 1, 1);
-
-                if (inventoryFolder[x].Count > 0 && inventoryFolder[x].CanStack)
-                    slots[x].transform.Find("Item").transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "x " + inventoryFolder[x].Count;
-                else slots[x].transform.Find("Item").transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "";
-
-            }
-        }
-
-
         if (inventoryFolder[x].itemID == -1 && slots[x].transform.Find("Item") != null)
         {
             Destroy(slots[x].transform.Find("Item").gameObject);
+            return;
         }
+
+
+        if (slots[x].transform.Find("Item") != null)
+        {
+          
+
+            slots[x].transform.Find("Item").transform.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/Items/" + inventoryFolder[x].itemNames[0]);
+            slots[x].transform.Find("Item").transform.GetComponent<Image>().color = new Color(1, 1, 1, 1);
+
+            if (inventoryFolder[x].Count > 0 && inventoryFolder[x].CanStack)
+                slots[x].transform.Find("Item").transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "x " + inventoryFolder[x].Count;
+            else slots[x].transform.Find("Item").transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "";
+            
+            return;
+        }
+
+        GameObject ItemOB = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/Item"), slots[x].transform);
+        ItemOB.GetComponent<RectTransform>().position = slots[x].GetComponent<RectTransform>().position;
+
+        ItemOB.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/Items/" + inventoryFolder[x].itemNames[0]);
+        ItemOB.GetComponent<Image>().color = new Color(1, 1, 1, 1);
+
+        ItemOB.name = "Item";
+
+        if (inventoryFolder[x].CanStack)
+            slots[x].transform.Find("Item").transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "x " + inventoryFolder[x].Count;
 
 
     }
@@ -792,34 +767,29 @@ public class Inventory : MonoBehaviour
 
     void ExitFromInventory()
     {
-        if (!showinvent && !showjournal) return;
+        if ((!showinvent && !showjournal) || pl.menu.MenuONOFF) return;
         
-        if ((pl.IM.menu_b || pl.IM.exit_b ) && !pl.menu.MenuONOFF)
-        {
+        if (!pl.IM.menu_b && !pl.IM.exit_b ) return;
+        
 
-            PlaySoundsPitched(UIOpen, 0.8f);
+        PlaySoundsPitched(UIOpen, 0.8f);
 
-            LeftArrow.SetActive(false);
-            RightArrow.SetActive(false);
+        LeftArrow.SetActive(false);
+        RightArrow.SetActive(false);
 
-            ONOFF(GameObject.Find("ButtonsUI"), true);
-            ONOFF(Controlls, true);
-            if (showjournal) DrawJournal(false);
-            if (showinvent) DrawInventory(false);
-            crafting = false;
-            showinvent = false;
-            showjournal = false;
-            DrawINV = false;
-            IM.ActionDelay = Time.fixedTime + 0.1f;
-            _menu.MenuActionDelay = Time.fixedTime + 0.1f;
-        }
+        ONOFF(GameObject.Find("ButtonsUI"), true);
+        ONOFF(Controlls, true);
+        if (showjournal) DrawJournal(false);
+        if (showinvent) DrawInventory(false);
+        crafting = false;
+        showinvent = false;
+        showjournal = false;
+        DrawINV = false;
+        IM.ActionDelay = Time.fixedTime + 0.1f;
+        _menu.MenuActionDelay = Time.fixedTime + 0.1f;
+        
 
         
-    }
-
-    private void OnGUI()
-    {
-        ShowPicketItems();
     }
 
 
@@ -954,7 +924,10 @@ public class Inventory : MonoBehaviour
 
         pl.PlaySoundsPitched(PickItem, 1);
 
-        ADDPickedName("+ " + GetItemInDatabase(id).itemNames[_menu.Language], 0, 0.25f, NamePos);
+        if (numplus > 1)
+            ADDPickedName("+ " + GetItemInDatabase(id).itemNames[_menu.Language] + " x " + numplus,  0.25f, NamePos);
+        else
+            ADDPickedName("+ " + GetItemInDatabase(id).itemNames[_menu.Language],  0.25f, NamePos);
 
 
     }
@@ -962,16 +935,17 @@ public class Inventory : MonoBehaviour
 
     public void AddItemNOAUDIO(int id, int numplus, int durability, Vector2 NamePos)
     {
+        if (id <= -1) return;
+
         if (GetItemInDatabase(id) == null)
             return;
 
         AddItemToInv(id, numplus, durability, NamePos);
 
-
-
-
-        ADDPickedName("+ " + GetItemInDatabase(id).itemNames[_menu.Language], 0, 0.25f, NamePos);
-
+        if (numplus > 1)
+            ADDPickedName("+ " + GetItemInDatabase(id).itemNames[_menu.Language] + " x " + numplus,  0.25f, NamePos);
+        else
+            ADDPickedName("+ " + GetItemInDatabase(id).itemNames[_menu.Language],  0.25f, NamePos);
 
     }
     public void AddItemNOAUDIO_NOPickedNames(int id, int numplus, int durability, Vector2 NamePos)
@@ -990,36 +964,32 @@ public class Inventory : MonoBehaviour
         
         if ((CheckItem(id) && !GetItemInDatabase(id).CanStack) || !CheckItem(id))
         {
-
-
-           
-                inventory.Add(new Item());
-                int i = inventory.Count - 1;
+            inventory.Add(new Item());
+            int i = inventory.Count - 1;
                 
-                // CurrentItem = i;
-                inventory[i] = DeepCopyItem(id, numplus, durability);
+            inventory[i] = DeepCopyItem(id, numplus, durability);
 
-                if (CurrentFolder != 0)
-                {
-                    if (inventory[i].Structure && (inventory[i]._StructureType == Item.StructureType.Building||
-                         inventory[i]._StructureType == Item.StructureType.Protection ||
-                         inventory[i]._StructureType == Item.StructureType.Decoration))
-                        FolderButtons[0].transform.Find("NewItemTag").gameObject.SetActive(true);
-                }
+            if (CurrentFolder != 0)
+            {
+                if (inventory[i].Structure && (inventory[i]._StructureType == Item.StructureType.Building||
+                        inventory[i]._StructureType == Item.StructureType.Protection ||
+                        inventory[i]._StructureType == Item.StructureType.Decoration))
+                    FolderButtons[0].transform.Find("NewItemTag").gameObject.SetActive(true);
+            }
 
-                if (CurrentFolder != 1)
-                {
-                    if (inventory[i].Structure && inventory[i]._StructureType == Item.StructureType.Tiles)
-                        FolderButtons[1].transform.Find("NewItemTag").gameObject.SetActive(true);
-                }
+            if (CurrentFolder != 1)
+            {
+                if (inventory[i].Structure && inventory[i]._StructureType == Item.StructureType.Tiles)
+                    FolderButtons[1].transform.Find("NewItemTag").gameObject.SetActive(true);
+            }
 
-                if (CurrentFolder != 2)
-                {
-                    if (inventory[i].Structure && inventory[i]._StructureType == Item.StructureType.Farms)
-                        FolderButtons[2].transform.Find("NewItemTag").gameObject.SetActive(true);
-                }
+            if (CurrentFolder != 2)
+            {
+                if (inventory[i].Structure && inventory[i]._StructureType == Item.StructureType.Farms)
+                    FolderButtons[2].transform.Find("NewItemTag").gameObject.SetActive(true);
+            }
 
-                UpdateInvFolder();
+            UpdateInvFolder();
                     
                     
             
@@ -1050,58 +1020,64 @@ public class Inventory : MonoBehaviour
     }
 
 
-    public void ADDPickedName(string text,int stylenumber,float speed, Vector2 Pos)
+    public void ADDPickedName(string text,float speed, Vector2 Pos)
     {
-        PickedX.Add(Pos.x);
-        PickedY.Add(Pos.y);
-
-        PickedSlide.Add(1);
-        PickedStyles.Add(stylenumber);
-        Picked.Add(text);
-
-        PickedSpeeds.Add(speed);
+        print("ADDPickedName");
+        for (int i = 0; i < PickedText.Count; i++)
+        {
+            if (PickedSlide[i] <= 0)
+            {
+                PickedX[i] = Pos.x;
+                PickedY[i] = Pos.y;
+                PickedSlide[i] = 1;
+                Picked[i] = text;
+                PickedSpeeds[i] = speed;
+                return;
+            }
+        }
     }
 
 
     void ShowPicketItems()
     {
-        for (int y = 0; y < PickedY.Count; y++)
+        for (int y = 0; y < PickedText.Count; y++)
         {
+            if (PickedSlide[y] > 0)
+            {
+                PickedText[y].GetComponent<RectTransform>().position =
+                  pl.MainCamera.WorldToScreenPoint(new Vector3(PickedX[y], PickedY[y] - PickedSlide[y] * 0.5f + 0.5f));
+
+                PickedText[y].GetComponent<TextMeshProUGUI>().text = Picked[y];
 
 
-            Color color = GUI.color;
-            GUI.color = new Color(1, 1, 1, PickedSlide[y]);
-          
-            GUI.Box(new Rect(pl.MainCamera.WorldToScreenPoint(new Vector3(PickedX[y],0,0)).x - 200f, Screen.height - Camera.main.WorldToScreenPoint(new Vector3(0,PickedY[y], 0)).y + PickedSlide[y] * 100 - 150, 400, 50), Picked[y], skin.customStyles[PickedStyles[y]]);
-            PickedSlide[y] -= Time.deltaTime * PickedSpeeds[y];
+                PickedText[y].GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, PickedSlide[y]);
+
+                PickedSlide[y] -= Time.deltaTime * 4 * PickedSpeeds[y];
+         
+            }
+
 
             if (PickedSlide[y] <= 0)
             {
-                Picked.RemoveAt(y);
-                PickedY.RemoveAt(y);
-                PickedX.RemoveAt(y);
-                PickedStyles.RemoveAt(y);
-                PickedSlide.RemoveAt(y);
-                PickedSpeeds.RemoveAt(y);
+                PickedText[y].GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, 0);
+
+                PickedText[y].GetComponent<RectTransform>().position = new Vector3(3000, 999);
+
+                Picked[y] = "";
+                PickedY[y] = 9999;
+                PickedX[y] = 9999;
+                PickedSlide[y] = 0;
+                PickedSpeeds[y] = 0;
+
             }
 
-            GUI.color = color;
         }
     }
 
 
-    /*public void ReduceItemCount(string namem,int minusn)
-	{
-		for (int i = 0; i<inventory.Count; i++) {
-			if (inventory [i].itemNames[0] == namem){
-				inventory [i] = new Item ();
-			}
-		}
-	}*/
-
     public void ReduceItemCount(int id, int minusn)
     {
-        print("ReduceItemCount " + id);
+    
 
         for (int i = 0; i < inventory.Count; i++)
         {
@@ -1113,7 +1089,7 @@ public class Inventory : MonoBehaviour
                 if (inventory[i].Count > minusn)
                 {
                     inventory[i].Count -= minusn;
-                    
+                   
                 }
                 else
                 {
@@ -1194,7 +1170,6 @@ public class Inventory : MonoBehaviour
 
     public string GetCurrentItemName()
     {
-        //print ("slotID"+slots[Ch_pos].itemID);
         if ((XChoise + YChoise * slotX) < inventory.Count)
             return inventory[XChoise + YChoise * slotX].itemNames[0];
         else return null;
@@ -1216,10 +1191,8 @@ public class Inventory : MonoBehaviour
 
             if (QuestMenu.transform.Find("Quest" + i) != null)
             {
-                // QuestMenu.transform.Find("Quest" + i).gameObject.SetActive(TF);
                 QuestMenu.transform.Find("Quest" + i).Find("Text").gameObject.GetComponent<TextMeshProUGUI>().text = Quests[i].Description[0];
-                // QuestMenu.transform.Find("Quest" + i).transform.position = new Vector3(QuestMenu.transform.position.x, QuestMenu.transform.position.y + (i * -140f) - 10f + Quest_YPos + Quest_YSlider, 0);
-
+                
                 if (Quests[i].Done)
                 {
                     QuestMenu.transform.Find("Quest" + i).Find("QuestMark").GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/UI/QuestDone");
@@ -1262,19 +1235,7 @@ public class Inventory : MonoBehaviour
     }
 
 
-    void AddMoneyAnim()
-    {
-        if (MaxAddedMoney > 0)
-        {
-            if (AddMoneyTimer < Time.fixedTime)
-            {
-                Money++;
-                AddedMoney++;
-                MaxAddedMoney--;
-                AddMoneyTimer = Time.fixedTime + 0.01f;
-            }
-        }
-    }
+  
 
 
     public void ONOFF(GameObject g, bool TF)
@@ -1326,9 +1287,9 @@ public class Inventory : MonoBehaviour
         if (g.GetComponent<BoxCollider2D>() != null)
             g.GetComponent<BoxCollider2D>().enabled = TF;
 
-        if (g.GetComponent<Character>() != null)
+       /* if (g.GetComponent<Character>() != null)
             g.GetComponent<Character>().enabled = TF;
-
+       */
        if (g.GetComponent<CharacterMove>() != null)
           g.GetComponent<CharacterMove>().enabled = TF;
     }
@@ -1405,345 +1366,6 @@ public class Inventory : MonoBehaviour
 
 
 
-    public string TooltipsString(Item i)
-    {
-
-        //#FF5D5D - red
-        //#9DFF99 - green
-
-        string red = "#FF5D5D";
-        string green = "#9DFF99";
-        string yellow = "#FFF224";
-
-        string s = "";
-        string plus = "";
-
-        string stargcolortag = "";
-        string endgcolortag = "";
-
-        stargcolortag = "<color=" + yellow + ">";
-        endgcolortag = "</color>";
-
-        s = stargcolortag + i.itemNames[_menu.Language] + endgcolortag + "\n" + "\n" + i.itemDesc[_menu.Language] + "\n";
-
-
-        if (_menu.Language == 0) LockedString = "LOCKED";
-        if (_menu.Language == 1) LockedString = "НЕ ВІДКРИТО";
-        if (_menu.Language == 2) LockedString = "鍵付き";
-
-        if (_menu.Language == 0) BodyPartString = "Body part: ";
-        if (_menu.Language == 1) BodyPartString = "Частина тіла: ";
-        if (_menu.Language == 2) BodyPartString = "身体の一部: ";
-
-        if (_menu.Language == 0)
-            BodypartsNames = new string[6] { "Head", "Body", "Legs", "Hand", "Eye", "Mutation" };
-
-        if (_menu.Language == 1)
-            BodypartsNames = new string[6] { "Голова", "Тіло", "Ноги", "Руки", "Око", "Мутація" };
-
-        if (_menu.Language == 2)
-            BodypartsNames = new string[6] { "Head", "Body", "Legs", "Hand", "Eye", "Mutation" };
-
-        if (_menu.Language == 0) DamageString = "Damage: ";
-        if (_menu.Language == 1) DamageString = "Пошкодження: ";
-        if (_menu.Language == 2) DamageString = "ダメージ: ";
-
-
-        if (_menu.Language == 0) DurabilityString = "Durability: ";
-        if (_menu.Language == 1) DurabilityString = "Міцність: ";
-        if (_menu.Language == 2) DurabilityString = "耐久性: ";
-
-
-        if (_menu.Language == 0) BulletDamageString = "Bullet Damage: ";
-        if (_menu.Language == 1) BulletDamageString = "Кульове пошкодження: ";
-        if (_menu.Language == 2) BulletDamageString = "弾丸のダメージ: ";
-
-        if (_menu.Language == 0) MaxHPString = "Max HP: ";
-        if (_menu.Language == 1) MaxHPString = "Максимальний HP: ";
-        if (_menu.Language == 2) MaxHPString = "最大HP: ";
-
-
-        if (_menu.Language == 0) VisionString = "Vision: ";
-        if (_menu.Language == 1) VisionString = "Зір: ";
-        if (_menu.Language == 2) VisionString = "ビジョン: ";
-
-        if (_menu.Language == 0) StaminaString = "Stamina: ";
-        if (_menu.Language == 1) StaminaString = "Витривалість: ";
-        if (_menu.Language == 2) StaminaString = "耐久: ";
-        
-
-
-        if (_menu.Language == 0) SatietyString = "Satiety: ";
-        if (_menu.Language == 1) SatietyString = "Cитість: ";
-        if (_menu.Language == 2) SatietyString = "満腹感: ";
-
-        if (_menu.Language == 0) HPString = "HP: ";
-        if (_menu.Language == 1) HPString = "Здоров'я: ";
-        if (_menu.Language == 2) HPString = "健康: ";
-
-        if (_menu.Language == 0) StaminaRecoveryspeedString = "Stamina Recovery speed: ";
-        if (_menu.Language == 1) StaminaRecoveryspeedString = "Швидкість відновлення витривалості: ";
-        if (_menu.Language == 2) StaminaRecoveryspeedString = "スタミナ回復速度: ";
-
-
-        if (_menu.Language == 0) NeedsStaminaString = "Needs Stamina: ";
-        if (_menu.Language == 1) NeedsStaminaString = "Потребує Витривалості: ";
-        if (_menu.Language == 2) NeedsStaminaString = "体力が必要: ";
-
-        if (_menu.Language == 0) DashDurationString = "Dash Duration: ";
-        if (_menu.Language == 1) DashDurationString = "Тривалість Деша: ";
-        if (_menu.Language == 2) DashDurationString = "ダッシュ時間: ";
-
-        if (_menu.Language == 0) FoodString = "Food";
-        if (_menu.Language == 1) FoodString = "Їжа";
-        if (_menu.Language == 2) FoodString = "食品";
-
-
-
-        if (_menu.Language == 0) CostString = "Cost";
-        if (_menu.Language == 1) CostString = "Ціна";
-        if (_menu.Language == 2) CostString = "価格だ";
-
-
-
-        if (_menu.Language == 0) BuildingCostString = "Cost to build";
-        if (_menu.Language == 1) BuildingCostString = "Ціна будування";
-        if (_menu.Language == 2) BuildingCostString = "建設費";
-
-        
-
-
-        if (pl.inv.GetItemInDatabase(i.itemID).Locked)
-        {
-            s += "<color=" + red + ">" + LockedString + "</color>";
-            s += "\n";
-        }
-
-        if (i._bodypart != null)
-        {
-            if (i._bodypart.Length > 0)
-            {
-                if (i.Vision > 0) plus = "+ ";
-                s += BodyPartString;
-
-                for (int j = 0; j < i._bodypart.Length; j++)
-                {
-                    s += "<color=" + yellow + ">" + BodypartsNames[j] + "</color>";
-
-                    if (j < i._bodypart.Length - 1) s += ", ";
-
-                }
-
-                s += "\n";
-            }
-        }
-
-
-        if (i.DamageAmount != 0)
-        {
-         
-            if (i.DamageAmount > 0)
-            {
-                stargcolortag = "<color=" + green + ">";
-                endgcolortag = "</color>";
-                plus = "+ ";
-            }
-            else if (i.DamageAmount < 0)
-            {
-                stargcolortag = "<color=" + red + ">";
-                endgcolortag = "</color>";
-            }
-
-
-            s += DamageString + stargcolortag + plus + i.DamageAmount + endgcolortag;
-            s += "\n";
-        }
-
-
-        if (i._type == Item.type.weapon)
-        {
-           
-            if (i.Durability > 1)
-            {
-                stargcolortag = "<color=" + green + ">";
-                endgcolortag = "</color>";
-
-            }
-            else if (i.Durability <= 1)
-            {
-                stargcolortag = "<color=" + red + ">";
-                endgcolortag = "</color>";
-            }
-
-            s += DurabilityString + stargcolortag + i.Durability + endgcolortag;
-            s += "\n";
-        }
-
-        if (i.BulletDamageAmount != 0)
-        {
-            
-            if (i.BulletDamageAmount > 0)
-            {
-                stargcolortag = "<color=" + green + ">";
-                endgcolortag = "</color>";
-                plus = "+ ";
-            }
-            else if (i.BulletDamageAmount < 0)
-            {
-                stargcolortag = "<color=" + red + ">";
-                endgcolortag = "</color>";
-            }
-
-            s += BulletDamageString + stargcolortag + plus + i.BulletDamageAmount + endgcolortag;
-            s += "\n";
-        }
-
-
-        if (i.MaxHP != 0)
-        {
-            
-            if (i.MaxHP > 0)
-            {
-                stargcolortag = "<color=" + green + ">";
-                endgcolortag = "</color>";
-                plus = "+ ";
-            }
-            else if (i.MaxHP < 0)
-            {
-                stargcolortag = "<color=" + red + ">";
-                endgcolortag = "</color>";
-            }
-
-            if (i.MaxHP > 0) plus = "+ ";
-            s += MaxHPString + stargcolortag + plus + i.MaxHP + endgcolortag;
-            s += "\n";
-        }
-
-
-        if (i.Vision != 0)
-        {
-            
-            if (i.Vision > 0)
-            {
-                stargcolortag = "<color=" + green + ">";
-                endgcolortag = "</color>";
-                plus = "+ ";
-            }
-            else if (i.Vision < 0)
-            {
-                stargcolortag = "<color=" + red + ">";
-                endgcolortag = "</color>";
-            }
-
-            s += VisionString + stargcolortag + plus + i.Vision + endgcolortag;
-            s += "\n";
-        }
-
-        if (i.Stamina != 0)
-        {
-       
-            if (i.Stamina > 0)
-            {
-                stargcolortag = "<color=" + green + ">";
-                endgcolortag = "</color>";
-                plus = "+ ";
-            }
-            else if (i.Stamina < 0)
-            {
-                stargcolortag = "<color=" + red + ">";
-                endgcolortag = "</color>";
-            }
-
-            s += StaminaString + stargcolortag + plus + i.Stamina + endgcolortag;
-            s += "\n";
-        }
-
-        if (i.Satiety != 0)
-        {
-          
-            if (i.Satiety > 0)
-            {
-                stargcolortag = "<color=" + green + ">";
-                endgcolortag = "</color>";
-                plus = "+ ";
-            }
-            else if (i.Satiety < 0)
-            {
-                stargcolortag = "<color=" + red + ">";
-                endgcolortag = "</color>";
-            }
-
-            s += SatietyString + stargcolortag + plus + i.Satiety + endgcolortag;
-            s += "\n";
-        }
-
-        if (i.HP != 0)
-        {
-        
-            if (i.HP > 0)
-            {
-                stargcolortag = "<color=" + green + ">";
-                endgcolortag = "</color>";
-                plus = "+ ";
-            }
-            else if (i.HP < 0)
-            {
-                stargcolortag = "<color=" + red + ">";
-                endgcolortag = "</color>";
-            }
-
-            s += HPString + stargcolortag + plus + i.HP + endgcolortag;
-            s += "\n";
-        }
-
-
-        if (crafting && ChooseTopSegmentSlot)
-        {
-            stargcolortag = "<color=" + yellow + ">";
-            endgcolortag = "</color>";
-
-
-            s += "\n" + CostString + stargcolortag + " " + i.Cost + endgcolortag;
-        
-        }
-
-
-        stargcolortag = "<color=" + yellow + ">";
-        endgcolortag = "</color>";
-            
-
-        s += "\n"+ BuildingCostString + stargcolortag + " " + i.BuildingCost + endgcolortag;
-        s += "\n";
-        
-
-        if (i.StaminaRecoverySpeed != 0)
-        {
-            if (i.StaminaRecoverySpeed > 0) plus = "+ ";
-            s += StaminaRecoveryspeedString + plus + i.StaminaRecoverySpeed;
-            s += "\n";
-        }
-
-        if (i.StaminaUse != 0)
-        {
-            if (i.StaminaUse > 0) plus = "";
-            s += NeedsStaminaString + plus + i.StaminaUse;
-            s += "\n";
-        }
-
-        if (i.DashDuration != 0)
-        {
-            if (i.DashDuration > 0) plus = "+ ";
-            s += DashDurationString + plus + i.DashDuration;
-            s += "\n";
-        }
-
-        if (i.Food) s += FoodString;
-
-
-
-        return s;
-    }
-
 
 
 
@@ -1751,7 +1373,7 @@ public class Inventory : MonoBehaviour
     {
       
 
-        if (pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(CraftingCross) && pl.IM.LeftMouseButtonDown)
+        if (pl.GetMouseCollList().Contains(CraftingCross) && pl.IM.LeftMouseButtonDown)
         {
             ONOFF(GameObject.Find("ButtonsUI"), true);
             ONOFF(Controlls, true);
@@ -1770,7 +1392,7 @@ public class Inventory : MonoBehaviour
 
 
 
-        if (pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(EscapeInventory) && pl.IM.LeftMouseButtonDown)
+        if (pl.GetMouseCollList().Contains(EscapeInventory) && pl.IM.LeftMouseButtonDown)
         {
             pl.menu.PlayAudio(ClickClip);
             showinvent = false;
@@ -1804,39 +1426,40 @@ public class Inventory : MonoBehaviour
 
 
 
-        if (!crafting)
+        if (crafting || !pl.IM.LeftMouseButtonDown) return;
+        
+
+        if (pl.GetMouseCollList().Contains(LeftArrow) )
         {
-            if (pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(LeftArrow) && pl.IM.LeftMouseButtonDown)
-            {
-                PauseInventory = false;
-                ChooseTopSegmentSlot = false;
+            PauseInventory = false;
+            ChooseTopSegmentSlot = false;
 
 
-                if(SlotSlide > 0)
-                SlotSlide--;
+            if(SlotSlide > 0)
+            SlotSlide--;
 
-                if (CurrentItem > 0)
-                    CurrentItem--;
+            if (CurrentItem > 0)
+                CurrentItem--;
 
-                SetSlots();
+            SetSlots();
 
-                pl.PlaySoundsPitched(ClickClip, 0.8f);
+            pl.PlaySoundsPitched(ClickClip, 0.8f);
 
-            }
-
-            if (pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(RightArrow) && pl.IM.LeftMouseButtonDown)
-            {
-                if(SlotSlide < inventoryFolder.Count - 5)
-                SlotSlide++;
-
-                if (CurrentItem <= craftingslotX * craftingslotY - 1)
-                    CurrentItem++;
-
-                pl.PlaySoundsPitched(ClickClip, 1f);
-                SetSlots();
-
-            }
         }
+
+        if (pl.GetMouseCollList().Contains(RightArrow) )
+        {
+            if(SlotSlide < inventoryFolder.Count - 5)
+            SlotSlide++;
+
+            if (CurrentItem <= craftingslotX * craftingslotY - 1)
+                CurrentItem++;
+
+            pl.PlaySoundsPitched(ClickClip, 1f);
+            SetSlots();
+
+        }
+        
 
 
 
@@ -1864,89 +1487,74 @@ public class Inventory : MonoBehaviour
 
     void Journal()
     {
+        bool canToggleJournal = (
+            (
+                pl.GetMouseCollList().Contains(JournalButton) &&
+                pl.IM.LeftMouseButtonDown &&
+                JournalButton.GetComponent<Image>().enabled
+            ) || pl.IM.journal_b
+            ) && IM.ActionDelay < Time.fixedTime &&
+            !showinvent &&
+            !pl.menu.MenuONOFF &&
+            !pl.Chatting &&
+            !ShowAch;
 
-        if (((pl.MouseOB.GetComponent<MouseController>().UIColl(JournalButton) && pl.IM.LeftMouseButtonDown && JournalButton.GetComponent<Image>().enabled) || pl.IM.journal_b) && IM.ActionDelay < Time.fixedTime && !showinvent && !pl.menu.MenuONOFF && !pl.Chatting && !ShowAch)
+        if (canToggleJournal)
         {
             showjournal = !showjournal;
-
 
             ONOFF(Controlls, showjournal);
             DrawJournal(showjournal);
             ONOFF(NewQuest, showjournal);
+
             IM.ActionDelay = Time.fixedTime + 0.1f;
-
             NewQuestBool = false;
-
         }
 
+        if (!showjournal) return;
 
-        if (showjournal)
+        // Update quest UI entries
+        for (int i = 0; i < Quests.Count; i++)
         {
+            Transform questEntry = QuestMenu.transform.Find("Quest" + i);
+            if (questEntry == null) continue;
 
+            questEntry.Find("Text").GetComponent<TextMeshProUGUI>().text = Quests[i].Description[0];
 
+            if (Quests[i].Done)
+            {
+                questEntry.Find("QuestMark").GetComponent<Image>().sprite =
+                    Resources.Load<Sprite>("Sprites/UI/QuestDone");
+            }
+        }
+
+        if (Quests.Count <= 1) return;
+
+        QuestMenu.transform.Find("Header")?.SetAsLastSibling();
+
+        // Handle vertical input for quest scrolling
+        bool scrollUp = (pl.IM._vertical < 0 || pl.IM.DPADY < 0) && CurrentQuest > 0 && VertDelay < Time.fixedTime;
+        bool scrollDown = (pl.IM._vertical > 0 || pl.IM.DPADY > 0) && CurrentQuest < Quests.Count - 1 && VertDelay < Time.fixedTime;
+
+        if (scrollUp || scrollDown)
+        {
+            CurrentQuest += scrollDown ? 1 : -1;
+            pl.PlaySoundsPitched(ClickClip, scrollDown ? 1f : 0.8f);
+
+            float offset = CurrentQuest * 100f;
             for (int i = 0; i < Quests.Count; i++)
             {
+                Transform questEntry = QuestMenu.transform.Find("Quest" + i);
+                if (questEntry == null) continue;
 
-
-                if (QuestMenu.transform.Find("Quest" + i) != null)
-                {
-                    QuestMenu.transform.Find("Quest" + i).Find("Text").gameObject.GetComponent<TextMeshProUGUI>().text = Quests[i].Description[0];
-
-                    if (Quests[i].Done)
-                    {
-                        QuestMenu.transform.Find("Quest" + i).Find("QuestMark").GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/UI/QuestDone");
-                    }
-
-                }
+                questEntry.position = new Vector3(
+                    QuestMenu.transform.position.x,
+                    QuestMenu.transform.position.y + (i * -140f) - 10f + offset,
+                    0
+                );
             }
 
-
-
-            if (Quests.Count > 1)
-            {
-                QuestMenu.transform.Find("Header").SetAsLastSibling();
-
-                if ((pl.IM._vertical < 0 || pl.IM.DPADY < 0) && CurrentQuest > 0 && VertDelay < Time.fixedTime)
-                {
-
-
-
-                    CurrentQuest--;
-
-                    pl.PlaySoundsPitched(ClickClip, 0.8f);
-
-                    for (int i = 0; i < Quests.Count; i++)
-                    {
-                        if (QuestMenu.transform.Find("Quest" + i) != null)
-                        {
-                            QuestMenu.transform.Find("Quest" + i).transform.position = new Vector3(QuestMenu.transform.position.x, QuestMenu.transform.position.y + (i * -140f) - 10f + CurrentQuest * 100, 0);
-                        }
-                    }
-
-                    VertDelay = Time.fixedTime + 0.1f;
-                }
-
-                if ((pl.IM._vertical > 0 || pl.IM.DPADY > 0) && CurrentQuest < Quests.Count - 1 && VertDelay < Time.fixedTime)
-                {
-
-                    CurrentQuest++;
-
-                    pl.PlaySoundsPitched(ClickClip, 1);
-
-                    for (int i = 0; i < Quests.Count; i++)
-                    {
-                        if (QuestMenu.transform.Find("Quest" + i) != null)
-                        {
-                            QuestMenu.transform.Find("Quest" + i).transform.position = new Vector3(QuestMenu.transform.position.x, QuestMenu.transform.position.y + (i * -140f) - 10f + CurrentQuest * 100, 0);
-                        }
-                    }
-
-                    VertDelay = Time.fixedTime + 0.1f;
-                }
-
-
-
-            }
+            VertDelay = Time.fixedTime + 0.1f;
         }
     }
 
@@ -2003,7 +1611,7 @@ public class Inventory : MonoBehaviour
             else
 
             {
-                Choose.transform.position = pl.MouseOB.transform.position + pl.inv.ShakeVector();
+                Choose.transform.position = pl.MouseUI.transform.position + pl.inv.ShakeVector();
 
             }
             ToolTip.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "";
@@ -2076,32 +1684,29 @@ public class Inventory : MonoBehaviour
     {
         int mouseid = -1;
 
-      
-        for (int r = 0; r < CraftingUIOB.GetComponent<ItemsSlotsUI>().Slots.Length; r++)
+        ItemsSlotsUI CraftingSlots = CraftingUIOB.GetComponent<ItemsSlotsUI>();
+        for (int r = 0; r < CraftingSlots.Slots.Length; r++)
         {
-            for (int i = 0; i < CraftingUIOB.GetComponent<ItemsSlotsUI>().Slots[r].Slot.Length; i++)
+            for (int i = 0; i < CraftingSlots.Slots[r].Slot.Length; i++)
             {
                 
-                if (pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(CraftingUIOB.GetComponent<ItemsSlotsUI>().Slots[r].Slot[i]) && !pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(CraftingCross))
+                if (pl.GetMouseCollList().Contains(CraftingSlots.Slots[r].Slot[i]) && !pl.GetMouseCollList().Contains(CraftingCross))
                 {
-                    if (CurrentItem != CraftingUIOB.GetComponent<ItemsSlotsUI>().Slots[r].items[i].itemID)
+                    if (!PauseInventory && CurrentItem != CraftingSlots.Slots[r].items[i].itemID)
                         pl.PlaySoundsPitched(ClickClip, 0.8f);
-                
-                    mouseid = CraftingUIOB.GetComponent<ItemsSlotsUI>().Slots[r].items[i].itemID;
-                    CurrentItem = CraftingUIOB.GetComponent<ItemsSlotsUI>().Slots[r].items[i].itemID;
+                    
+                    mouseid = CraftingSlots.Slots[r].items[i].itemID;
+                    CurrentItem = CraftingSlots.Slots[r].items[i].itemID;
 
-                 
                     PauseInventory = true;
            
-
-                    // ChooseTopSegmentSlot = false;
 
                     break;
                 }
 
            
 
-                if (pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(CraftingCross))
+                if (pl.GetMouseCollList().Contains(CraftingCross))
                 {
                     CurrentItem = 0;
 
@@ -2117,9 +1722,8 @@ public class Inventory : MonoBehaviour
 
     void CollidingOneOfTheSlots(int i)
     {
-        //if(crafting && !IM.MouseMode) return;
- 
-        if (!pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(slots[i]) && IM.MouseMode)
+      
+        if (!pl.GetMouseCollList().Contains(slots[i]) && IM.MouseMode)
             return;
 
         if (!IM.MouseMode &&  !Choose.GetComponent<CollList>().GetCollList().Contains(slots[i]) )
@@ -2128,40 +1732,45 @@ public class Inventory : MonoBehaviour
         if( i < inventoryFolder.Count &&  inventoryFolder[i].itemID == -1) return;
         if (i >= inventoryFolder.Count) return;
 
-
-
-
         if (CurrentItem != i)
         {
-            pl.PlaySoundsPitched(ClickClip, 0.8f);
-
+            if (GetCurrentItem().itemID <= -1)
+            {
+                pl.PlaySoundsPitched(ClickClip, 0.8f);
+            }
             if (IM.MouseMode)
             {
                 CurrentItem = i;
-
-               /* if (i >= 12)
-                {
-                    SlotSlide = i - 12;
-                    print("mouse slide: " + SlotSlide);
-                    SetSlots();
-                }
-
-                if (i < 12)
-                {
-                    SlotSlide = i - 12;
-                    print("mouse slide: " + SlotSlide);
-                    SetSlots();
-                }*/
             }
             PauseInventory = false;
             ChooseTopSegmentSlot = false;
         }
 
 
+        if (pl.IM.RightMouseButtonDown )
+        {
+            if (!inventoryFolder[i].CantBeSold)
+            {
+                AddItem(9, (int)(inventoryFolder[i].Cost / 1.5f), 999,
+                    pl.MainCamera.ScreenToWorldPoint(slots[i].transform.position));
+
+                ReduceItemCount(inventoryFolder[i].itemID, 1);
+                UpdateInvFolder();
+
+                return;
+            }
+            else
+                _menu.PlayAudio(_menu.ErrorClip);
+        }
+
+
+      
+
+
         if (!pl.IM.LeftMouseButtonDown && !pl.IM.enter_b)
         return;
 
-  
+        
         if (BufferItem.itemID > -1)
         {
             if (IM.ActionDelay < Time.fixedTime && !crafting)
@@ -2317,6 +1926,11 @@ public class Inventory : MonoBehaviour
 
         if (n.GetComponent<Animator>() != null)
             n.GetComponent<Animator>().enabled = false;
+
+
+        if (i.GetComponent<Character>() != null)
+            i.GetComponent<Character>().enabled = false;
+
 
 
         if (i.GetComponent<PathUpdate>() != null)
@@ -2573,6 +2187,8 @@ public class Inventory : MonoBehaviour
 
         result.Count = count;
         result.CanStack = T.CanStack;
+        result.CantBeSold = T.CantBeSold;
+
         result._bodypart = T._bodypart;
         result.Structure = T.Structure;
         result._StructureType = T._StructureType;
@@ -2605,6 +2221,385 @@ public class Inventory : MonoBehaviour
         result.Gun = T.Gun;
 
         return result;
+    }
+
+
+    public string TooltipsString(Item i)
+    {
+
+        //#FF5D5D - red
+        //#9DFF99 - green
+
+        string red = "#280d14";
+        string green = "#9DFF99";
+        string yellow = "#FFF224";
+
+        string s = "";
+        string plus = "";
+
+        string stargcolortag = "";
+        string endgcolortag = "";
+
+        stargcolortag = "<color=" + red + ">";
+        endgcolortag = "</color>";
+
+        s = stargcolortag + i.itemNames[_menu.Language] + endgcolortag + "\n" + "\n" + i.itemDesc[_menu.Language] + "\n";
+
+
+        if (_menu.Language == 0) LockedString = "LOCKED";
+        if (_menu.Language == 1) LockedString = "НЕ ВІДКРИТО";
+        if (_menu.Language == 2) LockedString = "鍵付き";
+
+        if (_menu.Language == 0) BodyPartString = "Body part: ";
+        if (_menu.Language == 1) BodyPartString = "Частина тіла: ";
+        if (_menu.Language == 2) BodyPartString = "身体の一部: ";
+
+        if (_menu.Language == 0)
+            BodypartsNames = new string[6] { "Head", "Body", "Legs", "Hand", "Eye", "Mutation" };
+
+        if (_menu.Language == 1)
+            BodypartsNames = new string[6] { "Голова", "Тіло", "Ноги", "Руки", "Око", "Мутація" };
+
+        if (_menu.Language == 2)
+            BodypartsNames = new string[6] { "Head", "Body", "Legs", "Hand", "Eye", "Mutation" };
+
+        if (_menu.Language == 0) DamageString = "Damage: ";
+        if (_menu.Language == 1) DamageString = "Пошкодження: ";
+        if (_menu.Language == 2) DamageString = "ダメージ: ";
+
+
+        if (_menu.Language == 0) DurabilityString = "Durability: ";
+        if (_menu.Language == 1) DurabilityString = "Міцність: ";
+        if (_menu.Language == 2) DurabilityString = "耐久性: ";
+
+
+        if (_menu.Language == 0) BulletDamageString = "Bullet Damage: ";
+        if (_menu.Language == 1) BulletDamageString = "Кульове пошкодження: ";
+        if (_menu.Language == 2) BulletDamageString = "弾丸のダメージ: ";
+
+        if (_menu.Language == 0) MaxHPString = "Max HP: ";
+        if (_menu.Language == 1) MaxHPString = "Максимальний HP: ";
+        if (_menu.Language == 2) MaxHPString = "最大HP: ";
+
+
+        if (_menu.Language == 0) VisionString = "Vision: ";
+        if (_menu.Language == 1) VisionString = "Зір: ";
+        if (_menu.Language == 2) VisionString = "ビジョン: ";
+
+        if (_menu.Language == 0) StaminaString = "Stamina: ";
+        if (_menu.Language == 1) StaminaString = "Витривалість: ";
+        if (_menu.Language == 2) StaminaString = "耐久: ";
+
+
+
+        if (_menu.Language == 0) SatietyString = "Satiety: ";
+        if (_menu.Language == 1) SatietyString = "Cитість: ";
+        if (_menu.Language == 2) SatietyString = "満腹感: ";
+
+        if (_menu.Language == 0) HPString = "HP: ";
+        if (_menu.Language == 1) HPString = "Здоров'я: ";
+        if (_menu.Language == 2) HPString = "健康: ";
+
+        if (_menu.Language == 0) StaminaRecoveryspeedString = "Stamina Recovery speed: ";
+        if (_menu.Language == 1) StaminaRecoveryspeedString = "Швидкість відновлення витривалості: ";
+        if (_menu.Language == 2) StaminaRecoveryspeedString = "スタミナ回復速度: ";
+
+
+        if (_menu.Language == 0) NeedsStaminaString = "Needs Stamina: ";
+        if (_menu.Language == 1) NeedsStaminaString = "Потребує Витривалості: ";
+        if (_menu.Language == 2) NeedsStaminaString = "体力が必要: ";
+
+        if (_menu.Language == 0) DashDurationString = "Dash Duration: ";
+        if (_menu.Language == 1) DashDurationString = "Тривалість Деша: ";
+        if (_menu.Language == 2) DashDurationString = "ダッシュ時間: ";
+
+        if (_menu.Language == 0) FoodString = "Food";
+        if (_menu.Language == 1) FoodString = "Їжа";
+        if (_menu.Language == 2) FoodString = "食品";
+
+
+
+        if (_menu.Language == 0) CostString = "Cost";
+        if (_menu.Language == 1) CostString = "Ціна";
+        if (_menu.Language == 2) CostString = "価格だ";
+
+
+
+        if (_menu.Language == 0) BuildingCostString = "Cost to build";
+        if (_menu.Language == 1) BuildingCostString = "Ціна будування";
+        if (_menu.Language == 2) BuildingCostString = "建設費";
+
+
+
+
+        if (pl.inv.GetItemInDatabase(i.itemID).Locked)
+        {
+            s += "<color=" + red + ">" + LockedString + "</color>";
+            s += "\n";
+        }
+
+        if (i._bodypart != null)
+        {
+            if (i._bodypart.Length > 0)
+            {
+                if (i.Vision > 0) plus = "+ ";
+                s += BodyPartString;
+
+                for (int j = 0; j < i._bodypart.Length; j++)
+                {
+                    s += "<color=" + red + ">" + BodypartsNames[j] + "</color>";
+
+                    if (j < i._bodypart.Length - 1) s += ", ";
+
+                }
+
+                s += "\n";
+            }
+        }
+
+
+        if (i.DamageAmount != 0)
+        {
+
+            if (i.DamageAmount > 0)
+            {
+                stargcolortag = "<color=" + green + ">";
+                endgcolortag = "</color>";
+                plus = "+ ";
+            }
+            else if (i.DamageAmount < 0)
+            {
+                stargcolortag = "<color=" + red + ">";
+                endgcolortag = "</color>";
+            }
+
+
+            s += DamageString + stargcolortag + plus + i.DamageAmount + endgcolortag;
+            s += "\n";
+        }
+
+
+        if (i._type == Item.type.weapon)
+        {
+
+            if (i.Durability > 1)
+            {
+                stargcolortag = "<color=" + green + ">";
+                endgcolortag = "</color>";
+
+            }
+            else if (i.Durability <= 1)
+            {
+                stargcolortag = "<color=" + red + ">";
+                endgcolortag = "</color>";
+            }
+
+            s += DurabilityString + stargcolortag + i.Durability + endgcolortag;
+            s += "\n";
+        }
+
+        if (i.BulletDamageAmount != 0)
+        {
+
+            if (i.BulletDamageAmount > 0)
+            {
+                stargcolortag = "<color=" + green + ">";
+                endgcolortag = "</color>";
+                plus = "+ ";
+            }
+            else if (i.BulletDamageAmount < 0)
+            {
+                stargcolortag = "<color=" + red + ">";
+                endgcolortag = "</color>";
+            }
+
+            s += BulletDamageString + stargcolortag + plus + i.BulletDamageAmount + endgcolortag;
+            s += "\n";
+        }
+
+
+        if (i.MaxHP != 0)
+        {
+
+            if (i.MaxHP > 0)
+            {
+                stargcolortag = "<color=" + green + ">";
+                endgcolortag = "</color>";
+                plus = "+ ";
+            }
+            else if (i.MaxHP < 0)
+            {
+                stargcolortag = "<color=" + red + ">";
+                endgcolortag = "</color>";
+            }
+
+            if (i.MaxHP > 0) plus = "+ ";
+            s += MaxHPString + stargcolortag + plus + i.MaxHP + endgcolortag;
+            s += "\n";
+        }
+
+
+        if (i.Vision != 0)
+        {
+
+            if (i.Vision > 0)
+            {
+                stargcolortag = "<color=" + green + ">";
+                endgcolortag = "</color>";
+                plus = "+ ";
+            }
+            else if (i.Vision < 0)
+            {
+                stargcolortag = "<color=" + red + ">";
+                endgcolortag = "</color>";
+            }
+
+            s += VisionString + stargcolortag + plus + i.Vision + endgcolortag;
+            s += "\n";
+        }
+
+        if (i.Stamina != 0)
+        {
+
+            if (i.Stamina > 0)
+            {
+                stargcolortag = "<color=" + green + ">";
+                endgcolortag = "</color>";
+                plus = "+ ";
+            }
+            else if (i.Stamina < 0)
+            {
+                stargcolortag = "<color=" + red + ">";
+                endgcolortag = "</color>";
+            }
+
+            s += StaminaString + stargcolortag + plus + i.Stamina + endgcolortag;
+            s += "\n";
+        }
+
+        if (i.Satiety != 0)
+        {
+
+            if (i.Satiety > 0)
+            {
+                stargcolortag = "<color=" + green + ">";
+                endgcolortag = "</color>";
+                plus = "+ ";
+            }
+            else if (i.Satiety < 0)
+            {
+                stargcolortag = "<color=" + red + ">";
+                endgcolortag = "</color>";
+            }
+
+            s += SatietyString + stargcolortag + plus + i.Satiety + endgcolortag;
+            s += "\n";
+        }
+
+        if (i.HP != 0)
+        {
+
+            if (i.HP > 0)
+            {
+                stargcolortag = "<color=" + green + ">";
+                endgcolortag = "</color>";
+                plus = "+ ";
+            }
+            else if (i.HP < 0)
+            {
+                stargcolortag = "<color=" + red + ">";
+                endgcolortag = "</color>";
+            }
+
+            s += HPString + stargcolortag + plus + i.HP + endgcolortag;
+            s += "\n";
+        }
+
+      
+        
+        if (ChooseTopSegmentSlot)
+        {
+        stargcolortag = "<color=" + red + ">";
+        endgcolortag = "</color>";
+
+            s += "\n" + CostString + stargcolortag + " " + i.Cost + endgcolortag;
+
+        }
+        else if (!i.CantBeSold)
+
+
+        {
+
+            stargcolortag = "<color=" + red + ">";
+            endgcolortag = "</color>";
+
+            s += "\n" + CostString + stargcolortag + " " + (int)(i.Cost / 1.5f) + endgcolortag;
+
+            }
+
+        
+
+        stargcolortag = "<color=" + red + ">";
+        endgcolortag = "</color>";
+
+
+      /*  s += "\n" + BuildingCostString + stargcolortag + " " + i.BuildingCost + endgcolortag;
+        s += "\n";
+      */
+
+        if (i.StaminaRecoverySpeed != 0)
+        {
+            if (i.StaminaRecoverySpeed > 0) plus = "+ ";
+            s += StaminaRecoveryspeedString + plus + i.StaminaRecoverySpeed;
+            s += "\n";
+        }
+
+        if (i.StaminaUse != 0)
+        {
+            if (i.StaminaUse > 0) plus = "";
+            s += NeedsStaminaString + plus + i.StaminaUse;
+            s += "\n";
+        }
+
+        if (i.DashDuration != 0)
+        {
+            if (i.DashDuration > 0) plus = "+ ";
+            s += DashDurationString + plus + i.DashDuration;
+            s += "\n";
+        }
+
+        if (i.Food) s += FoodString;
+
+
+
+        return s;
+    }
+
+
+    void ShowControlls()
+    {
+        if (showinvent || showjournal || blueprintshow) return;
+        
+        crafting = false;
+
+        if (pl.Chatting)
+        {
+
+            ONOFF(Controlls, false);
+            ONOFF(NewQuest, false);
+            DrawInvNo = false;
+        }
+        else
+        {
+            if (!DrawInvNo)
+            {
+                ONOFF(Controlls, true);
+                ONOFF(NewQuest, NewQuestBool);
+                DrawInvNo = true;
+            }
+
+        }
+        
     }
 
     public void ResetInventory()
@@ -2740,7 +2735,7 @@ public class Inventory : MonoBehaviour
         int r = 0;
         for (int i = 0; i < slots.Count; i++)
         {
-            if (pl.MouseOB.GetComponent<CollList>().GetCollList().Contains(slots[i]))
+            if (pl.GetMouseCollList().Contains(slots[i]))
             {
                 r++;
             }

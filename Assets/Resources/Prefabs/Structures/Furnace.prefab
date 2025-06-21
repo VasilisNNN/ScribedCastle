@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 6589077999744845784}
   - component: {fileID: 2683767879988630484}
   - component: {fileID: 4156189388308810768}
+  - component: {fileID: 7177000414449385673}
   m_Layer: 0
   m_Name: Furnace
   m_TagString: Flipping
@@ -28,13 +29,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7108247156075508102}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.739492, y: -0.273637, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5147633699886963578
 SpriteRenderer:
@@ -145,42 +146,22 @@ BoxCollider2D:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7108247156075508102}
   m_Enabled: 1
-  serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
   m_IsTrigger: 1
   m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
+  m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0.26999998}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.23}
-    oldSize: {x: 1, y: 1}
+    pivot: {x: 0.5, y: 0.25}
+    oldSize: {x: 1, y: 2}
     newSize: {x: 1.0666667, y: 1.0666667}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
+  serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
 --- !u!114 &2683767879988630484
@@ -253,3 +234,25 @@ MonoBehaviour:
   DayToAct: 000000000100000002000000
   Money: 6
   OnOccupation: 0
+--- !u!114 &7177000414449385673
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7108247156075508102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69981d64b1bd8eb47aa3b76f901a6e9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  FramesDelay: 0.1
+  CycleDelay: 0.1
+  SPRT:
+  - {fileID: 853541028, guid: 4bee40635d3b79047956be04e5f0e62e, type: 3}
+  - {fileID: 1039576372, guid: 4bee40635d3b79047956be04e5f0e62e, type: 3}
+  SPRT_AtTheEnd: []
+  DestroyAtTheEnd: 0
+  Loop: 1
+  StartFromRND: 1
+  RND_CycleDelay: 0

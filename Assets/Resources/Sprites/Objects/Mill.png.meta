@@ -44,12 +44,11 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
-    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMipmapLimit: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -72,7 +71,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 32
+  spritePixelsToUnits: 256
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -88,12 +87,11 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 1
-  swizzle: 50462976
   cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 256
+    maxTextureSize: 1024
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 0
@@ -187,6 +185,18 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: PS5
+    maxTextureSize: 256
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -194,10 +204,10 @@ TextureImporter:
       name: Mill_0
       rect:
         serializedVersion: 2
-        x: 9
-        y: 10
-        width: 41
-        height: 41
+        x: 72
+        y: 70
+        width: 329
+        height: 363
       alignment: 9
       pivot: {x: 0.5000001, y: 0.11608429}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -215,10 +225,10 @@ TextureImporter:
       name: Mill_1
       rect:
         serializedVersion: 2
-        x: 40
-        y: 51
-        width: 71
-        height: 71
+        x: 311
+        y: 404
+        width: 584
+        height: 575
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -236,10 +246,10 @@ TextureImporter:
       name: Mill_2
       rect:
         serializedVersion: 2
-        x: 56
-        y: 10
-        width: 32
-        height: 32
+        x: 439
+        y: 78
+        width: 272
+        height: 279
       alignment: 9
       pivot: {x: 0.5077579, y: 0.15187076}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -267,8 +277,9 @@ TextureImporter:
       Mill_0: -370714601
       Mill_1: 760692780
       Mill_2: 1107701461
-  mipmapLimitGroupName: 
+  spritePackingTag: 
   pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

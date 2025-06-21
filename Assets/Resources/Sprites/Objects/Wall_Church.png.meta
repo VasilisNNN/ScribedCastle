@@ -23,11 +23,12 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMasterTextureLimit: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -66,6 +67,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
   cookieLightType: 0
   platformSettings:
   - serializedVersion: 3
@@ -222,8 +224,8 @@ TextureImporter:
       name: Wall_Church_3
       rect:
         serializedVersion: 2
-        x: 768
-        y: 1536
+        x: 807
+        y: 1484
         width: 256
         height: 512
       alignment: 9
@@ -306,12 +308,12 @@ TextureImporter:
       name: Wall_Church_7
       rect:
         serializedVersion: 2
-        x: 768
-        y: 1024
-        width: 256
-        height: 512
-      alignment: 9
-      pivot: {x: 0.5, y: 0.25}
+        x: 1064
+        y: 1754
+        width: 141
+        height: 285
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -491,6 +493,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Wall_Church_16
+      rect:
+        serializedVersion: 2
+        x: 1090
+        y: 1590
+        width: 91
+        height: 146
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0a730ddcd223d854e8d47fc9e0a17414
+      internalID: -2109311755
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -510,6 +533,7 @@ TextureImporter:
       Wall_Church_13: -1019154139
       Wall_Church_14: -65536783
       Wall_Church_15: -386385858
+      Wall_Church_16: -2109311755
       Wall_Church_2: -749589890
       Wall_Church_3: 1295571285
       Wall_Church_4: -320479034
@@ -518,9 +542,8 @@ TextureImporter:
       Wall_Church_7: -169508219
       Wall_Church_8: 518731947
       Wall_Church_9: 1015818971
-  spritePackingTag: 
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

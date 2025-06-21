@@ -58,13 +58,13 @@ MonoBehaviour:
   Rewards:
   - itemNames: []
     itemDesc: []
-    itemID: 355
+    itemID: 9
     OriginalitemID: -1
     Cost: 0
     BuildingCost: 0
     _type: 0
     _Soundtype: 0
-    Count: 6
+    Count: 100
     DamageAmount: 0
     BulletDamageAmount: 0
     MaxHP: 0
@@ -94,6 +94,7 @@ MonoBehaviour:
     FireDefense: 0
     CanStack: 0
     Poop: 0
+    CantBeSold: 0
     Structure: 0
     _StructureType: 0
     Character: 0
@@ -123,6 +124,7 @@ MonoBehaviour:
     Locked: 0
   ReplaceOnUnlock: {fileID: 0}
   Unlocked: 0
+  DatabaseID: 13
 --- !u!1001 &2260140600490177919
 PrefabInstance:
   m_ObjectHideFlags: 0

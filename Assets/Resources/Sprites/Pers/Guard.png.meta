@@ -20,11 +20,12 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMasterTextureLimit: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -47,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 256
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -63,11 +64,12 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  swizzle: 50462976
   cookieLightType: 0
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 2048
+    maxTextureSize: 1024
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
@@ -101,6 +103,30 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Nintendo Switch
+    maxTextureSize: 1024
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Windows Store Apps
+    maxTextureSize: 1024
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -108,10 +134,10 @@ TextureImporter:
       name: Guard_0
       rect:
         serializedVersion: 2
-        x: 47
-        y: 663
-        width: 219
-        height: 316
+        x: 33
+        y: 769
+        width: 153
+        height: 223
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -129,10 +155,10 @@ TextureImporter:
       name: Guard_1
       rect:
         serializedVersion: 2
-        x: 293
-        y: 662
-        width: 217
-        height: 316
+        x: 207
+        y: 769
+        width: 152
+        height: 223
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -150,10 +176,10 @@ TextureImporter:
       name: Guard_2
       rect:
         serializedVersion: 2
-        x: 100
-        y: 512
-        width: 118
-        height: 133
+        x: 107
+        y: 515
+        width: 104
+        height: 110
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -163,6 +189,48 @@ TextureImporter:
       bones: []
       spriteID: 908ac99fac9071242b8d466b6d10b203
       internalID: -1741221029
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Guard_3
+      rect:
+        serializedVersion: 2
+        x: 35
+        y: 227
+        width: 122
+        height: 217
+      alignment: 9
+      pivot: {x: 0.87006015, y: 0.22755073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cb66f89f917a1b847a689ff6299a5dc5
+      internalID: 1407748268
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Guard_4
+      rect:
+        serializedVersion: 2
+        x: 181
+        y: 256
+        width: 108
+        height: 40
+      alignment: 9
+      pivot: {x: 0.13173477, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 42a7af69e43b1a54fb7deb4dd8c9a0e3
+      internalID: -1563195260
       vertices: []
       indices: 
       edges: []
@@ -181,9 +249,10 @@ TextureImporter:
       Guard_0: -2057172063
       Guard_1: -1572210512
       Guard_2: -1741221029
-  spritePackingTag: 
+      Guard_3: 1407748268
+      Guard_4: -1563195260
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

@@ -6,6 +6,7 @@ using UnityEngine.Tilemaps;
 using System;
 using TMPro;
 using Pathfinding;
+using static UnityEngine.GraphicsBuffer;
 
 public class StatsControll : MonoBehaviour
 {
@@ -410,9 +411,14 @@ public class StatsControll : MonoBehaviour
     }
     public void ChangeTheName()
     {
-        if (GameObject.Find(name) != null)
-            name += "N" + UnityEngine.Random.Range(0.1f, 100.1f) + UnityEngine.Random.Range(0.1f, 100.1f) + UnityEngine.Random.Range(0.1f, 100.1f) + UnityEngine.Random.Range(0.1f, 100.1f);
+        GameObject ob = GameObject.Find(name);
+        if(ob == gameObject) ob = GameObject.Find(name);
 
+        while (ob != null && ob != gameObject)
+        {
+            name += "N";
+            ob = GameObject.Find(name);
+        }
     }
 
     void SetColorToSPRT(SpriteRenderer SPRT, Material material)
@@ -427,7 +433,7 @@ public class StatsControll : MonoBehaviour
 
     
 
-        if (BuildedStructure && _transform.parent ==null)
+        if (BuildedStructure && tag == "Flipping" && _transform.parent ==null)
         {
 
             if (_transform.position.y > TargetPos.y-2)
@@ -438,12 +444,12 @@ public class StatsControll : MonoBehaviour
                 float colordepth = Camdepth + Mousedepth;
 
 
-                colordepth = Mathf.Clamp(colordepth, 0f, 0.7f);
-             
+               // colordepth = Mathf.Clamp(colordepth, 0f, 0.25f);
+                colordepth = 0;
 
-                SR.color = new Color(StartColor.r - colordepth, StartColor.g - colordepth / 1.1f, StartColor.b - colordepth / 1.5f, Mathf.Lerp(SR.color.a, Alpha, Time.deltaTime * 10));
+                SR.color = new Color(StartColor.r - colordepth / 1.5f, StartColor.g - colordepth / 1.1f, StartColor.b - colordepth , Mathf.Lerp(SR.color.a, Alpha, Time.deltaTime * 10));
                 for (int i = 0; i < transform.childCount; i++)
-                    SetChildColor(material, i, new Color(StartColor.r - colordepth , StartColor.g - colordepth / 1.1f, StartColor.b - colordepth / 1.5f));
+                    SetChildColor(material, i, new Color(StartColor.r - colordepth / 1.5f, StartColor.g - colordepth / 1.1f, StartColor.b - colordepth ));
 
             }
             else
@@ -471,20 +477,24 @@ public class StatsControll : MonoBehaviour
 
     void SetChildColor(Material material, int i, Color color)
     {
-        
+        if (transform.GetChild(i).GetComponent<SpriteRenderer>() == null) return;
             ChildSPRT = transform.GetChild(i).GetComponent<SpriteRenderer>();
 
+        if (ChildSPRT == null || transform.GetChild(i).GetComponent<Blinking>() != null) return;
 
-            if (ChildSPRT != null && transform.GetChild(i).GetComponent<Blinking>() == null)
-            {
-                if (material != null)
-                    ChildSPRT.material = material;
+        if (material != null)
+            ChildSPRT.material = material;
 
-                if (transform.GetChild(i).name != "Base")
-                    ChildSPRT.color = new Color(color.r, color.g, color.b, Alpha);
-
-            }
+        if (transform.GetChild(i).name == "Base") return;
         
+        ChildSPRT.color = new Color(color.r, color.g, color.b, Alpha);
+
+        for (int j = 0; j < ChildSPRT.transform.childCount; j++)
+        {
+            if (ChildSPRT.transform.GetChild(j).GetComponent<SpriteRenderer>() != null)
+                ChildSPRT.transform.GetChild(j).GetComponent<SpriteRenderer>().color = ChildSPRT.color;
+        }
+
     }
 
 
@@ -495,14 +505,40 @@ public class StatsControll : MonoBehaviour
         Alpha = alpha;
         SetColorToSPRT(SR, material);
 
+        if (!BuildedStructure) return;
 
         if (transform.localScale.x<1)
         transform.localScale = new Vector3(
             transform.localScale.x + Time.deltaTime,
-            transform.localScale.y + Time.deltaTime,
-            transform.localScale.z + Time.deltaTime);
-        else transform.localScale = new Vector3(1,1,1);
+            transform.localScale.y ,
+            transform.localScale.z );
+        
+        if (transform.localScale.y < 1)
+            transform.localScale = new Vector3(
+                transform.localScale.x ,
+                transform.localScale.y + Time.deltaTime,
+                transform.localScale.z );
 
+        if (transform.localScale.y > 1 || transform.localScale.x > 1)
+        {
+            transform.localScale = new Vector3(1, 1, 1);
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                transform.GetChild(i).name = transform.GetChild(i).name.Replace("(Clone)", null);
+                transform.GetChild(i).localScale = transform.localScale;
+                if (GetComponent<Animator>() != null)
+                {
+                    GetComponent<Animator>().enabled = true;
+                    GetComponent<Animator>().applyRootMotion = true;
+        
+                    GetComponent<Animator>().Rebind();
+                    GetComponent<Animator>().Update(0f);
+                }
+            }
+           
+
+
+        }
 
 
     }
@@ -521,7 +557,7 @@ public class StatsControll : MonoBehaviour
         }
 
         if(pl.Showdamage)
-        inv.ADDPickedName(damage.ToString(), 1, 1, transform.position);
+        inv.ADDPickedName(damage.ToString(),  1, transform.position);
 
 
 
