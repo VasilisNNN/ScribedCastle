@@ -124,7 +124,9 @@ public class MenuCustom : MonoBehaviour
         StartLanguageDelay = Time.fixedTime + 0.25f;
 
         if (Screen.currentResolution.width<=20)
-            Screen.SetResolution(1920, 1080, FullScreen);
+            Screen.SetResolution(1080, 1920, FullScreen);
+
+        Screen.SetResolution(1080, 1920, FullScreenMode.Windowed);
 
 
 
