@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.Tilemaps;
 using System;
 using TMPro;
+using NUnit;
 
 public class ItemsSlotsUI : MonoBehaviour
 {
@@ -42,10 +43,11 @@ public class ItemsSlotsUI : MonoBehaviour
     private int CurrentFolder;
     private List<Item> CraftingFolder = new List<Item>();
     private GameObject LeftFolder, RightFolder;
-
+    private Tilemap FloorTilemap;
     void Start()
     {
-        
+
+        FloorTilemap = InitializeObjects.FloorTilemap;
         LeftFolder = transform.Find("LeftFolder").gameObject;
         RightFolder = transform.Find("RightFolder").gameObject;
 
@@ -57,8 +59,7 @@ public class ItemsSlotsUI : MonoBehaviour
        
         ItemOnChoose = GameObject.Find("ChooseUI").transform.Find("ItemOnChoose").gameObject;
         ItemOnChooseIMG = GameObject.Find("ChooseUI").transform.Find("ItemOnChoose").GetComponent<Image>();
-        Const = GameObject.Find("Constructor").GetComponent<Constructor>();
-
+      
         ClickClip = Resources.Load<AudioClip>("Sound/UI/Click_0");
         TakeItemClip = Resources.Load<AudioClip>("Sound/UI/Accept");
 
@@ -66,7 +67,8 @@ public class ItemsSlotsUI : MonoBehaviour
     
         
         StartAnim = Time.fixedTime + 1f;
-        pl = GameObject.Find("Player").GetComponent<Player>();
+        pl = InitializeObjects.PL;
+        Const = InitializeObjects.Constr;
 
         ShowSlots = false;
         pl.inv.ONOFF(gameObject, false);
@@ -595,7 +597,7 @@ public class ItemsSlotsUI : MonoBehaviour
 
             Const.SetToPlayerPos();
             if (pl.inv.GetCurrentItem().TargetTileMap == null)
-                pl.inv.SetToMouse(pl.inv.GetCurrentItem().ObjectPrefs, 0, 0, GameObject.Find("Floor").GetComponent<Tilemap>(), pl.inv.GetCurrentItem().itemID);
+                pl.inv.SetToMouse(pl.inv.GetCurrentItem().ObjectPrefs, 0, 0, FloorTilemap, pl.inv.GetCurrentItem().itemID);
             else pl.inv.SetToMouse(pl.inv.GetCurrentItem().ObjectPrefs, 0, 0, pl.inv.GetCurrentItem().TargetTileMap, pl.inv.GetCurrentItem().itemID);
 
             pl.inv.showinvent = false;

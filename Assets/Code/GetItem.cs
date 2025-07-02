@@ -66,11 +66,11 @@ public class GetItem : MonoBehaviour {
     }
 
     void Start () {
-        database = GameObject.Find("ItemDatabase").GetComponent<ItemDatabase>();
-      
-        inv = GameObject.Find("Player").GetComponent<Inventory>();
-        pl = GameObject.Find("Player").GetComponent<Player>();
-        Constr = GameObject.Find("Constructor").GetComponent<Constructor>();
+        database = InitializeObjects.Itemdatabase;
+
+        pl = InitializeObjects.PL;
+        inv = pl.inv;
+        Constr = InitializeObjects.Constr;
 
         if (!DontSetCounts)
         {
@@ -620,7 +620,7 @@ public class GetItem : MonoBehaviour {
 
 
         if(QuestID>-1)
-        pl.inv.DoneQuest(QuestID);
+        pl.journal.DoneQuest(QuestID);
 
         
     }
@@ -649,7 +649,7 @@ public class GetItem : MonoBehaviour {
 
 
         if (QuestID > -1)
-            pl.inv.DoneQuest(QuestID);
+            pl.journal.DoneQuest(QuestID);
 
 
     }

@@ -19,30 +19,24 @@ public class MovementControll : MonoBehaviour
     public int[] PickSpecificItem;
 
 
-    public bool Enemy;
-
-    public bool Soldier;
-
 
     public bool DropItemsOnTarget;
     public bool DestroyTarget;
 
     public bool LeavesTrash;
 
-    public Vector2 Pos { get; set; }
-    private Vector2 MoveToPos, NextStep;
     public GameObject MoveToObject { get; private set; }
 
     private float PoisonDelay;
 
-    private float MoveTimer, OnTheTableWaiting, ActionTimer, PoisonTimer, SearchForTargetsTimer;
+    private float  OnTheTableWaiting, PoisonTimer, SearchForTargetsTimer;
 
 
     private Constructor Const;
     private Player pl;
     private GameObject moneyui;
 
-    private Tilemap RT;
+  
     private List<TileBase> Brush = new List<TileBase>();
 
     public float ActionDelay = 10;
@@ -53,13 +47,6 @@ public class MovementControll : MonoBehaviour
 
     public float MoveDelayMax = 0.2f;
 
-
-    private GameObject BloodEffect_0;
-
-    private List<GameObject> DishesObjects = new List<GameObject>();
-    private float SoldierDelay;
-
-    private float FollowTimer;
     public float FollowTimerDelay = 10;
     private float InvisTimer;
 
@@ -74,8 +61,6 @@ public class MovementControll : MonoBehaviour
     public GameObject[] TargetGameObjects;
 
 
-
-    private Constructor constr;
     private Item CarringDish;
 
     private GameObject DishObject;
@@ -85,7 +70,7 @@ public class MovementControll : MonoBehaviour
 
     public GameObject ObjectOfOccupation;
     private Transform _transform;
-    private CharacterMove CM;
+    private CharacterPath CM;
 
 
     public bool TriggerOFF_OffScreen;
@@ -104,14 +89,21 @@ public class MovementControll : MonoBehaviour
     private Animator Anim;
     private string CurrentAnimName;
     private float AnimFade;
+    private bool ActionOnPointComlete;
+    private float OnPointAnimationTimer;
 
+    private SpriteRenderer SPRT;
     void Start()
     {
+        SPRT = GetComponent<SpriteRenderer>();
+        pl = InitializeObjects.PL;
+        Const = InitializeObjects.Constr;
+
         Anim = GetComponent<Animator>();
 
-        CM = GetComponent<CharacterMove>();
+        CM = GetComponent<CharacterPath>();
         _transform = transform;
-        constr = GameObject.Find("Constructor").GetComponent<Constructor>();
+  
         Stats = GetComponent<StatsControll>();
 
 
@@ -125,36 +117,22 @@ public class MovementControll : MonoBehaviour
 
         DamageClips.Add(Resources.Load<AudioClip>("Sound/Hits/Player_Get_Damage_0"));
 
-        StartMaterial = GetComponent<SpriteRenderer>().material;
+        StartMaterial = SPRT.material;
         WhiteMaterial = Resources.Load<Material>("Materials/DamageLight");
 
-        pl = GameObject.Find("Player").GetComponent<Player>();
+       
 
-      
         if (pl.inv.GetItemInDatabase(315) != null)
             Beds.Add(pl.inv.GetItemInDatabase(315).ObjectPrefs);
 
+       
 
-        Const = GameObject.Find("Constructor").GetComponent<Constructor>();
-
-
-        ActionTimer = 0;
-
-        RT = GameObject.Find("Grid").transform.Find("Floor").GetComponent<Tilemap>();
         Brush.Add(Resources.Load<TileBase>("Brushes/Wall_Red"));
         Brush.Add(null);
 
-        int max = 100;
     
         PoisonDelay = 10;
 
-        BloodEffect_0 = Resources.Load<GameObject>("Prefabs/Effects/BloodEffect_0");
-      
-
-        if (Enemy) constr.Enemies.Add(new ObjectOnBoard(GetComponent<StatsControll>().DatabaseID, transform.position, name, gameObject, GetComponent<StatsControll>(), GetComponent<PubObject>()));
-
-
-        //  Dish = DD.DishList[0];
     }
 
     private void Update()
@@ -169,7 +147,6 @@ public class MovementControll : MonoBehaviour
     {
 
         SetMoveToObject(pl.gameObject);
-        FollowTimer = Time.fixedTime + FollowTimerDelay;
     }
 
     void Animations()
@@ -202,21 +179,17 @@ public class MovementControll : MonoBehaviour
         if (Const.Game_SPEED <= 0) return;
 
     
-        if (Enemy)
-            EnemyMove();
 
         bool DamageFromEnemies = true;
         if (CM != null)
         {
             CM.WallObsticleCheck(pl.gameObject);
 
-            if (Enemy)
-                DamageFromEnemies = CM.PathComlitionCheck();
-            else DamageFromEnemies = true;
+          
+            DamageFromEnemies = true;
         }
         else DamageFromEnemies = true;
 
-        if (Soldier) DamageFromEnemies = false;
 
         if (DamageFromEnemies && InvisTimer < Time.fixedTime && MinDamage > 0 && ((Stats.CurrentGrowState > 0 && Stats.GrowingSprites.Length > 1) || (Stats.GrowingSprites.Length <= 1)))
         {
@@ -319,14 +292,10 @@ public class MovementControll : MonoBehaviour
 
 
 
-        MoveTimer -= Time.deltaTime * Const.Game_SPEED;
-
-
 
         PoisonTimer -= Time.deltaTime * Const.Game_SPEED;
 
-        ActionTimer -= Time.deltaTime * Const.Game_SPEED;
-
+        
         SearchForTargetsTimer -= Time.deltaTime * Const.Game_SPEED;
 
 
@@ -369,11 +338,11 @@ public class MovementControll : MonoBehaviour
             return false;
 
 
-        for (int i = 0; i < constr.OBOnBoard.Count; i++)
+        for (int i = 0; i < Const.OBOnBoard.Count; i++)
         {
-            if (constr.OBOnBoard[i].Object != null)
+            if (Const.OBOnBoard[i].Object != null)
             {
-                if (GetComponent<CollList>().GetCollList().Contains(constr.OBOnBoard[i].Object))
+                if (GetComponent<CollList>().GetCollList().Contains(Const.OBOnBoard[i].Object))
                 {
                     result = true;
                     break;
@@ -409,172 +378,7 @@ public class MovementControll : MonoBehaviour
 
 
 
-    void EnemyMove()
-    {
-        Vector2 MoveSpeed = new Vector2(0.5f, 0.25f);
-
-        // TriggerOffScreenF();
-
-
-        Vector2 MinCam = new Vector2(pl.MainCamera.transform.position.x - pl.MainCamera.orthographicSize / 2, pl.MainCamera.transform.position.y - pl.MainCamera.orthographicSize / 4);
-
-
-        if (Mathf.Abs(transform.position.x - pl.transform.position.x) < FollowBorder &&
-            Mathf.Abs(transform.position.y - pl.transform.position.y) < FollowBorder)
-        {
-
-            //ATTACKING PLAYER
-
-            float BORDER = pl.MainCamera.GetComponent<CameraBor>().cameraHalfWidth;
-
-            if (!pl.EnableAttackSoundIfEnemyInCamera)
-                BORDER = 100;
-
-            if (Mathf.Abs(transform.position.x - pl.MainCamera.transform.position.x) < BORDER / 2.5f &&
-                Mathf.Abs(transform.position.y - pl.MainCamera.transform.position.y) < BORDER / 5f)
-            {
-
-                if (CM != null) CM.StartAttack();
-
-
-                SetMoveToObject(pl.gameObject);
-
-                FollowTimer = Time.fixedTime + FollowTimerDelay;
-            }
-
-
-            if (Mathf.Abs(transform.position.x - pl.transform.position.x) > BORDER ||
-                Mathf.Abs(transform.position.y - pl.transform.position.y) > BORDER)
-            {
-                print("NOT IN CAMERA: " + name);
-
-                if (CM != null) CM.RemoveFromAttackList();
-            }
-
-
-
-
-        }
-        else
-        {
-
-
-            // ATTACKING WORKERS, FRIENDS
-
-            GameObject[] Perss = GameObject.FindGameObjectsWithTag("Pers");
-
-            for (int i = 0; i < Perss.Length; i++)
-            {
-                AttackWorkers(i);
-            }
-
-            if (CM != null)
-            {
-                if (CM.Attacking)
-                {
-                    if (MoveToObject == pl.gameObject && FollowTimer < Time.fixedTime) UnSetMoveToObject();
-                }
-            }
-        }
-
-
-
-        WalkToTheTarget();
-
-
-
-        if (CM != null)
-        {
-            if (MoveToObject != null)
-            {
-
-                CM.MovePoints = new Transform[2] { transform, MoveToObject.transform };
-                CM.MovePointsBuffer = new List<Vector2>();
-
-                if (CM.MovePointsBuffer.Count < CM.MovePoints.Length)
-                {
-                    for (int i = 0; i < CM.MovePoints.Length; i++)
-                        CM.MovePointsBuffer.Add(CM.MovePoints[i].position);
-                }
-            }
-            else
-            {
-                if (GetComponent<MovementControll>().GoingBack)
-                    CM.GoBack();
-
-            }
-        }
-
-
-
-        if (CM == null)
-            return;
-
-        if (MoveToObject == null || !CM.Attacking)
-            return;
-
-
-        if (MoveTimer >= 0 || Mathf.Abs(transform.position.x - MoveToObject.transform.position.x) >= 0.01f || Mathf.Abs(transform.position.y - MoveToObject.transform.position.y) >= 0.01f)
-            return;
-
-
-
-
-        if (MoveToObject.transform.parent != null)
-        {
-            if (MoveToObject.transform.parent.GetComponent<PubObject>() != null)
-            {
-                for (int i = 0; i < MoveToObject.transform.parent.GetComponent<PubObject>().Sits.Count; i++)
-                {
-                    if (MoveToObject.transform.parent.GetComponent<PubObject>().Sits[i].Name == MoveToObject.name)
-                    {
-                        MoveToObject.transform.parent.GetComponent<PubObject>().Sits[i].Num = 0;
-                        //print("ZERO");
-                    }
-                }
-            }
-        }
-
-
-
-        if (MoveToObject.GetComponent<MovementControll>() == null)
-        {
-
-
-
-
-            // Const.AddLogPart("Clients death: -" + 50, "Смерть клієнта: -" + 50,gameObject);
-
-            for (int j = 0; j < Const.OBOnBoard.Count; j++)
-            {
-                if (MoveToObject == Const.OBOnBoard[j].Object)
-                    Const.OBOnBoard.RemoveAt(j);
-            }
-
-
-            if (MoveToObject != pl.gameObject)
-                Const.DestroyThis(MoveToObject);
-
-
-        }
-        else
-        {
-            GameObject BE = Instantiate<GameObject>(BloodEffect_0);
-            BE.transform.position = transform.position;
-
-
-            Const.SpendMoney(transform.position, 5);
   
-            MTO_StatsControll.HP -= MinDamage;
-        }
-        UnSetMoveToObject();
-        MoveTimer = 4f;
-
-
-
-
-    }
-
 
     void ItemPickerMove()
     {
@@ -638,6 +442,8 @@ public class MovementControll : MonoBehaviour
 
         if (MoveToObject == null)
         {
+            SetOnPointToDefault();
+
             if (GoingBack)
                 CM.GoBack();
             return;
@@ -672,78 +478,61 @@ public class MovementControll : MonoBehaviour
             if (!ItemPicker && !MoveBetweenA_B)
             {
 
+                SetOnPointToDefault();
 
                 if (TargetGameObjects.Length > 0)
                     for (int i = 0; i < TargetGameObjects.Length; i++)
                         SearchForTargets(TargetGameObjects[i], 0);
 
-                FadeToAnim("Start");
 
             }
-            
-           
+
+            ActionOnPointComlete = false;
 
             return;
         }
 
 
 
-        float minborder = 0.33f;
+        float mindistance= 0.33f;
 
-        if (Mathf.Abs(_transform.position.x - MoveToObject.transform.position.x) > minborder || 
-            Mathf.Abs(_transform.position.y - MoveToObject.transform.position.y) > minborder)
+        float distance = Mathf.Abs( Vector3.Distance(_transform.position, MoveToObject.transform.position));
+
+
+        if (distance > mindistance)
         {
             WalkToTheTarget();
         }
-
-
-        if (Mathf.Abs(_transform.position.x - MoveToObject.transform.position.x) <= minborder &&
-            Mathf.Abs(_transform.position.y - MoveToObject.transform.position.y) <= minborder)
+        else
+        if (distance <= mindistance)
         {
 
             OnThePoint();
 
         }
-        else 
+        else
         {
             FadeToAnim("Start");
-         
 
-         
         }
 
-        if (MTO_PubObject == null) return;
-        
-        /*if (MTO_PubObject.wall <= 0 ||! CollWithMoveToObject()) return;
-        OnThePoint();
-        */
        
     }
 
 
     void OnThePoint()
     {
+        if (!ActionOnPointComlete)
+        {
+            OnPointAnimationTimer = Time.fixedTime + 3;
+            FadeToAnim("OnThePoint");
+           
+            ActionOnPointComlete = true;
+            return;
+        }
 
         ObjectOfOccupation = MoveToObject;
-        
-        FadeToAnim("OnThePoint");
-
-        if (Soldier)
-        {
-            if (MTO_StatsControll != null)
-            {
-                if (Stats.Damage != 0)
-                {
-
-                    if (CM != null)
-                        CM.Attacking = true;
-
-                    MTO_StatsControll.GetDamage(Stats.Damage);
-                    Stats.GetDamage(Stats.Damage);
-                    UnSetMoveToObject();
-                }
-            }
-        }
+        if (OnPointAnimationTimer > Time.fixedTime) return;
 
         if (MTO_StatsControll != null)
             CharacterEats();
@@ -757,9 +546,9 @@ public class MovementControll : MonoBehaviour
             if (CarringDish == null)
             {
 
-                if (MoveToObject.GetComponent<PubObject>().DishesOnTable.Count > 0)
+                if (MTO_PubObject.DishesOnTable.Count > 0)
                 {
-                    CarringDish = MoveToObject.GetComponent<PubObject>().DishesOnTable[0];
+                    CarringDish = MTO_PubObject.DishesOnTable[0];
                     RemoveDishesOnTable(0, 1);
 
                     UnSetMoveToObject();
@@ -792,10 +581,10 @@ public class MovementControll : MonoBehaviour
         if (CarringDish != null && MoveToObject != null)
         {
 
-            if (MoveToObject.GetComponent<PubObject>() != null)
+            if (MTO_PubObject != null)
             {
 
-                if (MoveToObject.GetComponent<PubObject>().Table)
+                if (MTO_PubObject.Table)
                 {
 
                     AddDishesOnTable(CarringDish);
@@ -845,10 +634,10 @@ public class MovementControll : MonoBehaviour
 
     void SetColotAndMaterial(float Alpha, Material material)
     {
-        if (GetComponent<SpriteRenderer>() != null)
+        if (SPRT != null)
         {
-            GetComponent<SpriteRenderer>().material = material;
-            GetComponent<SpriteRenderer>().color = new Color(GetComponent<SpriteRenderer>().color.r, GetComponent<SpriteRenderer>().color.g, GetComponent<SpriteRenderer>().color.b, Alpha);
+            SPRT.material = material;
+            SPRT.color = new Color(SPRT.color.r, SPRT.color.g, SPRT.color.b, Alpha);
         }
 
 
@@ -975,42 +764,7 @@ public class MovementControll : MonoBehaviour
 
 
 
-    void AttackWorkers(int i)
-    {
-        if (GetComponent<Attacks>() != null) return;
-
-
-        GameObject[] Perss = GameObject.FindGameObjectsWithTag("Pers");
-
-        if (Perss[i] == null)
-            return;
-
-        GameObject p = Perss[i];
-
-        if (p.transform.parent == constr.transform)
-            return;
-
-        if (Mathf.Abs(p.transform.position.x - transform.position.x) >= 2 ||
-            Mathf.Abs(p.transform.position.y - transform.position.y) >= 2)
-            return;
-
-
-        if (p.GetComponent<MovementControll>() != null)
-        {
-            if (!p.GetComponent<MovementControll>().Enemy && !p.GetComponent<MovementControll>().Soldier && p.transform.parent != constr.transform)
-            {
-                SetMoveToObject(p);
-
-
-            }
-        }
-        else if (p.transform.parent != constr.transform)
-            SetMoveToObject(p);
-
-
-
-    }
-
+  
     void CharacterBringsItemToUs()
     {
         //Character brings item to us
@@ -1086,7 +840,7 @@ public class MovementControll : MonoBehaviour
     {
 
         //Character Eats
-        if (!Stats.CanBeHungry || Stats.Satiety == Stats.SatietyMax || MoveToObject.GetComponent<PubObject>().DishesOnTable.Count == 0)
+        if (!Stats.CanBeHungry || Stats.Satiety == Stats.SatietyMax || MTO_PubObject.DishesOnTable.Count == 0)
             return;
 
         Stats.HungerTimer = pl.DayNight.DayLength / Stats.SatietyMax;
@@ -1094,10 +848,10 @@ public class MovementControll : MonoBehaviour
 
         if (LeavesTrash)
         {
-            if (constr.AllTrash < constr.MaxTrash)
+            if (Const.AllTrash < Const.MaxTrash)
             {
                 DropObject(pl.inv.GetItemInDatabase(9998).ObjectPrefs);
-                constr.AllTrash++;
+                Const.AllTrash++;
             }
         }
 
@@ -1121,11 +875,11 @@ public class MovementControll : MonoBehaviour
                     pl.inv.AddItemNOAUDIO(ItemsTheyPaysToPlayer[i], pl.Payment * MoveToObject.GetComponent<PubObject>().DishesOnTable[0].Cost, -1, transform.position);
 
             }
-            else pl.inv.AddItemNOAUDIO(9, pl.Payment * MoveToObject.GetComponent<PubObject>().DishesOnTable[0].Cost, -1, transform.position);
+            else pl.inv.AddItemNOAUDIO(9, pl.Payment * MTO_PubObject.DishesOnTable[0].Cost, -1, transform.position);
         }
 
 
-        Stats.Satiety += MoveToObject.GetComponent<PubObject>().DishesOnTable[0].Satiety;
+        Stats.Satiety += MTO_PubObject.DishesOnTable[0].Satiety;
         if (Stats.Satiety > Stats.SatietyMax) Stats.Satiety = Stats.SatietyMax;
 
         RemoveDishesOnTable(0, 1);
@@ -1147,9 +901,6 @@ public class MovementControll : MonoBehaviour
         if (MTO_GetItem == null)
             return;
 
-
-     
-       
         if (!ItemPicker || MTO_GetItem.item.Length <= 0)
             return;
 
@@ -1202,7 +953,7 @@ public class MovementControll : MonoBehaviour
         MoveToObject = null;
 
         if (CM != null) CM.Attacking = false;
-        
+        SetOnPointToDefault();
 
         MTO_StatsControll = null;
 
@@ -1211,33 +962,40 @@ public class MovementControll : MonoBehaviour
 
     }
 
+    void SetOnPointToDefault()
+    {
+        OnPointAnimationTimer = -1;
+        FadeToAnim("Start");
+        ObjectOfOccupation = null;
+        ActionOnPointComlete = false;
 
+    }
     void AddDishesOnTable(Item additem)
     {
 
-        if (!MoveToObject.GetComponent<PubObject>().DishesOnTable.Contains(additem))
+        if (!MTO_PubObject.DishesOnTable.Contains(additem))
         {
-            MoveToObject.GetComponent<PubObject>().DishesOnTable.Add(additem);
-            MoveToObject.GetComponent<PubObject>().DishesOnTable[MoveToObject.GetComponent<PubObject>().DishesOnTable.Count - 1].Count = 1;
+            MTO_PubObject.DishesOnTable.Add(additem);
+            MTO_PubObject.DishesOnTable[MTO_PubObject.DishesOnTable.Count - 1].Count = 1;
+            return;
         }
-        else
+        
+        for (int i = 0; i < MTO_PubObject.DishesOnTable.Count; i++)
         {
-            for (int i = 0; i < MoveToObject.GetComponent<PubObject>().DishesOnTable.Count; i++)
+            if (MTO_PubObject.DishesOnTable[i].itemID == additem.itemID)
             {
-                if (MoveToObject.GetComponent<PubObject>().DishesOnTable[i].itemID == additem.itemID)
-                {
-                    MoveToObject.GetComponent<PubObject>().DishesOnTable[i].Count++;
-                    return;
-                }
+                MTO_PubObject.DishesOnTable[i].Count++;
+                return;
             }
         }
+        
         
     }
 
     void FadeToAnim(string n)
     {
         if (CurrentAnimName == n) return;
-        AnimFade = Time.fixedTime+ 1f;
+        AnimFade = Time.fixedTime+ 0.2f;
         CurrentAnimName = n;
 
         print("fade to anim");
@@ -1245,12 +1003,12 @@ public class MovementControll : MonoBehaviour
 
     void RemoveDishesOnTable(int i, int count)
     {
-        if (MoveToObject.GetComponent<PubObject>().DishesOnTable.Count <= 0) return;
+        if (MTO_PubObject.DishesOnTable.Count <= 0) return;
 
-        if (MoveToObject.GetComponent<PubObject>().DishesOnTable[i].Count > 1)
-            MoveToObject.GetComponent<PubObject>().DishesOnTable[i].Count-= count;
-        else 
-            MoveToObject.GetComponent<PubObject>().DishesOnTable.RemoveAt(i);
+        if (MTO_PubObject.DishesOnTable[i].Count > 1)
+            MTO_PubObject.DishesOnTable[i].Count-= count;
+        else
+            MTO_PubObject.DishesOnTable.RemoveAt(i);
         
     }
 

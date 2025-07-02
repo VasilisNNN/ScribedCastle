@@ -81,7 +81,7 @@ SpriteRenderer:
   m_Size: {x: 0.65, y: 1.175}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &3242557130142251189
@@ -199,21 +199,17 @@ MonoBehaviour:
   BringsPickedItemToThePlayer: 0
   MoveBetweenA_B: 0
   PickSpecificItem: 
-  Client: 0
   Enemy: 1
-  Waitress: 0
-  Cook: 0
   Soldier: 0
   DropItemsOnTarget: 0
   DestroyTarget: 0
   LeavesTrash: 0
   ActionDelay: 10
-  NoTheTableDealy: 10
   EnemiesBase: {fileID: 0}
   MinDamage: 3
   MoveDelayMax: 0.2
+  FollowTimerDelay: 10
   FollowBorder: 30
-  Tables: []
   A_Point: []
   TargetGameObjects: []
   IgnoreOccupation: 0
@@ -401,14 +397,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 3242557130142251189}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63db08a8f8173b240b017ec491ed9b76, type: 3}
+  m_Script: {fileID: 11500000, guid: 558ea03f5f2881449b59604b5de24102, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MovePoints: []
   OnPointDelay: 0
   DirectionUpdate: 0
-  SpeedMultiplier: 3
-  FollowTime: 20
+  SpeedMultiplier: 4
+  FollowTime: 7
   AttackDelayTime: 1
   Suicide: 0
   Dodging: 0
@@ -452,6 +448,7 @@ MonoBehaviour:
   MinSniff: -99
   MaxSniff: 99
   DatabaseID: 3008
+  DatabaseOriginalID: -1
   AddItemAutomaticly: 0
   ItemIDs: 
   ItemCount: 1
@@ -497,7 +494,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31ccc12666dd77c42a73ada1b16624c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DayC: 2
+  DayC: 
 --- !u!1 &4131788730071269264
 GameObject:
   m_ObjectHideFlags: 0
@@ -579,7 +576,7 @@ SpriteRenderer:
   m_Size: {x: 0.65, y: 1.175}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &5091711769319839855
@@ -664,7 +661,7 @@ SpriteRenderer:
   m_Size: {x: 0.1875, y: 0.1875}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!95 &8488883121148643907
@@ -771,7 +768,7 @@ SpriteRenderer:
   m_Size: {x: 0.15625, y: 0.125}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &6504911045176910991
@@ -796,3 +793,4 @@ MonoBehaviour:
   DestroyAtTheEnd: 0
   Loop: 1
   StartFromRND: 1
+  RND_CycleDelay: 0

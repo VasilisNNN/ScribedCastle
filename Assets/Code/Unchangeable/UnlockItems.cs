@@ -53,9 +53,10 @@ public class UnlockItems : MonoBehaviour
 
 
         SL = GameObject.Find("Constructor").GetComponent<SaveLoad>();
-        inv = GameObject.Find("Player").GetComponent<Inventory>();
-        pl = GameObject.Find("Player").GetComponent<Player>();
-        
+        pl = InitializeObjects.PL;
+        inv = pl.inv;
+     
+
         UnlockAnimation = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/UnlockAnimation"),GameObject.Find("Canvas").transform);
        
     }

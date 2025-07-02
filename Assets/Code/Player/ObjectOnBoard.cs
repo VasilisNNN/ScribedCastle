@@ -11,7 +11,7 @@ public class ObjectOnBoard
     public int ID;
     public GameObject Object;
     public StatsControll Stats;
-    public CharacterMove CharMove;
+    public CharacterPath CharMove;
     public PubObject PO;
     public Vector2 BaseObjectPosition = new Vector2(-999, -999);
     public bool hasParrent;
@@ -37,7 +37,7 @@ public class ObjectOnBoard
 
         if (_object != null)
         {
-            if (_object.GetComponent<CharacterMove>() != null) CharMove = _object.GetComponent<CharacterMove>();
+            if (_object.GetComponent<CharacterPath>() != null) CharMove = _object.GetComponent<CharacterPath>();
         }
     }
 

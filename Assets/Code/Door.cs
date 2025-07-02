@@ -23,19 +23,20 @@ public class Door : MonoBehaviour
 
     private float Delay, StartDelay;
 
+    private InputMode IM;
     void Start()
     {
 
         if (!CutSceneMode)
         {
-            pl = GameObject.Find("Player").GetComponent<Player>();
-
+            
             skin = Resources.Load<GUISkin>("Prefabs/New GUISkin");
 
-
-            inv = GameObject.Find("Player").GetComponent<Inventory>();
+            pl = InitializeObjects.PL;
+            inv = pl.inv;
+            IM = pl.IM;
         }
-        else gameObject.AddComponent<InputMode>();
+        else IM = gameObject.AddComponent<InputMode>();
 
 
         FadeOut = GameObject.Find("FadeOut");
@@ -73,7 +74,7 @@ public class Door : MonoBehaviour
         }
         else
         {
-            if (GetComponent<InputMode>().enter_b || GetComponent<InputMode>().space_b || GetComponent<InputMode>().LeftMouseButtonDown)
+            if (IM.enter_b || IM.space_b || IM.LeftMouseButtonDown)
             {
                 pl.menu.TransitionToTheScene(Location, true);
                

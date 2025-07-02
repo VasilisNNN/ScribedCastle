@@ -34,7 +34,7 @@ public class AnimationFrame : MonoBehaviour
     private void Awake()
     {
         Play = true;
-
+        if(GameObject.Find("Constructor")!=null)
         constr = GameObject.Find("Constructor").GetComponent<Constructor>();
         Renderer = GetComponent<SpriteRenderer>();
         

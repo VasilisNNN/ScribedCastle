@@ -171,10 +171,10 @@ public class DrawIfActive : MonoBehaviour
     {
         if (QuestID > -1)
         {
-            pl.inv.AddQuest(QuestID);
+            pl.journal.AddQuest(QuestID);
 
 
-            pl.inv.DoneQuest(QuestID);
+            pl.journal.DoneQuest(QuestID);
 
 
             QuestID = -1;
@@ -261,9 +261,9 @@ public class DrawIfActive : MonoBehaviour
         }
 
 
-        if (uiel.GetComponent<CharacterMove>() != null)
+        if (uiel.GetComponent<CharacterPath>() != null)
         {
-            uiel.GetComponent<CharacterMove>().enabled = tf;
+            uiel.GetComponent<CharacterPath>().enabled = tf;
         }
 
         if (uiel.GetComponent<MovementControll>() != null)
@@ -294,9 +294,9 @@ public class DrawIfActive : MonoBehaviour
             }
         }
 
-        if (uiel.GetComponent<CharacterMove>() != null)
+        if (uiel.GetComponent<CharacterPath>() != null)
         {
-            uiel.GetComponent<CharacterMove>().enabled = tf;
+            uiel.GetComponent<CharacterPath>().enabled = tf;
         }
 
         if (uiel.GetComponent<SpriteRenderer>() != null)

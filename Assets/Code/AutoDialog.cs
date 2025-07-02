@@ -4,9 +4,10 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static UnityEngine.EventSystems.StandaloneInputModule;
 
 
-[RequireComponent(typeof(TextDatabase))]
+
 [RequireComponent(typeof(InputMode))]
 
 public class AutoDialog : MonoBehaviour
@@ -35,10 +36,9 @@ public class AutoDialog : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (GetComponent<TextDatabase>() == null) gameObject.AddComponent<TextDatabase>();
-        textdatabase = GetComponent<TextDatabase>();
+        textdatabase = InitializeObjects.Textdatabase;
 
-        DialogOB = Instantiate<GameObject>(GO, GameObject.Find("Canvas").transform);
+        DialogOB = Instantiate<GameObject>(GO, InitializeObjects.CanvasTransform);
         DialogOB.GetComponent<RectTransform>().anchoredPosition = Camera.main.WorldToScreenPoint(transform.position);
         timer = Time.fixedTime + 1 + textdatabase.textEN[NumberInData(ID)].line[0].line[0].Length * 0.04f;
         DialogOBAS = DialogOB.GetComponent<AudioSource>();

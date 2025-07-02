@@ -2,40 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
-
-using System;
 
 
-#if UNITY_SWITCH
-using System.Threading.Tasks;
-using nn.hid;
-#endif
+public class InputMode: MonoBehaviour
+{
 
+    private IInputs CurrentInputs;
 
-
-public class InputMode : MonoBehaviour
-    {
-
-
-#if UNITY_SWITCH
-    private System.Text.StringBuilder stringBuilder = new System.Text.StringBuilder();
-
-
-    private NpadId npadId = NpadId.Invalid;
-    private NpadStyle npadStyle = NpadStyle.Invalid;
-    private NpadState npadState = new NpadState();
-
-   
-#endif
-
-
-
-    //public bool LeftMenu { get; set; }
     public bool SideButton { get; set; }
-        private bool HorizontalFlipBuffer, SideButtonBuffer, exit_bBuffer, enter_bBuffer, menu_bBuffer, LeftTriggerBuffer, RightTriggerBuffer, QuestBookBuffer, LeftMouseButtonBuffer, RightMouseButtonBuffer, RightstickpushBuffer, LeftstickpushBuffer, HealBuffer;
-        private float AttackBufferF, InventoryBufferF, SideButtonBufferF, exit_bBufferF, enter_b_pushBufferF, enter_bBufferF, menu_bBufferF, LeftTriggerBufferF, RightTriggerBufferF, QuestBookBufferF, LeftMouseButtonBufferF, RightMouseButtonBufferF, RightstickpushBufferF, LeftstickpushBufferF;
-    private bool Achbutton_bBuffer, journal_bBuffer, Dash_bBuffer, space_bBuffer, inventory_bBuffer, enterENTER_bBuffer;
 
     public float _horizontal { get; set; }
         public float _vertical { get; set; }
@@ -50,7 +24,6 @@ public class InputMode : MonoBehaviour
         public bool CamMoveHold { get; set; }
         public bool HorizontalFlip { get; set; }
 
-        // public bool SpaceB { get; set; }
         public bool _vertical_button { get; set; }
 
 
@@ -64,7 +37,7 @@ public class InputMode : MonoBehaviour
 
 
         public float VerticalArrows { get; set; }
-        private int _horizontalScroll_Timer;
+        public int _horizontalScroll_Timer { get; }
 
         public float Enterdeley { get; set; }
 
@@ -79,14 +52,11 @@ public class InputMode : MonoBehaviour
         public bool enter_b_hold { get; set; }
         public bool shift { get; set; }
 
-        public bool joystick = false;
+        public bool joystick { get; set; }
 
-        public float GamepadVertTimer { get; set; }
-        public float GamepadHorTimer { get; set; }
-        private float GamepadRHorTimer;
 
-        public bool QuestBook { get; set; }
-
+    public bool QuestBook { get; set; }
+    public bool FadeMode { get; private set; }
         public bool LeftTrigger { get; set; }
         public bool RightTrigger { get; set; }
 
@@ -108,16 +78,16 @@ public class InputMode : MonoBehaviour
 
     public bool journal_b { get; set; }
     public bool UButton { get; set; }
-    public Vector2 MousePosition;
+    public Vector2 MousePosition { get;set; }
 
-        private Image JoyConImage, ProGamepadImage;
 
-    
-    private bool RightStickMoveX, RightStickMoveY;
+    public bool RightStickMoveX { get; }
+    public bool RightStickMoveY { get; }
+
 
     public bool MouseMode { get; set; }
-    private Vector3 PrevMousePos;
-    private float MousePosTimer;
+    public Vector3 PrevMousePos { get; set; }
+    public float MousePosTimer { get; set; }
 
     public bool BKey { get; set; }
     public bool OKey { get; set; }
@@ -132,50 +102,25 @@ public class InputMode : MonoBehaviour
 
     private void Awake()
         {
-        if (GameObject.Find("GamepadChoise") == null)
-        {
-            GameObject GamepadChoise = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/GamepadChoise"), GameObject.Find("Canvas").transform);
-            GamepadChoise.name = "GamepadChoise";
 
-        }
+#if UNITY_STANDALONE
 
+        CurrentInputs = new PCKeyboardInputs();
 
-
-        JoyConImage = GameObject.Find("GamepadChoise").transform.Find("Joycon").GetComponent<Image>();
-        ProGamepadImage = GameObject.Find("GamepadChoise").transform.Find("ProGamepad").GetComponent<Image>();
-
-        JoyConImage.color = new Color(1, 1, 1, 0);
-        ProGamepadImage.color = new Color(1, 1, 1, 0);
-        #if UNITY_PS5 || UNITY_PS4
-        PS_SaveMain = GameObject.Find("Constructor").GetComponent<SonySaveDataMain>();
-        #endif
-#if UNITY_SWITCH
-        Npad.Initialize();
-        Npad.SetSupportedIdType(new NpadId[] { NpadId.Handheld, NpadId.No1 });
-        Npad.SetSupportedStyleSet(NpadStyle.FullKey | NpadStyle.Handheld | NpadStyle.JoyDual);
-
-        if (SceneManager.GetActiveScene().name == "StartMenu")
-        {
-            NpadStyle handheldStyle = Npad.GetStyleSet(NpadId.Handheld);
-            NpadState handheldState = npadState;
-
-            if (handheldStyle != NpadStyle.None)
-            {
-                Npad.GetState(ref handheldState, NpadId.Handheld, handheldStyle);
-
-                if (npadId != NpadId.Handheld)
-                {
-                    JoyConImage.color = new Color(1, 1, 1, 1);
-                    ProGamepadImage.color = new Color(1, 1, 1, 0);
-                }
-                npadId = NpadId.Handheld;
-                npadStyle = handheldStyle;
-                npadState = handheldState;
-            }
-
-        }
 
 #endif
+
+#if UNITY_SWITCH
+
+    joystick = true;
+        CurrentInputs = new SwitchInputs();
+
+#endif
+
+#if UNITY_PS5 || UNITY_PS4
+        PS_SaveMain = GameObject.Find("Constructor").GetComponent<SonySaveDataMain>();
+#endif
+        CurrentInputs.Init();
 
     }
 
@@ -188,173 +133,63 @@ public class InputMode : MonoBehaviour
 
 
 
-    private bool UpdatePadState()
-    {
-#if UNITY_SWITCH
-        DrawGamepad();
-
-        NpadStyle handheldStyle = Npad.GetStyleSet(NpadId.Handheld);
-        NpadState handheldState = npadState;
-        if (handheldStyle != NpadStyle.None)
-        {
-            Npad.GetState(ref handheldState, NpadId.Handheld, handheldStyle);
-            if (handheldState.buttons != NpadButton.None)
-            {
-                if (npadId != NpadId.Handheld)
-                {
-                    JoyConImage.color = new Color(1, 1, 1, 1);
-                    ProGamepadImage.color = new Color(1, 1, 1, 0);
-                }
-                npadId = NpadId.Handheld;
-                npadStyle = handheldStyle;
-                npadState = handheldState;
-                return true;
-            }
-        }
-
-        NpadStyle no1Style = Npad.GetStyleSet(NpadId.No1);
-        NpadState no1State = npadState;
-        if (no1Style != NpadStyle.None)
-        {
-            Npad.GetState(ref no1State, NpadId.No1, no1Style);
-            if (no1State.buttons != NpadButton.None)
-            {
-                if (npadId != NpadId.No1)
-                {
-                    ProGamepadImage.color = new Color(1, 1, 1, 1);
-                    JoyConImage.color = new Color(1, 1, 1, 0);
-                }
-
-                npadId = NpadId.No1;
-                npadStyle = no1Style;
-                npadState = no1State;
-
-                return true;
-            }
-        }
-
-        if ((npadId == NpadId.Handheld) && (handheldStyle != NpadStyle.None))
-        {
-
-            npadId = NpadId.Handheld;
-            npadStyle = handheldStyle;
-            npadState = handheldState;
-        }
-        else if ((npadId == NpadId.No1) && (no1Style != NpadStyle.None))
-        {
-
-            npadId = NpadId.No1;
-            npadStyle = no1Style;
-            npadState = no1State;
-        }
-        else
-        {
-            npadId = NpadId.Invalid;
-            npadStyle = NpadStyle.Invalid;
-            npadState.Clear();
-            return false;
-        }
-        return true;
-#endif
-
-#if UNITY_STANDALONE
-            return false;
-#endif
-
-
-        return false;
-    }
 
     void Update()
         {
-
 #if UNITY_STANDALONE
 
+        CurrentInputs = new PCKeyboardInputs();
+        joystick = false;
 
-        if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
-        {
-
-
-            if (joystick)
-            {
-
-                MouseMode = false;
-                joystick = false;
-            }
-        }
-        else
-        {
-
-            /*if (Input.GetButtonDown("Delete_J") || Input.GetButtonDown("Cancel_J") || Input.GetButtonDown("Enter_J"))
-            {
-                print("JOYSTICK");
-
-                joystick = true;
-            }*/
-
-        }
-
-        if (MousePosTimer < Time.fixedTime)
-        {
-            //  print("PrevMousePos " + PrevMousePos + " /  Input.mousePosition" + Input.mousePosition);
-
-            if (PrevMousePos != Input.mousePosition)
-            {
-
-                MouseMode = true;
-                PrevMousePos = Input.mousePosition;
-            }
-            MousePosTimer = Time.fixedTime + 0.1f;
-
-        }
-
-
-        if (LeftMouseButtonDown)
-        {
-            MouseMode = true;
-        }
-        if (_horizontal_R_Push || _vertical_R_Push || _horizontalPush || _verticalPush || enter_b || space_b || exit_b)
-        {
-
-            MouseMode = false;
-        }
-
+        MouseModeChange();
 #endif
 
-#if UNITY_SWITCH
-        MouseMode = false;
-        joystick = true;
-#endif
+        CurrentInputs.Body();
 
-#if UNITY_PS4 || UNITY_PS5
-        MouseMode = false;
-        joystick = true;
-#endif
+        if (!CurrentInputs.PudState) return;
 
+        enter_b = CurrentInputs.enter_b;
+        enter_b_hold = CurrentInputs.enter_b_hold;
+        inventory_b = CurrentInputs.inventory_b;
 
+        _horizontal = CurrentInputs._horizontal;
+        _vertical = CurrentInputs._vertical;
+        _horizontal_R = CurrentInputs._horizontal_R;
+        _vertical_R = CurrentInputs._vertical_R;
 
-        if (!joystick)
-        {
-            KeyboardMouseControlls();
-        }
-        else
-        {
-#if UNITY_STANDALONE
-            PCGamepadControlls();
-#endif
-#if UNITY_SWITCH
+        exit_b = CurrentInputs.exit_b;
+        delete_b = CurrentInputs.delete_b;
 
-            SwitchGamepadControlls();
+        menu_b = CurrentInputs.menu_b;
+        LeftMouseButton = CurrentInputs.LeftMouseButton;
+        LeftMouseButtonDown = CurrentInputs.LeftMouseButtonDown;
+        RightMouseButtonDown = CurrentInputs.RightMouseButtonDown;
+        RightMouseButton = CurrentInputs.RightMouseButton;
+        space_b = CurrentInputs.space_b;
 
-#endif
-#if UNITY_PS5 || UNITY_PS4
+        BKey = CurrentInputs.BKey;
+        OKey = CurrentInputs.OKey;
 
-            PS5GamepadControlls();
+        MouseScroll = CurrentInputs.MouseScroll;
 
-#endif
+        DPADX = CurrentInputs.DPADX;
+        DPADY = CurrentInputs.DPADY;
 
+        _horizontal_DPAD_Push = CurrentInputs._horizontal_DPAD_Push;
+        _vertical_DPAD_Push = CurrentInputs._vertical_DPAD_Push;
+        RightTrigger = CurrentInputs.RightTrigger;
+        LeftTrigger = CurrentInputs.LeftTrigger;
 
-        }
+        ZLKey = CurrentInputs.ZLKey;
+        R2 = CurrentInputs.R2;
+        L2 = CurrentInputs.L2;
+
+        FadeMode = CurrentInputs.FadeMode;
+        _horizontalPush = CurrentInputs._horizontalPush;
+        _verticalPush = CurrentInputs._verticalPush;
+
+  
+        MousePosition = Input.mousePosition;
 
 
 
@@ -394,83 +229,7 @@ public class InputMode : MonoBehaviour
         */
 
 
-#if UNITY_STANDALONE
 
-
-
-        LeftMouseButtonDown = Input.GetMouseButtonDown(0);
-        RightMouseButtonDown = Input.GetMouseButtonDown(1);
-
-        MouseScroll = Input.GetAxis("Mouse ScrollWheel");
-        MousePosition = Input.mousePosition;
-
-
-        Heal = Input.GetButtonDown("Heal");
-      //  journal_b = Input.GetButtonDown("Journal");
-        inventory_b = Input.GetButtonDown("Inventory");
-      //  Achbutton = Input.GetButtonDown("Achivements");
-
-
-        LeftMouseButton = Input.GetMouseButton(0);
-
-
-
-        RightMouseButton = Input.GetMouseButton(1);
-
-        SideButton = Input.GetButtonDown("SideButton");
-
-        LeftTrigger = Input.GetButtonDown("LeftTrigger");
-        RightTrigger = Input.GetButtonDown("RightTrigger");
-
-        R2 = Input.GetKeyDown(KeyCode.T);
-        L2 = Input.GetKeyDown(KeyCode.R);
-
-        //LeftMenu = Input.GetKeyDown(KeyCode.Z);
-        QuestBook = Input.GetKeyDown(KeyCode.Q);
-
-        //  SpaceB = Input.GetButtonDown("Space");
-
-        _horizontal = Input.GetAxis("Horizontal");
-        _vertical = Input.GetAxis("Vertical") * -1;
-
-        _horizontal_R = Input.GetAxis("Horizontal_R");
-        _vertical_R = Input.GetAxis("Vertical_R");
-        space_b = Input.GetButtonDown("Space");
-
-        _verticalPush = Input.GetButtonDown("Vertical");
-
-        _horizontalPush = Input.GetButtonDown("Horizontal");
-
-
-        _vertical_R_Push = Input.GetButtonDown("Vertical_R");
-        _horizontal_R_Push = Input.GetButtonDown("Horizontal_R");
-
-
-        VerticalArrows = Input.GetAxis("VerticalArrows");
-
-
-        enter_b = Input.GetButtonDown("Enter");
-        shift = Input.GetButton("Shift");
-        enter_b_hold = Input.GetButton("Enter");
-
-        exit_b = Input.GetButtonDown("Exit");
-        delete_b = Input.GetButtonDown("Delete");
-
-
-
-
-        menu_b = Input.GetButtonDown("Menu");
-        CamMove = Input.GetKeyDown(KeyCode.LeftControl);
-        CamMoveHold = Input.GetKey(KeyCode.LeftControl);
-
-        HorizontalFlip = Input.GetButtonDown("HorizontalFlip");
-        Rightstickpush = Input.GetButtonDown("RightStickPush");
-
-
-      //  UButton = Input.GetKey(KeyCode.U);
-        BKey = Input.GetButtonDown("BKey");
-        OKey = Input.GetButtonDown("OKey");
-#endif
     }
 
 
@@ -521,165 +280,39 @@ public class InputMode : MonoBehaviour
 
     }
 
-    void SwitchGamepadControlls()
+  
+
+    public void MouseModeChange()
     {
-#if UNITY_SWITCH
-        if (!UpdatePadState()) return;
+  
+        if (LeftMouseButtonDown || RightMouseButtonDown)
+        MouseMode = true;
 
-        enter_b = npadState.GetButtonDown(NpadButton.A);
-        enter_b_hold = npadState.GetButton(NpadButton.A);
-        Heal = npadState.GetButtonDown(NpadButton.X);
-
-        exit_b = npadState.GetButtonDown(NpadButton.B);
-        delete_b = npadState.GetButton(NpadButton.B);
-        menu_b = npadState.GetButtonDown(NpadButton.Plus);
-        Rightstickpush = npadState.GetButtonDown(NpadButton.StickR);
-        HorizontalFlip = npadState.GetButtonDown(NpadButton.ZR);
-
-        RightTrigger = npadState.GetButtonDown(NpadButton.R);
-        LeftTrigger = npadState.GetButtonDown(NpadButton.L);
-        SideButton = npadState.GetButtonDown(NpadButton.X);
-
-        if(npadState.GetButtonDown(NpadButton.StickR))
-        MouseScroll=1;
-          if(npadState.GetButtonDown(NpadButton.StickL))
-        MouseScroll=-1;
-
-        if (npadState.GetButton(NpadButton.StickLUp)) _vertical = 1;
-        else if (npadState.GetButton(NpadButton.StickLDown)) _vertical = -1;
-        else _vertical = 0;
-
-
-        if (npadState.GetButton(NpadButton.StickLLeft)) _horizontal = -1;
-        else if (npadState.GetButton(NpadButton.StickLRight)) _horizontal = 1;
-        else _horizontal = 0;
-
-
-        if (npadState.GetButton(NpadButton.StickRUp)) _vertical_R = 1;
-        else if (npadState.GetButton(NpadButton.StickRDown)) _vertical_R = -1;
-        else _vertical_R = 0;
-
-        if (_vertical_R == 0)
+        if (MousePosTimer < Time.fixedTime)
         {
-            if (npadState.GetButton(NpadButton.StickRLeft)) _horizontal_R = -1;
-            else if (npadState.GetButton(NpadButton.StickRRight)) _horizontal_R = 1;
-            else _horizontal_R = 0;
-        }
 
-
-
-        if (npadState.GetButton(NpadButton.Up)) DPADY = 1;
-        else if (npadState.GetButton(NpadButton.Down)) DPADY = -1;
-        else DPADY = 0;
-
-        if (npadState.GetButton(NpadButton.Left)) DPADX = -1;
-        else if (npadState.GetButton(NpadButton.Right)) DPADX = 1;
-        else DPADX = 0;
-
-
-
-        if (_horizontal > 0.1f || _horizontal < -0.1f)
-        {
-            if (GamepadHorTimer < Time.fixedTime)
+            if (PrevMousePos != Input.mousePosition)
             {
-                _horizontalPush = true;
-                GamepadHorTimer = Time.fixedTime + 0.01f;
+                PrevMousePos = Input.mousePosition;
+                MouseMode = true;
+
             }
-            else _horizontalPush = false;
+            MousePosTimer = Time.fixedTime + 0.1f;
+
         }
-        else _horizontalPush = false;
 
 
-        if (_horizontal_R > 0.1f || _horizontal_R < -0.1f)
+        if (_vertical != 0 || _horizontal != 0 || _horizontal_R_Push || _vertical_R_Push || _horizontalPush || _verticalPush || enter_b || space_b || exit_b)
         {
-            if (GamepadRHorTimer < Time.fixedTime)
-            {
-                _horizontal_R_Push = true;
-                GamepadRHorTimer = Time.fixedTime + 0.01f;
-            }
-            else _horizontal_R_Push = false;
+
+        MouseMode = false;
         }
-        else _horizontal_R_Push = false;
 
+   
 
-        if (DPADX > 0.1f || DPADX < -0.1f)
-        {
-            if (GamepadHorTimer < Time.fixedTime)
-            {
-                _horizontal_DPAD_Push = true;
-                GamepadHorTimer = Time.fixedTime + 0.01f;
-            }
-            else _horizontal_DPAD_Push = false;
-        }
-        else _horizontal_DPAD_Push = false;
+       
 
-        if (DPADY > 0.1f || DPADY < -0.1f)
-        {
-            if (GamepadVertTimer < Time.fixedTime)
-            {
-                _vertical_DPAD_Push = true;
-                GamepadVertTimer = Time.fixedTime + 0.01f;
-            }
-            else _vertical_DPAD_Push = false;
-        }
-        else _vertical_DPAD_Push = false;
-
-
-
-
-        if (_vertical > 0.1f || _vertical < -0.1f)
-        {
-            if (GamepadVertTimer < Time.fixedTime)
-            {
-                _verticalPush = true;
-                GamepadVertTimer = Time.fixedTime + 0.01f;
-            }
-            else _verticalPush = false;
-        }
-        else _verticalPush = false;
-
-      //  journal_b = npadState.GetButtonDown(NpadButton.L);
-        QuestBook = npadState.GetButtonDown(NpadButton.L);
-        space_b = npadState.GetButtonDown(NpadButton.R);
-        //Dash = npadState.GetButtonDown(NpadButton.B);
-        inventory_b = npadState.GetButtonDown(NpadButton.Y);
-
-        BKey = npadState.GetButtonDown(NpadButton.X);
-        OKey = npadState.GetButtonDown(NpadButton.ZR);
-        ZLKey = npadState.GetButtonDown(NpadButton.ZL);
-        R2 = npadState.GetButtonDown(NpadButton.ZR);
-        L2 = npadState.GetButtonDown(NpadButton.ZL);
-
-        /*
-          if (Mathf.Abs(npadState.analogStickR.y) < 100)
-        _horizontal_R = npadState.analogStickR.x;
-   else
-    _vertical_R = npadState.analogStickR.y;
-
-    if (npadState.analogStickR.y==0) _vertical_R = 0;
-
-        Debug.Log("_horizontal_R: " + _horizontal_R);
-        Debug.Log("_vertical_R: " + _vertical_R);
-        */
-
-
-        /*
-        if (npadState.GetButtonDown(NpadButton.A))
-        {
-            Debug.Log("NpadButton.A Down");
-        }
-        else if (npadState.GetButtonUp(NpadButton.A))
-        {
-            Debug.Log("NpadButton.A Up");
-        }*/
-
-
-
-#endif
     }
-
-
-
     void PS5GamepadControlls()
     {
 #if UNITY_PS5 || UNITY_PS4
@@ -818,12 +451,7 @@ public class InputMode : MonoBehaviour
     }
 
 
-    void DrawGamepad()
-    {
-        if (JoyConImage.color.a > 0) JoyConImage.color = new Color(1, 1, 1, JoyConImage.color.a - 0.03f);
-        if (ProGamepadImage.color.a > 0) ProGamepadImage.color = new Color(1, 1, 1, ProGamepadImage.color.a - 0.03f);
-
-    }
+   
 
 }
 

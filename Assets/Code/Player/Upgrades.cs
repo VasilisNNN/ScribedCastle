@@ -74,8 +74,8 @@ public class Upgrades : MonoBehaviour
         //BG = transform.Find("BG").gameObject;
 
         StartAnim = Time.fixedTime + 1f;
-        pl = GameObject.Find("Player").GetComponent<Player>();
-        inv = GameObject.Find("Player").GetComponent<Inventory>();
+        pl = InitializeObjects.PL;
+        inv = pl.inv;
 
         ShowUpgrade = false;
         pl.inv.ONOFF(gameObject, false);
@@ -269,8 +269,8 @@ public class Upgrades : MonoBehaviour
 
         if (pl == null)
         {
-            pl = GameObject.Find("Player").GetComponent<Player>();
-            inv = GameObject.Find("Player").GetComponent<Inventory>();
+            pl = InitializeObjects.PL;
+            inv = pl.inv;
             PlayerGun = pl.GetComponent<Gun>();
         }
 

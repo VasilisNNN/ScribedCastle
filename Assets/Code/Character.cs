@@ -54,8 +54,11 @@ public class  Character : MonoBehaviour
 
     public bool DestroyOnDialogEnd;
 
-    private void Awake()
+  
+    private void Start()
     {
+        pl = InitializeObjects.PL;
+      
         ChattingOnColl = false;
 
         if (!NotAlive && Chatting && !Enemy) Save = true;
@@ -64,7 +67,7 @@ public class  Character : MonoBehaviour
         {
             HitClip = Resources.Load<AudioClip>("Sound/Sound Library - Battle/Sword/Sword_On_Flesh/Flesh/Sword_On_Flesh_Flesh_" + Random.Range(1, 5) + "_Short");
 
- 
+
         }
 
 
@@ -84,32 +87,29 @@ public class  Character : MonoBehaviour
         if (_SoundType == SoundType.Flesh)
         {
             HitClip = Resources.Load<AudioClip>("Sound/Sound Library - Battle/Sword/Sword_On_Flesh/Flesh/Sword_On_Flesh_Flesh_1");
-            
+
         }
-        
-      
+
+
         // 5% chanse
-        RNDORGANS = new int[42] { -1, -1, -1, -1, -1,-1,-1,-1, -1, -1, -1, -1, -1, -1, -1, -1,-1,-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,-1,-1, 5, 7, 103,102 };
-       // RNDORGANS = new int[2] { 5, 7 };
+        RNDORGANS = new int[42] { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 5, 7, 103, 102 };
+        // RNDORGANS = new int[2] { 5, 7 };
 
         _transform = transform;
-        pl = GameObject.Find("Player").GetComponent<Player>();
-        if(!Zombie &&!NotAlive)
-        pl.Characters.Add(gameObject);
-
-
        
+        if (!Zombie && !NotAlive)
+            pl.Characters.Add(gameObject);
+
+
+
         ChattingUIObject = GameObject.Find("Chatting");
-        
+
 
         StartMaterial = GetComponent<SpriteRenderer>().material;
         WhiteMaterial = Resources.Load<Material>("Materials/DamageLight");
-   
-        name += SceneManager.GetActiveScene().name;
-    }
 
-    private void Start()
-    {
+        name += SceneManager.GetActiveScene().name;
+
         ChattingObject = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/ChattingSine"));
         ChattingObject.name = "ChattingSine";
         ChattingObject.transform.position = new Vector3(transform.position.x, transform.position.y + 0.2f, 1);
@@ -191,7 +191,7 @@ public class  Character : MonoBehaviour
         {
            
 
-            if (pl.inv.CheckQuestStart(QuestID) && Quest_End_Item_ID > -1)
+            if (pl.journal.CheckQuestStart(QuestID) && Quest_End_Item_ID > -1)
             {
                 ChattingObject.transform.Find("QuestItem").gameObject.SetActive(true);
 
@@ -206,7 +206,7 @@ public class  Character : MonoBehaviour
             else ChattingObject.transform.Find("QuestItem").gameObject.SetActive(false);
 
 
-            if (pl.inv.CheckQuestDone(QuestID))
+            if (pl.journal.CheckQuestDone(QuestID))
             ChattingObject.transform.Find("QuestItem").gameObject.SetActive(false);
             
         }
@@ -219,7 +219,7 @@ public class  Character : MonoBehaviour
 
         if (QuestID > -1)
         {
-            if (pl.inv.CheckQuestDone(QuestID) && DialogID_QuestDone_NoItem>-1)
+            if (pl.journal.CheckQuestDone(QuestID) && DialogID_QuestDone_NoItem>-1)
             {
                 if (DialogID_AfterItem > -1) DialogID = DialogID_QuestDone_NoItem;
             }
@@ -236,13 +236,13 @@ public class  Character : MonoBehaviour
                 if (pl.inv.CheckItem(Quest_End_Item_ID))
                 {
 
-                    pl.inv.AddQuest(QuestID);
+                    pl.journal.AddQuest(QuestID);
 
-                    if (!pl.inv.CheckQuestDone(QuestID))
+                    if (!pl.journal.CheckQuestDone(QuestID))
                         pl.inv.DropItemDifferentSpotsNearby(transform.position, DropItemCount, new int[1] { DropItem },pl.inv.GetItemInDatabase(DropItem).Durability);
 
 
-                    pl.inv.DoneQuest(QuestID);
+                    pl.journal.DoneQuest(QuestID);
 
                     if (DialogID_AfterItem > -1) DialogID = DialogID_AfterItem;
                      QuestID = -1;
@@ -275,9 +275,9 @@ public class  Character : MonoBehaviour
         {
             if (QuestID > -1)
             {
-                if (!pl.inv.CheckQuestDone(QuestID))
+                if (!pl.journal.CheckQuestDone(QuestID))
                 {
-                    pl.inv.AddQuest(QuestID);
+                    pl.journal.AddQuest(QuestID);
 
                     ChattingUIObject.GetComponent<Dialog>().LastLine = false;
                 }

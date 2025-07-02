@@ -42,6 +42,9 @@ public class Enemies : MonoBehaviour
 
     void Start()
     {
+        pl = InitializeObjects.PL;
+        _constr = InitializeObjects.Constr;
+
         stats = GetComponent<StatsControll>();
         SPRT = GetComponent<SpriteRenderer>();
         AnimFrame = GetComponent<AnimationFrame>();
@@ -50,22 +53,12 @@ public class Enemies : MonoBehaviour
 
         EnemiesInWaveCount = 0;
 
-        _constr = GameObject.Find("Constructor").GetComponent<Constructor>();
-        pl = GameObject.Find("Player").GetComponent<Player>();
+
         if (DelayStart < 0) DelayStart = DelayBetweenWaves;
 
         if (DelayStart > pl.DayNight.DayLength)
             timer = DelayStart - _constr.SL.DayTime;
         else timer = DelayStart;
-
-        //EnemyTimer = GameObject.Find("EnemyTimer");
-
-            /*  for (int i = 0; i < _constr.OBOnBoard.Count; i++)
-              {
-                  if (_constr.OBOnBoard[i].Name.Contains(EnemyObjects[0].name))
-                  BuildedPers.Add(_constr.OBOnBoard[i].Object);
-
-              }*/
 
 
     }
@@ -175,11 +168,7 @@ public class Enemies : MonoBehaviour
         MovementControll EnemyObjects_MC = EnemyObjects[num].GetComponent<MovementControll>();
 
 
-        if (EnemyObjects_MC.Soldier && _constr.SoldiersCount >= _constr.SoldiersCountMAX) return;
-  
-        if (EnemyObjects_MC.Enemy && _constr.EnemiesCount >= _constr.EnemiesCountMAX) return;
-   
-      
+     
  
 
 
@@ -193,11 +182,8 @@ public class Enemies : MonoBehaviour
 
         GameObject Enemy = Instantiate<GameObject>(EnemyObjects[num]);
 
-        if (Enemy.GetComponent<MovementControll>().Soldier)
-            _constr.SoldiersCount++;
-
-        if (Enemy.GetComponent<MovementControll>().Enemy)
-            _constr.EnemiesCount++;
+  
+   
 
         BuildedPers.Add(Enemy);
         Enemy.name = EnemyObjects[num].name + BuildedPers.Count;

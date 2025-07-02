@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class GenerateMoney : MonoBehaviour
 {
-    private Constructor constr;
+    private Constructor Constr;
     private Player pl;
     private Inventory inv;
 
@@ -21,11 +22,11 @@ public class GenerateMoney : MonoBehaviour
     void Start()
     {
     
-        constr = GameObject.Find("Constructor").GetComponent<Constructor>();
-        pl = GameObject.Find("Player").GetComponent<Player>();
-
-        inv = GameObject.Find("Player").GetComponent<Inventory>();
-
+        pl = InitializeObjects.PL;
+        inv = pl.inv;
+        Constr = InitializeObjects.Constr;
+      
+       
         Anim = GetComponent<Animator>();
     }
 

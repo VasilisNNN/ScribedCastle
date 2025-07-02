@@ -565,10 +565,9 @@ public class Gun : MonoBehaviour
 
         if (DestructibleOBs.GetComponent<MovementControll>() != null)
         {
-            if (DestructibleOBs.GetComponent<MovementControll>().Enemy &&
-                DestructibleOBs.GetComponent<CharacterMove>() != null)
+            if (DestructibleOBs.GetComponent<CharacterPath>() != null)
             {
-                if (!DestructibleOBs.GetComponent<CharacterMove>().PathComlitionCheck() && Mathf.Abs(DestructibleOBs.GetComponent<CharacterMove>().SpeedForce.x)>0.2f && Mathf.Abs(DestructibleOBs.GetComponent<CharacterMove>().SpeedForce.y) > 0.2f)
+                if (!DestructibleOBs.GetComponent<CharacterPath>().PathComlitionCheck() && Mathf.Abs(DestructibleOBs.GetComponent<CharacterPath>().SpeedForce.x)>0.2f && Mathf.Abs(DestructibleOBs.GetComponent<CharacterPath>().SpeedForce.y) > 0.2f)
                     return;
             }
         }
@@ -897,9 +896,9 @@ public class Gun : MonoBehaviour
 
             FO.GetDamage(bullet.GetComponent<Bullet>().Damage);
 
-            if (FO.GetComponent<CharacterMove>() != null)
+            if (FO.GetComponent<CharacterPath>() != null)
             {
-                FO.GetComponent<CharacterMove>().StartAttack();
+                FO.GetComponent<CharacterPath>().StartAttack();
             }
 
 

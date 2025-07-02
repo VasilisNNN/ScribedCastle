@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using NUnit;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -8,28 +9,28 @@ public class RecipeUnlock : MonoBehaviour
     public Tilemap Floor;
     private Player pl;
     public int DishID;
-    private Constructor Const;
+    private Constructor Constr;
 
     public AudioClip Clip;
     public GameObject UnlockingObject;
 
-    // Start is called before the first frame update
+   
     void Start()
     {
-        pl = GameObject.Find("Player").GetComponent<Player>();
-        Const = GameObject.Find("Constructor").GetComponent<Constructor>();
+        pl = InitializeObjects.PL;
+        Constr = InitializeObjects.Constr;
 
-        Floor = GameObject.Find("Floor").GetComponent<Tilemap>();
+        Floor = InitializeObjects.FloorTilemap;
 
 
         if (Floor.GetTile(Floor.WorldToCell(transform.position)) != null)
         {
             if (DishID > -1)
             {
-                Const.Dishes.Add(pl.inv.GetItemInDatabase(DishID));
+                Constr.Dishes.Add(pl.inv.GetItemInDatabase(DishID));
             }
 
-            Const.PlaySound(Clip, 1);
+            Constr.PlaySound(Clip, 1);
 
             Destroy(gameObject);
 
@@ -42,27 +43,18 @@ public class RecipeUnlock : MonoBehaviour
   
         if (Floor.GetTile(Floor.WorldToCell(transform.position)) != null)
         {
-            if (GameObject.Find("MenuRecipes") == null)
-            {
-               // GameObject MenuActive;
-              //  MenuActive = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/MenuQuest"), GameObject.Find("Food Menu").transform);
-               // MenuActive.transform.position = GameObject.Find("Food Menu").transform.position;
-              //  MenuActive.name = "MenuRecipes" ;
-            }
-
-            //UNLOCKS NEXT TUTORIAL STEP
-
+            
            
             if (DishID > -1)
             {
-                Const.AddLogPart("New recipe!", "Новий рецепт","",null);
-                Const.Dishes.Add(pl.inv.GetItemInDatabase(DishID));
-                Const.PlaySound(Clip, 1);
+                Constr.AddLogPart("New recipe!", "Новий рецепт","",null);
+                Constr.Dishes.Add(pl.inv.GetItemInDatabase(DishID));
+                Constr.PlaySound(Clip, 1);
             }
 
             if (UnlockingObject != null)
             {
-                Const.AddLogPart("New decoration!", "Новое украшение!", "", null);
+                Constr.AddLogPart("New decoration!", "Новое украшение!", "", null);
                 UnlockingObject.GetComponent<ProgressionDraw>().Active = true;
             }
 

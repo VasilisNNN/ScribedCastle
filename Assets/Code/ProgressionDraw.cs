@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 using TMPro;
+using NUnit;
 public class ProgressionDraw : MonoBehaviour
 {
   
@@ -15,7 +16,7 @@ public class ProgressionDraw : MonoBehaviour
    
   
 
-    private Constructor constr;
+    private Constructor Constr;
 
     public GameObject[] PrefabObject;
     private int[] Num;
@@ -34,8 +35,9 @@ public class ProgressionDraw : MonoBehaviour
     // Start is called before the first frame update
     public void StartProgression()
     {
-        constr = GameObject.Find("Constructor").GetComponent<Constructor>();
-        pl = GameObject.Find("Player").GetComponent<Player>();
+   
+        pl = InitializeObjects.PL;
+        Constr = InitializeObjects.Constr;
 
 
         Active = true;
@@ -54,7 +56,7 @@ public class ProgressionDraw : MonoBehaviour
 
         if (Recipe)
         {
-            if (constr.Dishes.Count > 2)
+            if (Constr.Dishes.Count > 2)
                 FirstRecipe = true;
         }
         else FirstRecipe = true;
@@ -62,7 +64,7 @@ public class ProgressionDraw : MonoBehaviour
 
         if (FullGame)
         {
-            if (constr.DEMO)
+            if (Constr.DEMO)
             {
                 if (GetComponent<Image>() != null)
                     GetComponent<Image>().enabled = false;
@@ -132,11 +134,11 @@ public class ProgressionDraw : MonoBehaviour
         {
             for (int p = 0; p < PrefabObject.Length; p++)
             {
-                for (int i = 0; i < constr.OBOnBoard.Count; i++)
+                for (int i = 0; i < Constr.OBOnBoard.Count; i++)
                 {
                     if (PrefabObject[p] != null)
                     {
-                        if (constr.OBOnBoard[i].Name == PrefabObject[p].name)
+                        if (Constr.OBOnBoard[i].Name == PrefabObject[p].name)
                         {
                             Num[p] = 1;
                             break;
@@ -154,10 +156,10 @@ public class ProgressionDraw : MonoBehaviour
 
             if (!OnField)
             {
-            if (constr.Floors >= floor &&
-                constr.Walls >= wall &&
-                constr.Humans >= humans &&
-                constr.Grounds >= ground && PrefabIshere && FirstRecipe && setbrush)
+            if (Constr.Floors >= floor &&
+                Constr.Walls >= wall &&
+                Constr.Humans >= humans &&
+                Constr.Grounds >= ground && PrefabIshere && FirstRecipe && setbrush)
                 OnOff(true, 1);
             else
             {

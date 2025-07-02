@@ -5,11 +5,11 @@ using Pathfinding;
 
 public class PathUpdate : MonoBehaviour
 {
-    private CharacterMove CM;
+    private CharacterPath CM;
     private Seeker seeker;
     private Rigidbody2D rb;
     private Player pl;
-    private Constructor _constr;
+
     private float distanceToFinish;
 
     private float currentTime;
@@ -17,17 +17,16 @@ public class PathUpdate : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        _constr = GameObject.Find("Constructor").GetComponent<Constructor>();
-
+        pl = InitializeObjects.PL;
+    
+       
         if (GetComponent<Seeker>() == null) gameObject.AddComponent<Seeker>();
         seeker = GetComponent<Seeker>();
-        CM = GetComponent<CharacterMove>();
+        CM = GetComponent<CharacterPath>();
 
         rb = GetComponent<Rigidbody2D>();
         
-        pl = GameObject.Find("Player").GetComponent<Player>();
-
-
+       
 
         InvokeRepeating("UpdatePath", 0f, 0.25f / CM.SpeedMultiplier);
     }

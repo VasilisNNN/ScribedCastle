@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using NUnit;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -36,8 +37,8 @@ public class Bullet : MonoBehaviour
 
     void Start()
     {
-        pl = GameObject.Find("Player").GetComponent<Player>();
-
+        pl = InitializeObjects.PL;
+ 
 
         if (_SoundType == SoundType.Regular)
         {

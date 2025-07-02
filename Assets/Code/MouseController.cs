@@ -49,7 +49,7 @@ public class MouseController : MonoBehaviour
 
     private void Update()
     {
-        transform.position = new Vector3(Input.mousePosition.x, Input.mousePosition.y, GameObject.Find("Canvas").transform.position.z);
+        transform.position = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0);
 
     }
    

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using NUnit;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +9,8 @@ public class DayNightCheck : MonoBehaviour
     public List<DayAndNight.DayCycle> DayC = new List<DayAndNight.DayCycle>();
     void Start()
     {
-        pl = GameObject.Find("Player").GetComponent<Player>();
+
+        pl = InitializeObjects.PL;
     }
     
     void Update()

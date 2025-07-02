@@ -1,11 +1,10 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using System.Linq;
 using UnityEngine.SceneManagement;
-using Pathfinding;
 using TMPro;
+using static UnityEngine.EventSystems.StandaloneInputModule;
 
 
 
@@ -13,7 +12,7 @@ using TMPro;
 
 public class Player : MonoBehaviour {
 
-    public static Player Instance { get; private set; }
+
     public bool CutSceenMode { get; set; }
 
     public int MaxHP { get; set; }
@@ -50,12 +49,6 @@ public class Player : MonoBehaviour {
 
 
     public int DamageAll { get; set; }
-    public int FireDamage { get; set; }
-    public int IceDamage { get; set; }
-    public int MagicDamage { get; set; }
-    public int MechanicDamage { get; set; }
-    
-
 
     public List<GameObject> coll_obj = new List<GameObject>();
     public List<GameObject> Characters = new List<GameObject>();
@@ -75,45 +68,31 @@ public class Player : MonoBehaviour {
     public DayAndNight DayNight { get; set; }
 
     
-    private Texture2D SaveTexture;
-    private float SaveAlpha;
-
-    
-    private float secondstimer, seconds, minutes, hours, StaminaTimer, HungerTimer;
+    private float StaminaTimer;
     public float MutationTimer { get; set; }
     public float PathRescan { get; set; }
 
     public float PathRescanBoundTimer { get; private set; }
     private Bounds RescanBound;
 
-    private Texture2D BGScreen, MoneyTexture, LoveTexture;
     private float DashTimer;
 
-    private float ControllTextureAlpha;
-    private Texture2D ChoiseTexture;
-
-
-
     public int YPos { get; set; }
-    public int XPos { get; set; }
+  
 
     public float Invinc { get; private set; }
-    private Texture GamepadT, KeyboardT, BG_HP_Black, BG_HP_White;
+
     public float MaxSeconds { get; set; }
     
-    private AudioSource DamageAS;
-    private AudioSource Hit;
-
-
     private List<AudioClip> DamageClips = new List<AudioClip>();
 
-    private AudioClip PickUpMoney, OpenMap, OpenInventory, OpenCardsInv, DeathClip, DashClip;
+    private AudioClip  DashClip;
 
 
     private string StartLayer = "Pers";
     private string ForG = "ItemFG";
     public Inventory inv { get; set; }
-
+    public Journal journal { get; set; }
     private UnityEngine.Audio.AudioMixer mg;
     private bool devmode;
 
@@ -130,9 +109,6 @@ public class Player : MonoBehaviour {
     private GameObject PlayerMask;
     private Material StartMaterial, WhiteMaterial;
     
-    private Vector2 PrevPlayerPos;
-    private bool MouseButtonRight;
-
     private AstarPath AP;
     private bool Dashback;
 
@@ -146,7 +122,7 @@ public class Player : MonoBehaviour {
 
     private Material mat;
 
-    private GameObject BodySPRT, BodyParent, LegLeft, LegRight, Hunger_Scrollbar, HP_Scrollbar, Stamina_Scrollbar;
+    private GameObject Hunger_Scrollbar, HP_Scrollbar, Stamina_Scrollbar;
 
     public Sprite[] LegsSPRTS;
 
@@ -187,28 +163,15 @@ public class Player : MonoBehaviour {
     public bool RestartAllOnDeath;
 
     public bool Showdamage;
-    public bool HeightControllON;
+ 
 
     public int SpeedMultiplier = 1;
 
-    private int layerPlus, parentLayerOrder, layerBuffer, maxChild = 1;
-    private string layerName = "";
-    private BoxCollider2D playerBox, boxCollider;
-
-    private GameObject[] FlippingObjects;
-    private MovementControll obj_movementControll;
-    private SpriteRenderer obj_spriteRenderer, obj_BaseSPRT;
-    private GameObject obj_child;
-
+ 
     private float PixelPerStat;
-    private List<GameObject> batch;
-    
-    private List<GameObject> objectsInRange = new List<GameObject>();
-    public LayerMask LMask;
-    private Collider2D[] colliders;
+  
     private SpriteRenderer Child_SPRT;
 
-    private int testint = 0;
     public bool TEST { get; set; }
 
     private bool AddTestitems;
@@ -222,19 +185,20 @@ public class Player : MonoBehaviour {
     public new Vector2 FlippingRange = new Vector2(10, 7);
     [HideInInspector]
     public GameObject MouseOB;
+    private Rigidbody2D rigidbody2D;
 
+    public LayerSorting LayerSort;
 
     private void Awake()
     {
-        if (Instance == null)
-            Instance = this;
+        LayerSort = GetComponent<LayerSorting>();
 
         TEST = true;
-
+        rigidbody2D = GetComponent<Rigidbody2D>();
         DayNight = GameObject.Find("DayAndNight").GetComponent<DayAndNight>();
         inv = GetComponent<Inventory>();
-
-        playerBox = GetComponent<BoxCollider2D>();
+        journal = GetComponent<Journal>();
+       
 
         if (GameObject.Find("HPBG") != null)
         {
@@ -256,11 +220,7 @@ public class Player : MonoBehaviour {
         if(transform.Find("FightMusic")!=null)
         FightMusic = transform.Find("FightMusic").GetComponent<AudioSource>();
         _constr = GameObject.Find("Constructor").GetComponent<Constructor>();
-        BodySPRT = transform.Find("Body").Find("BodySPRT").gameObject;
-        BodyParent = transform.Find("Body").gameObject;
-        LegLeft = GameObject.Find("LegLeft").gameObject;
-        LegRight = GameObject.Find("LegRight").gameObject;
-
+      
         if (GameObject.Find("PathFinding")!=null)
         AP = GameObject.Find("PathFinding").GetComponent<AstarPath>();
 
@@ -281,45 +241,11 @@ public class Player : MonoBehaviour {
         MaxStamina = 5;
 
         Stamina = MaxStamina;
-
-       // Load();
-        
-        DamageAS = transform.Find("LegsZone").GetComponent<AudioSource>();
-        Hit = transform.Find("Body").GetComponent<AudioSource>();
-
-        DeathClip = Resources.Load<AudioClip>("Sound/UI/Death");
-        PickUpMoney = Resources.Load<AudioClip>("Sound/UI/GetMoney");
-        OpenMap = Resources.Load<AudioClip>("Sound/UI/Map_Open");
-        OpenInventory = Resources.Load<AudioClip>("Sound/UI/Inventory_Open");
-        OpenCardsInv = Resources.Load<AudioClip>("Sound/UI/CardDeck_Open");
-
-        
         DashClip = Resources.Load<AudioClip>("Sound/UI/Dash");
-
         YPos = 0;
-        GamepadT = Resources.Load<Texture2D>("Sprites/UI/Gamepad_icon");
-        KeyboardT = Resources.Load<Texture2D>("Sprites/UI/KeyBoard_icon");
-        BG_HP_Black = Resources.Load<Texture>("Sprites/UI/Level_BG_Black");
-        BG_HP_White = Resources.Load<Texture>("Sprites/UI/Level_BG_White");
-       
-       DamageClips.Add(Resources.Load<AudioClip>("Sound/Hits/Player_Get_Damage_0"));
+        DamageClips.Add(Resources.Load<AudioClip>("Sound/Hits/Player_Get_Damage_0"));
 
-   
-        
-      
-        ChoiseTexture = Resources.Load<Texture2D>("Sprites/UI/ChoiseIcon");
-
-        
-
-        BGScreen = Resources.Load<Texture2D>("Sprites/UI/BGScreen");
-
-        MoneyTexture = Resources.Load<Texture2D>("Sprites/UI/Money");
-        LoveTexture = Resources.Load<Texture2D>("Sprites/UI/Love");
-        
         if (SceneManager.GetActiveScene().name == "CutSceen") CutSceenMode = true;
-
-        SaveTexture = Resources.Load<Texture2D>("Sprites/UI/Flopy");
-     
         
         _transform = transform;
         PlayerAnim = GetComponent<Animator>();
@@ -334,38 +260,21 @@ public class Player : MonoBehaviour {
 
 
         MaxSeconds = 100;
-
-        /* if(SceneManager.GetActiveScene().name!="Menu")
-         Save();*/
-
-       GameObject ChattingUIObject = GameObject.Find("Chatting");
+        GameObject ChattingUIObject = GameObject.Find("Chatting");
 
 
         PlayerMask = GameObject.Find("PlayerMask");
-
         StatsObject = GameObject.Find("Stats");
 
         Hunger_Scrollbar = StatsObject.transform.Find("Hunger_Scrollbar").gameObject;
         HP_Scrollbar = StatsObject.transform.Find("HP_Scrollbar").gameObject;
         Stamina_Scrollbar = StatsObject.transform.Find("Stamina_Scrollbar").gameObject;
+     
+
+
+    }
 
   
-
-        ResetFlippingObjects();
-
-        //PlayerPrefs.DeleteAll();
-
-
-
-
-
-
-    }
-
-    public void ResetFlippingObjects()
-    {
-        FlippingObjects = GameObject.FindGameObjectsWithTag("Flipping");
-    }
 
 
 
@@ -407,7 +316,7 @@ public class Player : MonoBehaviour {
         if (SliderHPUI)
             DrawHPSliders();
 
-        objectsInRange.Clear();
+        /*objectsInRange.Clear();
 
         colliders = Physics2D.OverlapBoxAll(MainCamera.transform.position, FlippingRange , 0f, LMask);
 
@@ -426,23 +335,13 @@ public class Player : MonoBehaviour {
        
       SequentialBatchProcessing(objectsInRange, 40);
 
-
+        */
 
         // if (Input.GetKeyDown(KeyCode.LeftControl)&&Input.GetKeyDown(KeyCode.D))
         // devmode = !devmode;
 
 
-        /*  if (IM.enter_b && IM._horizontal>0) testint ++;
 
-
-
-          if (testint == 5)
-          {
-              TEST = true;
-
-          }
-          else TEST = false;
-          */
 
         if (TEST)
         {
@@ -494,9 +393,7 @@ public class Player : MonoBehaviour {
         if (!_gameover && !menu.MenuONOFF && !_constr.Building && !StartLoading)
         {
             HandleInput();
-            Timer();
-     
-          
+         
         }
 
         Movement();
@@ -541,13 +438,10 @@ public class Player : MonoBehaviour {
 
         if (!GetComponent<AudioSource>().isPlaying) GetComponent<AudioSource>().pitch = 1;
 
-             MouseButtonRight = IM.RightMouseButton;
-
-
         if (StartLoading ||CutSceenMode|| _gameover || _constr.Building || menu.MenuONOFF || inv.blueprintshow || inv.showinvent || Attacking || inv.showjournal || inv.showinvent || _constr.ChooseMouseObject || MutationTimer > Time.fixedTime)
         {
             _normalHSpeed = _normalVSpeed = 0;
-               GetComponent<Rigidbody2D>().velocity = new Vector3(_normalHSpeed * 2.5f, _normalVSpeed * 2.5f, 0);
+            rigidbody2D.velocity = new Vector3(_normalHSpeed * 2.5f, _normalVSpeed * 2.5f, 0);
             return;
         }
 
@@ -574,22 +468,19 @@ public class Player : MonoBehaviour {
 
         UnderAttackAudio();
 
-        GetComponent<Rigidbody2D>().velocity = new Vector3(_normalHSpeed * 2.5f, _normalVSpeed * 2.5f, 0);
+        rigidbody2D.velocity = new Vector3(_normalHSpeed * 2.5f, _normalVSpeed * 2.5f, 0);
         if(CanFlip) Flip();
         
 
     }
 
-
-    //INPUT
     private void HandleInput()
     {
-
-
         CollRemoval();
 
-
-
+        if (IM.Dash)
+            DashHandler();
+        DashStop();
 
     }
 
@@ -648,19 +539,7 @@ public class Player : MonoBehaviour {
         }
     }
 
-    void HeightControll()
-    {
-        BodySPRT.transform.position = new Vector3(BodySPRT.transform.position.x, BodyParent.transform.position.y + 0.04f * Height);
-
-        if (Height < LegsSPRTS.Length)
-        {
-            LegLeft.GetComponent<SpriteRenderer>().sprite = LegsSPRTS[Height];
-            LegRight.GetComponent<SpriteRenderer>().sprite = LegsSPRTS[Height];
-        }
-
-        MainCamera.orthographicSize = CameraNormalSize + 0.35f*Height;
-    }
-
+  
     void DashAnimationAndSound(float DashTimerDuration, string anim_name)
     {
         PlayerAnim.SetBool("Walk", false);
@@ -685,8 +564,7 @@ public class Player : MonoBehaviour {
     {
         if (menu.MenuONOFF) return;
 
-       if(HeightControllON) HeightControll();
-
+       
         if (_transform.Find("Vision") != null)
         {
             _transform.Find("Vision").transform.localScale = new Vector3(0.6f + (Vision * VisionBlackFieldIncreasing), 0.6f + (Vision * VisionBlackFieldIncreasing), 1);
@@ -746,107 +624,6 @@ public class Player : MonoBehaviour {
         }
 
     
-
-        if (IM.Dash )
-        {
-
-  
-
-            int DashSpeed = 5;
-            float DashTimerDuration = 0.15f * DashDuration;
-            if (Stamina < 2)
-            {
-                DashSpeed = 1;
-                DashTimerDuration = 0.05f * DashDuration;
-            }
-
-            if (_normalHSpeed ==0 && _normalVSpeed == 0 && DashTimer < Time.fixedTime)
-            {
-               
-                Invinc = Time.fixedTime + 0.3f * DashDuration;
-                Dashback = true;
-                if (FaceZoneBack.GetCollList().Count == 0)
-                {
-         
-                    _normalHSpeed = DashSpeed * _transform.localScale.x * -1;
-                    _normalVSpeed = 0;
-                }
-
-
-                DashAnimationAndSound(DashTimerDuration, "DashBack");
-            }
-
-            if (Mathf.Abs(_normalHSpeed) >= Mathf.Abs(_normalVSpeed) && _normalHSpeed != 0 && DashTimer < Time.fixedTime)
-            {
-            
-              
-                if (FaceZone.GetCollList().Count == 0)
-                {
-                
-                    Invinc = Time.fixedTime + 0.3f * DashDuration;
-                    _normalHSpeed = DashSpeed * _transform.localScale.x;
-                   
-                }
-
-                DashAnimationAndSound(DashTimerDuration, "Dash");
-
-            }
-
-            if (Mathf.Abs(_normalHSpeed) < Mathf.Abs(_normalVSpeed) && _normalVSpeed < 0 && DashTimer < Time.fixedTime)
-            {
-                
-            
-                if (FaceDownZone.GetComponent<CollList>().GetCollList().Count == 0)
-                {
-                    print("DOWN2");
-                    Invinc = Time.fixedTime + 0.3f * DashDuration;
-                    _normalVSpeed = -DashSpeed;
-                }
-
-                DashAnimationAndSound(DashTimerDuration, "DashDown");
-            }
-
-            if (Mathf.Abs(_normalHSpeed) < Mathf.Abs(_normalVSpeed) && _normalVSpeed > 0 && DashTimer < Time.fixedTime)
-            {
-                
-                if (FaceUpZone.GetCollList().Count == 0)
-                {
-              
-                    Invinc = Time.fixedTime + 0.3f * DashDuration;
-                    _normalVSpeed = DashSpeed;
-                }
-
-
-                DashAnimationAndSound(DashTimerDuration, "DashUp");
-            }
-
-            
-        }
-
-
-
-        if (!Dashback)
-        {
-
-            if (FaceZone.GetCollList().Count > 0 && ( DashTimer > Time.fixedTime))
-            {
-
-                _normalHSpeed = 0;
-                //DashTimer = -1;
-            }
-        }
-        if (FaceDownZone.GetCollList().Count > 0 && _normalVSpeed < 0)
-        {
-            
-            _normalVSpeed = 0;
-           // DashTimer = -1;
-        }
-        if (FaceUpZone.GetCollList().Count > 0 && _normalVSpeed > 0)
-        {
-            _normalVSpeed = 0;
-           // DashTimer = -1;
-        }
-
       
         
         if (StaminaTimer < Time.fixedTime && Stamina< MaxStamina)
@@ -871,153 +648,104 @@ public class Player : MonoBehaviour {
 
     }
 
-
-
-   void SequentialBatchProcessing(List<GameObject> list, int batchSize)
+    void DashStop()
     {
-        for (int i = 0; i < list.Count; i += batchSize)
+        if (!Dashback)
         {
-            batch = list.Skip(i).Take(batchSize).ToList();
-            ProcessBatch(batch);
-        }
-    }
 
-    void ProcessBatch(List<GameObject> batch)
-    {
-     LayerFlipСycle(batch.ToArray());
-    }
-
-
-
-
-    void ObjFlip(GameObject Child, ref int LayerPlus, string LLayer, int ParentLayerOrder, int i, int pluslayer)
-    {
-        Child_SPRT = null;
-        Child_SPRT = Child.GetComponent<SpriteRenderer>();
-
-        if (Child_SPRT == null)
-            return;
-
-
-        Child_SPRT.sortingLayerName = LLayer;
-        Child_SPRT.sortingOrder = ParentLayerOrder + (1 * i + 2);
-
-        if(Child.name == "Base") Child_SPRT.sortingOrder = ParentLayerOrder - 1;
-        if (Child.name == "BG") Child_SPRT.sortingOrder = ParentLayerOrder - 2;
-        LayerPlus = ParentLayerOrder + (1 * i + 2);
-
-    }
-
-
-    void LayerFlipСycle(GameObject[] Perss)
-    {
-        if (Perss == null)
-        {
-            return ;
-        }
-
-
-        if (Perss.Length == 0)
-        {
-            return;
-        }
-             
-
-        for (int p = 0; p < Perss.Length; p++)
-        {
-            ObjectInLayerToFlip(Perss[p]);
-            
-        }
-                    
-                
-            
-        
-    }
-    void ObjectInLayerToFlip(GameObject obj)
-    {
-        if(obj==null) return;
-
-        if (Mathf.Abs(obj.transform.position.x - MainCamera.transform.position.x) >= MainCamera.orthographicSize * 8f ||
-            Mathf.Abs(obj.transform.position.y - MainCamera.transform.position.y) >= MainCamera.orthographicSize * 8f)
-        {
-            return;
-        }
-
-  
-        boxCollider = obj.GetComponent<BoxCollider2D>();
-        obj_movementControll = obj.GetComponent<MovementControll>();
-        obj_spriteRenderer = obj.GetComponent<SpriteRenderer>();
-   
-        if (obj.transform.parent == _constr.transform || (obj.transform.parent != null && obj.transform.parent.tag == "Flipping"))
-        {
-            return;
-        }
-
-
-        if (boxCollider.bounds.min.y < playerBox.bounds.min.y)
-        {
-            layerName = ForG;
-        }
-        else
-        {
-            layerName = StartLayer;
-        }
-
-        layerPlus = 0;
-        parentLayerOrder = 0;
-        layerBuffer = -200;
-        maxChild = 1;
-
-        if (obj_movementControll != null &&
-            obj_movementControll.ObjectOfOccupation != null &&
-            obj_movementControll.ObjectOfOccupation.transform.Find("Base") != null)
-        {
-            obj_BaseSPRT = obj_movementControll.ObjectOfOccupation.transform.Find("Base").GetComponent<SpriteRenderer>();
-
-            obj_spriteRenderer.sortingLayerName = obj_BaseSPRT.sortingLayerName;
-            obj_spriteRenderer.sortingOrder = obj_BaseSPRT.sortingOrder + 1;
-            parentLayerOrder = obj_spriteRenderer.sortingOrder;
-        }
-        else
-        {
-            ApplyLayerOrder(obj, layerName, out parentLayerOrder, layerBuffer, boxCollider.bounds.min.y, boxCollider.bounds.min.x);
-        }
-
-        layerPlus = parentLayerOrder;
-
-        SetChildLayer(obj, layerPlus, layerName);
-
-    }
-
-    void SetChildLayer(GameObject obj, int parentSortingOrder, string layerName)
-    {
-        for (int i = 0; i < obj.transform.childCount; i++)
-        {
-         
-                obj_child = obj.transform.GetChild(i).gameObject;
-
-            if (obj_child.name != "Vision")
+            if (FaceZone.GetCollList().Count > 0 && (DashTimer > Time.fixedTime))
             {
-                ObjFlip(obj_child, ref parentSortingOrder, layerName, parentSortingOrder, -1, 1);
 
-                SetChildLayer(obj_child, parentSortingOrder, layerName);
+                _normalHSpeed = 0;
+
             }
-            
+        }
+        if (FaceDownZone.GetCollList().Count > 0 && _normalVSpeed < 0)
+        {
+
+            _normalVSpeed = 0;
+
+        }
+        if (FaceUpZone.GetCollList().Count > 0 && _normalVSpeed > 0)
+        {
+            _normalVSpeed = 0;
+
+        }
+
+    }
+
+    void DashHandler()
+    {
+
+        int DashSpeed = 5;
+        float DashTimerDuration = 0.15f * DashDuration;
+        if (Stamina < 2)
+        {
+            DashSpeed = 1;
+            DashTimerDuration = 0.05f * DashDuration;
+        }
+
+        if (_normalHSpeed == 0 && _normalVSpeed == 0 && DashTimer < Time.fixedTime)
+        {
+
+            Invinc = Time.fixedTime + 0.3f * DashDuration;
+            Dashback = true;
+            if (FaceZoneBack.GetCollList().Count == 0)
+            {
+
+                _normalHSpeed = DashSpeed * _transform.localScale.x * -1;
+                _normalVSpeed = 0;
+            }
+
+
+            DashAnimationAndSound(DashTimerDuration, "DashBack");
+        }
+
+        if (Mathf.Abs(_normalHSpeed) >= Mathf.Abs(_normalVSpeed) && _normalHSpeed != 0 && DashTimer < Time.fixedTime)
+        {
+
+
+            if (FaceZone.GetCollList().Count == 0)
+            {
+
+                Invinc = Time.fixedTime + 0.3f * DashDuration;
+                _normalHSpeed = DashSpeed * _transform.localScale.x;
+
+            }
+
+            DashAnimationAndSound(DashTimerDuration, "Dash");
+
+        }
+
+        if (Mathf.Abs(_normalHSpeed) < Mathf.Abs(_normalVSpeed) && _normalVSpeed < 0 && DashTimer < Time.fixedTime)
+        {
+
+
+            if (FaceDownZone.GetComponent<CollList>().GetCollList().Count == 0)
+            {
+                print("DOWN2");
+                Invinc = Time.fixedTime + 0.3f * DashDuration;
+                _normalVSpeed = -DashSpeed;
+            }
+
+            DashAnimationAndSound(DashTimerDuration, "DashDown");
+        }
+
+        if (Mathf.Abs(_normalHSpeed) < Mathf.Abs(_normalVSpeed) && _normalVSpeed > 0 && DashTimer < Time.fixedTime)
+        {
+
+            if (FaceUpZone.GetCollList().Count == 0)
+            {
+
+                Invinc = Time.fixedTime + 0.3f * DashDuration;
+                _normalVSpeed = DashSpeed;
+            }
+
+
+            DashAnimationAndSound(DashTimerDuration, "DashUp");
         }
     }
-
-
    
-
-    void ApplyLayerOrder(GameObject ob, string larename, out int outorder, int layerbuffer, float ypos, float xpos)
-    {
-        ob.GetComponent<SpriteRenderer>().sortingLayerName = larename;
-        ob.GetComponent<SpriteRenderer>().sortingOrder = (int)(ypos * layerbuffer) + (int)(xpos);
-        outorder = (int)(ypos * layerbuffer) + (int)(xpos );
-
-
-    }
-
     public void BlowThisSmall(GameObject g)
     {
    
@@ -1041,7 +769,7 @@ public class Player : MonoBehaviour {
         }
 
         Destroy(g);
-        ResetFlippingObjects();
+        LayerSort.ResetFlippingObjects();
     }
 
     public void BlowThis(GameObject g)
@@ -1099,7 +827,7 @@ public class Player : MonoBehaviour {
 
 
         Destroy(g);
-        ResetFlippingObjects();
+        LayerSort.ResetFlippingObjects();
     }
 
 
@@ -1124,33 +852,7 @@ public class Player : MonoBehaviour {
 
 
 
-    void Timer()
-    {
-
-        if (secondstimer < Mathf.Floor(Time.fixedTime) && !_gameover)
-        {
-            
-                seconds++;
-              
-                secondstimer = Mathf.Floor(Time.fixedTime);
-            
-        }
-
-        if (seconds >= 60)
-        {
-            minutes++;
-            seconds = 0;
-            
-        }
-
-
-        if (minutes >= 60)
-        {
-            minutes = 0;
-            hours++;
-        }
-    }
-
+  
 
 
     public void PlayHandsAudio(AudioClip AC, int pitch)
@@ -1178,14 +880,6 @@ public class Player : MonoBehaviour {
     }
 
 
-    public float GetMaxSeconds()
-    {
-        return MaxSeconds;
-    }
-    public float GetSeconds()
-    {
-        return seconds;
-    }
 
     void DrawHPParts()
     {

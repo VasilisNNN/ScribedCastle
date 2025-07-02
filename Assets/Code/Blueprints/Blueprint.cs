@@ -27,9 +27,9 @@ public class Blueprint : MonoBehaviour
     public int DatabaseID;
     public void UpdateBP()
     {
-        CleanBP();
-        pl = GameObject.Find("Player").GetComponent<Player>();
+        pl = InitializeObjects.PL;
 
+        CleanBP();
         _transform = GetComponent<Transform>();
             SaveToBlueprint();
         

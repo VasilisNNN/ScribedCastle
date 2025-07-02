@@ -5,7 +5,7 @@ using UnityEngine.Tilemaps;
 
 public class Steps : MonoBehaviour {
 	public Player pl;
-    public CharacterMove cm;
+    public CharacterPath cm;
     private float _normalHSpeed, _normalVSpeed;
 
     public float delay = 0.35f;
@@ -42,6 +42,10 @@ public class Steps : MonoBehaviour {
     void Start () {
 
         GameObject Grid = GameObject.Find("Grid");
+        foreach (GameObject basechild in Grid.transform)
+        BaseTile.Add(basechild.GetComponent<Tilemap>());
+
+
 
         for (int i = 0; i < Grid.transform.childCount; i++)
         {
@@ -65,8 +69,7 @@ public class Steps : MonoBehaviour {
         roadteps = new int[BaseTile.Count];
         mudsteps = new int[BaseTile.Count];
 
-        //  pl = GameObject.Find("Player").GetComponent<Player>();
-
+       
         AS = GetComponent<AudioSource>();
 
 

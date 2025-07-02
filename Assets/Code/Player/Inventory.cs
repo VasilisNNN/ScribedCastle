@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Tilemaps;
 using TMPro;
@@ -10,17 +8,12 @@ using System.Linq;
 public class Inventory : MonoBehaviour
 {
 
-
-    private List<string> FinalItem = new List<string>();
     public int slotX { get; set; }
     public int slotY;
 
     private int SlotSlide;
 
 
-
-    private float DrawFinalItemTimer, AddMoneyTimer;
-    public GUISkin skin;
     public List<Item> inventory = new List<Item>();
     public List<Item> inventoryFolder = new List<Item>();
     public List<GameObject> slots = new List<GameObject>();
@@ -36,14 +29,10 @@ public class Inventory : MonoBehaviour
 
     public ItemDatabase database { get; set; }
 
-    private string tooltip;
-
 
     public int XChoise { get; set; }
     public int YChoise { get; set; }
 
-    private Rect ActionRect;
-    private float ActionPos, VertDelay;
     // Use this for initialization
     private float slotspace = 0;
 
@@ -51,7 +40,7 @@ public class Inventory : MonoBehaviour
     public int Money { get; set; }
 
     private Vector2 ScreenBorder;
-    private Texture2D ChoiseTexture;
+
 
     private List<GameObject> PickedText = new List<GameObject>();
     private List<string> Picked = new List<string>();
@@ -60,40 +49,26 @@ public class Inventory : MonoBehaviour
 
     private List<float> PickedSlide = new List<float>();
 
-    private List<int> PickedStyles = new List<int>();
     private List<float> PickedSpeeds = new List<float>();
 
 
-    private bool NewQuestBool;
+
     public float HorDelay { get; set; }
     public float ExitingTimer { get; set; }
 
-    
-    private float CardYscroll, CardsWidth;
-
-    private string[] SellTag;
-
-
-    private float[] DescWidth;
     private MenuCustom _menu;
-    public bool Exiting { get; set; }
     public float FadeAlpha { get; set; }
-    public string ExitingString { get; set; }
-    private Texture2D EnterTexture, EnterTexture_J, MoneyTexture, PhoneMessagePlayer, PhoneMessageLover;
-    private int AddedMoney { get; set; }
-    public int MaxAddedMoney { get; set; }
+   
     public bool showjournal { get; set; }
 
     [HideInInspector]
     public AudioClip OpenInventory, OpenCardsInv, PickItem, ClickClip, UIOpen, ShakeClip, TakeItemClip;
 
-    UnityEngine.Audio.AudioMixer aumixer;
-    private float masterfloat;
+
     public bool devmode;
 
-    private float Journal_YStart = 0;
     private Rect[] SlotsRect;
-    private float XStart, WidthSlot;
+    private float  WidthSlot;
     private InputMode IM;
     private GameObject InventoryUIOB, StatsUI, LogUI, BlueprintMenu, LeftFolder, RightFolder;
     public GameObject CraftingUIOB { get; private set; }
@@ -102,14 +77,12 @@ public class Inventory : MonoBehaviour
     public int CurrentItem { get; private set; }
 
     public int CurrentItemID { get; private set; }
-    public int CurrentQuest { get; private set; }
-
+   
     public bool PauseInventory;
-    public List<Quest> Quests = new List<Quest>();
-    private QuestDatabase QD;
+  
 
     [HideInInspector]
-    public GameObject CraftingCross, NewQuest;
+    public GameObject CraftingCross;
 
     public GameObject LeftArrow { get; private set; }
     public GameObject RightArrow { get; private set; }
@@ -117,14 +90,11 @@ public class Inventory : MonoBehaviour
 
     public GameObject EscapeInventory { get; private set; }
 
-
-    private int Quest_YPos;
-    private float Quest_YSlider;
     public GameObject ToolTip { get; private set; }
-    private GameObject QuestMenu, Controlls;
+    private GameObject Controlls;
 
     private bool DrawINV, DrawInvNo;
-    private Constructor _constr;
+    private Constructor Constr;
 
     public GetItem CurrentCraftingTable;
     private bool CraftingDraw;
@@ -132,7 +102,7 @@ public class Inventory : MonoBehaviour
     public List<GameObject> NeedItemGameobject = new List<GameObject>();
 
     [HideInInspector]
-    public GameObject InventoryButton, JournalButton;
+    public GameObject InventoryButton;
 
 
     public bool ChooseTopSegmentSlot { get; set; }
@@ -172,9 +142,16 @@ public class Inventory : MonoBehaviour
 
     private Vector3 ShakePos;
     private float ShakeTimer;
+    private RectTransform CanvasTransform;
 
+    private Tilemap FloorTilemap;
+
+    private Journal JournalOB;
     void Awake()
     {
+        JournalOB = gameObject.AddComponent<Journal>();
+        FloorTilemap = InitializeObjects.FloorTilemap;
+        CanvasTransform = InitializeObjects.CanvasTransform.GetComponent<RectTransform>();
 
         for (int i = 0; i < 10; i++)
         {
@@ -187,71 +164,38 @@ public class Inventory : MonoBehaviour
 
 
         }
-        EscapeInventory = GameObject.Find("EscapeInventory");
-
         BufferItem = new Item();
-        InventoryButton = GameObject.Find("InventoryButton");
-        JournalButton = GameObject.Find("JournalButton");
-        BlueprintMenu = GameObject.Find("BlueprintMenu");
 
+        EscapeInventory = GameObject.Find("EscapeInventory");
+        InventoryButton = GameObject.Find("InventoryButton");
+        BlueprintMenu = GameObject.Find("BlueprintMenu");
         CraftingCross = GameObject.Find("CraftingCross");
-        StatsUI = GameObject.Find("Canvas").transform.Find("Stats").gameObject;
+        StatsUI = CanvasTransform.transform.Find("Stats").gameObject;
 
         if(GameObject.Find("VaultUI")!=null)
         VaultUI = GameObject.Find("VaultUI").GetComponent<ItemsSlotsUI>();
 
-        LogUI = GameObject.Find("Canvas").transform.Find("Log").gameObject;
+        LogUI = CanvasTransform.transform.Find("Log").gameObject;
 
         CurrentItemID = -1;
-        _constr = GameObject.Find("Constructor").GetComponent<Constructor>();
 
-        _menu = _constr.GetComponent<MenuCustom>();
+        Constr = InitializeObjects.Constr;
+        pl = GetComponent<Player>();
 
-        QuestMenu = GameObject.Find("QuestMenu");
-        NewQuest = GameObject.Find("NewQuest");
-
-
-        QD = GetComponent<QuestDatabase>();
-
-        EnterTexture = Resources.Load<Texture2D>("Sprites/UI/EButton");
-        EnterTexture_J = Resources.Load<Texture2D>("Sprites/UI/EButton_J");
-
-        OpenInventory = Resources.Load<AudioClip>("Sound/UI/Inventory_Open");
-        OpenCardsInv = Resources.Load<AudioClip>("Sound/UI/CardDeck_Open");
-        PickItem = Resources.Load<AudioClip>("Sound/Items/PickItem");
-
-        UIOpen = Resources.Load<AudioClip>("Sound/UI/UI_Open");
-
-        ClickClip = Resources.Load<AudioClip>("Sound/UI/Click_0");
-        ShakeClip = Resources.Load<AudioClip>("Sound/UI/UI_Shake");
-        TakeItemClip = Resources.Load<AudioClip>("Sound/UI/Accept");
-
+        _menu = Constr.GetComponent<MenuCustom>();
+        database = InitializeObjects.Itemdatabase;
         Controlls = GameObject.Find("Controlls");
 
         FadeAlpha = 1;
-        masterfloat = -40;
 
-        aumixer = Resources.Load<UnityEngine.Audio.AudioMixer>("Sound/NewAudioMixer");
-        aumixer.SetFloat("Master", 0);
-
-    
-        SellTag = new string[2] { "Sell", "Продать" };
-        DescWidth = new float[2];
-
-        ChoiseTexture = Resources.Load<Texture2D>("Sprites/UI/Choose");
-        MoneyTexture = Resources.Load<Texture2D>("Sprites/UI/Money");
-        PhoneMessagePlayer = Resources.Load<Texture2D>("Sprites/UI/Noun");
-        PhoneMessageLover = Resources.Load<Texture2D>("Sprites/UI/Adjective");
-
-
-        skin = Resources.Load<GUISkin>("Prefabs/New GUISkin");
-        pl = GetComponent<Player>();
+        LoadSounds();
+        
         XChoise = 0;
         YChoise = 0;
 
         if (GameObject.Find("CraftingUI") == null)
         {
-            CraftingUIOB = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/CraftingUI"), GameObject.Find("Canvas").transform);
+            CraftingUIOB = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/CraftingUI"), CanvasTransform);
             CraftingUIOB.name = "CraftingUI";
             CraftingUIOB = GameObject.Find("CraftingUI");
 
@@ -264,49 +208,28 @@ public class Inventory : MonoBehaviour
 
         if (GameObject.Find("InventoryUI") == null)
         {
-            GameObject INV = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/InventoryUI"), GameObject.Find("Canvas").transform);
+            GameObject INV = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/InventoryUI"), CanvasTransform);
             INV.name = "InventoryUI";
             INV = GameObject.Find("InventoryUI");
 
         }
         else InventoryUIOB = GameObject.Find("InventoryUI");
 
-
-
-
-
         FolderButtons.Add(InventoryUIOB.transform.Find("BuildingsFolderButton").gameObject);
         FolderButtons.Add(InventoryUIOB.transform.Find("GrassFolderButton").gameObject);
         FolderButtons.Add(InventoryUIOB.transform.Find("StoneFolderButton").gameObject);
-
 
         LeftFolder = InventoryUIOB.transform.Find("LeftFolder").gameObject;
         RightFolder = InventoryUIOB.transform.Find("RightFolder").gameObject;
 
 
-
         ToolTip = InventoryUIOB.transform.Find("ToolTip").gameObject;
-
-        if (GameObject.Find("ItemDatabase") != null)
-            database = GameObject.Find("ItemDatabase").GetComponent<ItemDatabase>();
-        else
-        {
-            gameObject.AddComponent<ItemDatabase>();
-            database = GetComponent<ItemDatabase>();
-        }
 
         LeftArrow = InventoryUIOB.transform.Find("LeftArrow").gameObject;
         RightArrow = InventoryUIOB.transform.Find("RightArrow").gameObject;
 
-    
-        
-        int craftingslotNUM = craftingslotX * craftingslotY;
-
-     
-
         Choose = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/ChooseUI"), InventoryUIOB.transform);
         Choose.name = "InvChoose";
-
 
         IM = GetComponent<InputMode>();
 
@@ -314,20 +237,29 @@ public class Inventory : MonoBehaviour
         RightArrow.SetActive(false);
         LeftArrow.SetActive(false);
    
-
-        ONOFF(NewQuest, false);
-        ONOFF(QuestMenu, false);
-     
         ONOFF(EscapeInventory, false);
-        NewQuestBool = false;
+   
         LoadSlots();
 
 
        
     }
 
+    void LoadSounds()
+    {
+        OpenInventory = Resources.Load<AudioClip>("Sound/UI/Inventory_Open");
+        OpenCardsInv = Resources.Load<AudioClip>("Sound/UI/CardDeck_Open");
+        PickItem = Resources.Load<AudioClip>("Sound/Items/PickItem");
 
-     public  void LoadSlots()
+        UIOpen = Resources.Load<AudioClip>("Sound/UI/UI_Open");
+
+        ClickClip = Resources.Load<AudioClip>("Sound/UI/Click_0");
+        ShakeClip = Resources.Load<AudioClip>("Sound/UI/UI_Shake");
+        TakeItemClip = Resources.Load<AudioClip>("Sound/UI/Accept");
+
+    }
+
+    public  void LoadSlots()
     {
         slotX = database.items.Count + 20;
         SlotsRect = new Rect[database.items.Count + 1000];
@@ -375,15 +307,13 @@ public class Inventory : MonoBehaviour
 
         if (pl.IM._vertical > 0.5f || pl.IM._vertical < -0.5f)
         {
-            if (pl.inv.CurrentItem < 0)
-                pl.inv.CurrentItem = 0;
+            if (CurrentItem < 0)
+                CurrentItem = 0;
         }
 
-        if (Quest_YSlider != 0) 
-            Quest_YPos = 0;
-        
+   
         Crafting();
-        Journal();
+  
 
         ExitFromInventory();
         ShowPicketItems();
@@ -392,7 +322,7 @@ public class Inventory : MonoBehaviour
         if (pl.GetComponent<Achivements>()!=null) 
             ShowAch = pl.GetComponent<Achivements>().ShowAch;
 
-        if(!blueprintshow)
+       
         Start_Close_Inventory();
         
         ONOFF_Inventory();
@@ -434,8 +364,9 @@ public class Inventory : MonoBehaviour
             pl.menu.MenuONOFF ||
             pl.Chatting ||
             ShowAch ||
-            _constr.TutorialPause || 
-            pl.StartLoading)
+            Constr.TutorialPause || 
+            pl.StartLoading || 
+            blueprintshow)
             return;
 
 
@@ -446,17 +377,16 @@ public class Inventory : MonoBehaviour
             if (!showinvent)
             {
                 PlaySoundsPitched(UIOpen,0.8f);
-                _constr.DeActivateBuilding();
+                Constr.DeActivateBuilding();
                 PauseInventory = false;
                 crafting = false;
 
                 CurrentItem = 0;
                 SlotSlide = 0;
 
-                SetSlots();
             }
 
-            _constr.ChooseMouseObject = false;
+            Constr.ChooseMouseObject = false;
 
             if (showinvent && !crafting )
             {
@@ -466,8 +396,13 @@ public class Inventory : MonoBehaviour
               
                     Choose.transform.position = slots[CurrentItem].transform.position;
                     PauseInventory = false;
+  
                 UpdateInvFolder();
             }
+
+
+            SetSlots();
+
 
             IM.ActionDelay = Time.fixedTime + 0.2f;
         }
@@ -485,10 +420,11 @@ public class Inventory : MonoBehaviour
 
                 LeftArrow.SetActive(false);
                 RightArrow.SetActive(false);
-
+               
                 ONOFF(GameObject.Find("ButtonsUI"), true);
 
                 ONOFF(Controlls, true);
+                
                 DrawInventory(false);
                 DrawINV = false;
             }
@@ -496,8 +432,8 @@ public class Inventory : MonoBehaviour
         }
 
         if (DrawINV) return;
-        
-        _constr.DeActivateBuildingNOINV();
+
+        Constr.DeActivateBuildingNOINV();
         ONOFF(GameObject.Find("ButtonsUI"), false);
         ONOFF(Controlls, false);
         DrawInventory(true);
@@ -655,21 +591,21 @@ public class Inventory : MonoBehaviour
 
     void UpdateFolderNumber(int ID)
     {
-        if (!pl.inv.GetItemInDatabase(ID).Structure) return;
+        if (!GetItemInDatabase(ID).Structure) return;
 
         if (crafting)
         {
             for (int i = 0; i < inventory.Count; i++)
             {
-                if (pl.inv.GetItemInDatabase(ID)._StructureType == Item.StructureType.Building||
-                    pl.inv.GetItemInDatabase(ID)._StructureType == Item.StructureType.Protection||
-                       pl.inv.GetItemInDatabase(ID)._StructureType == Item.StructureType.Decoration)
+                if (GetItemInDatabase(ID)._StructureType == Item.StructureType.Building||
+                    GetItemInDatabase(ID)._StructureType == Item.StructureType.Protection||
+                       GetItemInDatabase(ID)._StructureType == Item.StructureType.Decoration)
                     CurrentFolder = 0;
 
-                if (pl.inv.GetItemInDatabase(ID)._StructureType == Item.StructureType.Tiles)
+                if (GetItemInDatabase(ID)._StructureType == Item.StructureType.Tiles)
                     CurrentFolder = 1;
 
-                if (pl.inv.GetItemInDatabase(ID)._StructureType == Item.StructureType.Farms)
+                if (GetItemInDatabase(ID)._StructureType == Item.StructureType.Farms)
                     CurrentFolder = 2;
             }
         }
@@ -779,7 +715,7 @@ public class Inventory : MonoBehaviour
 
         ONOFF(GameObject.Find("ButtonsUI"), true);
         ONOFF(Controlls, true);
-        if (showjournal) DrawJournal(false);
+        if (showjournal) JournalOB.DrawJournal(false);
         if (showinvent) DrawInventory(false);
         crafting = false;
         showinvent = false;
@@ -1178,62 +1114,6 @@ public class Inventory : MonoBehaviour
 
 
 
-    void DrawJournal(bool TF)
-    {
-
-
-        //Quest_YSlider = QuestMenu.transform.Find("Scrollbar").GetComponent<Scrollbar>().value;
-        print("Quest_YSlider " + Quest_YSlider);
-        ONOFF(QuestMenu, TF);
-
-        for (int i = 0; i < Quests.Count; i++)
-        {
-
-            if (QuestMenu.transform.Find("Quest" + i) != null)
-            {
-                QuestMenu.transform.Find("Quest" + i).Find("Text").gameObject.GetComponent<TextMeshProUGUI>().text = Quests[i].Description[0];
-                
-                if (Quests[i].Done)
-                {
-                    QuestMenu.transform.Find("Quest" + i).Find("QuestMark").GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/UI/QuestDone");
-                }
-
-            }
-            else
-            {
-
-                if (Quests[i].Started)
-                {
-
-
-                    GameObject QuestOB = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/QuestPart"), QuestMenu.transform);
-                    QuestOB.transform.position = new Vector3(QuestMenu.transform.position.x, QuestMenu.transform.position.y + (i * -140f) - 10f, 0);
-                    QuestOB.name = "Quest" + i;
-                    QuestOB.transform.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().text = Quests[i].Description[0];
-                }
-
-
-                if (Quests[i].Done)
-                {
-                    QuestMenu.transform.Find("Quest" + i).Find("QuestMark").GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/UI/QuestDone");
-                }
-            }
-        }
-
-
-
-
-
-    }
-
-
-
-    public void AddMoney(int max)
-    {
-        AddedMoney = 0;
-        MaxAddedMoney = max;
-    }
-
 
   
 
@@ -1241,7 +1121,7 @@ public class Inventory : MonoBehaviour
     public void ONOFF(GameObject g, bool TF)
     {
         if (g == null) return;
-        if (g.transform.parent == _constr.transform) return;
+        if (g.transform.parent == Constr.transform) return;
 
         TurnComponentsONOFF(g, TF);
         ToggleThroughChild(g.transform, TF);
@@ -1264,6 +1144,10 @@ public class Inventory : MonoBehaviour
 
     void TurnComponentsONOFF(GameObject g, bool TF)
     {
+        if (g.GetComponent<GamepadUI>() != null && _menu.HideUI && TF)
+            return;
+
+
         if (g.GetComponent<DrawIfActive>() != null) return;
 
 
@@ -1290,44 +1174,10 @@ public class Inventory : MonoBehaviour
        /* if (g.GetComponent<Character>() != null)
             g.GetComponent<Character>().enabled = TF;
        */
-       if (g.GetComponent<CharacterMove>() != null)
-          g.GetComponent<CharacterMove>().enabled = TF;
+       if (g.GetComponent<CharacterPath>() != null)
+          g.GetComponent<CharacterPath>().enabled = TF;
     }
 
-
-    public void AddQuestNoNew(int QID)
-    {
-
-        for (int i = 0; i < QD.QuestsEN.Count; i++)
-        {
-            if (QD.QuestsEN[i].ID == QID && !QD.QuestsEN[i].Started && !Quests.Contains(QD.QuestsEN[i]))
-            {
-                Quests.Add(QD.QuestsEN[i]);
-                Quests[Quests.Count - 1].Started = true;
-                QD.QuestsEN[i].Started = true;
-            }
-        }
-
-    }
-
-    public void AddQuest(string QName)
-    {
-
-        ONOFF(NewQuest, true);
-
-
-        NewQuestBool = true;
-        for (int i = 0; i < QD.QuestsEN.Count; i++)
-        {
-            if (QD.QuestsEN[i].NAME == QName && !QD.QuestsEN[i].Started)
-            {
-                Quests.Add(QD.QuestsEN[i]);
-                Quests[Quests.Count - 1].Started = true;
-                QD.QuestsEN[i].Started = true;
-            }
-        }
-
-    }
 
   
     void Crafting()
@@ -1343,7 +1193,7 @@ public class Inventory : MonoBehaviour
             if(VaultUI!=null)
             VaultUI.CloseUI();
 
-           // ONOFF(StatsUI, false);
+            SetSlots();
             ONOFF(LogUI, false);
             CraftingDraw = true;
         }
@@ -1375,9 +1225,14 @@ public class Inventory : MonoBehaviour
 
         if (pl.GetMouseCollList().Contains(CraftingCross) && pl.IM.LeftMouseButtonDown)
         {
-            ONOFF(GameObject.Find("ButtonsUI"), true);
-            ONOFF(Controlls, true);
-            if (showjournal) DrawJournal(false);
+            if (Constr.ShowChargeUI)
+            {
+                ONOFF(GameObject.Find("ButtonsUI"), true);
+                ONOFF(Controlls, true);
+            }
+
+
+            if (showjournal) JournalOB.DrawJournal(false);
             if (showinvent) DrawInventory(false);
             crafting = false;
 
@@ -1465,103 +1320,13 @@ public class Inventory : MonoBehaviour
 
     }
 
-    public void AddQuest(int QID)
-    {
+   
 
-
-        ONOFF(NewQuest, true);
-        NewQuestBool = true;
-
-        for (int i = 0; i < QD.QuestsEN.Count; i++)
-        {
-            if (QD.QuestsEN[i].ID == QID && !QD.QuestsEN[i].Started && !Quests.Contains(QD.QuestsEN[i]))
-            {
-                Quests.Add(QD.QuestsEN[i]);
-                Quests[Quests.Count - 1].Started = true;
-                QD.QuestsEN[i].Started = true;
-            }
-        }
-
-    }
-
-
-    void Journal()
-    {
-        bool canToggleJournal = (
-            (
-                pl.GetMouseCollList().Contains(JournalButton) &&
-                pl.IM.LeftMouseButtonDown &&
-                JournalButton.GetComponent<Image>().enabled
-            ) || pl.IM.journal_b
-            ) && IM.ActionDelay < Time.fixedTime &&
-            !showinvent &&
-            !pl.menu.MenuONOFF &&
-            !pl.Chatting &&
-            !ShowAch;
-
-        if (canToggleJournal)
-        {
-            showjournal = !showjournal;
-
-            ONOFF(Controlls, showjournal);
-            DrawJournal(showjournal);
-            ONOFF(NewQuest, showjournal);
-
-            IM.ActionDelay = Time.fixedTime + 0.1f;
-            NewQuestBool = false;
-        }
-
-        if (!showjournal) return;
-
-        // Update quest UI entries
-        for (int i = 0; i < Quests.Count; i++)
-        {
-            Transform questEntry = QuestMenu.transform.Find("Quest" + i);
-            if (questEntry == null) continue;
-
-            questEntry.Find("Text").GetComponent<TextMeshProUGUI>().text = Quests[i].Description[0];
-
-            if (Quests[i].Done)
-            {
-                questEntry.Find("QuestMark").GetComponent<Image>().sprite =
-                    Resources.Load<Sprite>("Sprites/UI/QuestDone");
-            }
-        }
-
-        if (Quests.Count <= 1) return;
-
-        QuestMenu.transform.Find("Header")?.SetAsLastSibling();
-
-        // Handle vertical input for quest scrolling
-        bool scrollUp = (pl.IM._vertical < 0 || pl.IM.DPADY < 0) && CurrentQuest > 0 && VertDelay < Time.fixedTime;
-        bool scrollDown = (pl.IM._vertical > 0 || pl.IM.DPADY > 0) && CurrentQuest < Quests.Count - 1 && VertDelay < Time.fixedTime;
-
-        if (scrollUp || scrollDown)
-        {
-            CurrentQuest += scrollDown ? 1 : -1;
-            pl.PlaySoundsPitched(ClickClip, scrollDown ? 1f : 0.8f);
-
-            float offset = CurrentQuest * 100f;
-            for (int i = 0; i < Quests.Count; i++)
-            {
-                Transform questEntry = QuestMenu.transform.Find("Quest" + i);
-                if (questEntry == null) continue;
-
-                questEntry.position = new Vector3(
-                    QuestMenu.transform.position.x,
-                    QuestMenu.transform.position.y + (i * -140f) - 10f + offset,
-                    0
-                );
-            }
-
-            VertDelay = Time.fixedTime + 0.1f;
-        }
-    }
-
+  
     void ChooseUIAndTooltipPositions()
     {
-        if (!showinvent) pl.inv.ToolTip.SetActive(false);
-        else pl.inv.ToolTip.SetActive(true);
+        if (!showinvent) ToolTip.SetActive(false);
+        else ToolTip.SetActive(true);
 
         if (IM.ActionDelay > Time.fixedTime || PauseInventory) return;
         
@@ -1593,7 +1358,7 @@ public class Inventory : MonoBehaviour
 
 
 
-                Choose.transform.position = slots[CurrentItem].transform.position + pl.inv.ShakeVector();
+                Choose.transform.position = slots[CurrentItem].transform.position + ShakeVector();
             }
 
 
@@ -1611,7 +1376,7 @@ public class Inventory : MonoBehaviour
             else
 
             {
-                Choose.transform.position = pl.MouseUI.transform.position + pl.inv.ShakeVector();
+                Choose.transform.position = pl.MouseUI.transform.position + ShakeVector();
 
             }
             ToolTip.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "";
@@ -1666,12 +1431,12 @@ public class Inventory : MonoBehaviour
 
     void CorrectDropPosition(ref Vector3 DropPos, int d)
     {
-        if (_constr.DroppedItems[d] == null) return;
+        if (Constr.DroppedItems[d] == null) return;
         
-        if (DropPos != _constr.DroppedItems[d].transform.position) return;
+        if (DropPos != Constr.DroppedItems[d].transform.position) return;
 
        
-        if (_constr.GreyMap.GetTile(_constr.GreyMap.WorldToCell(DropPos)) != null)
+        if (Constr.GreyMap.GetTile(Constr.GreyMap.WorldToCell(DropPos)) != null)
         {
            
             DropPos += new Vector3(0.5f, 0, 0);
@@ -1785,9 +1550,9 @@ public class Inventory : MonoBehaviour
         if (GetCurrentItem().Structure )
         {
 
-            _constr.SetToPlayerPos();
+            Constr.SetToPlayerPos();
             if (GetCurrentItem().TargetTileMap == null)
-                SetToMouse(GetCurrentItem().ObjectPrefs, 0, 0, GameObject.Find("Floor").GetComponent<Tilemap>(), GetCurrentItem().itemID);
+                SetToMouse(GetCurrentItem().ObjectPrefs, 0, 0, FloorTilemap, GetCurrentItem().itemID);
             else SetToMouse(GetCurrentItem().ObjectPrefs, 0, 0, GetCurrentItem().TargetTileMap, GetCurrentItem().itemID);
        
             showinvent = false;
@@ -1807,42 +1572,42 @@ public class Inventory : MonoBehaviour
     {
         TileBase[] TargetBrush = new TileBase[0];
 
-        if (pl.inv.GetCurrentItem().TargetBrush != null)
-            TargetBrush = pl.inv.GetCurrentItem().TargetBrush;
+        if (GetCurrentItem().TargetBrush != null)
+            TargetBrush = GetCurrentItem().TargetBrush;
 
         if (TargetBrush == null)
             TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Isometric/Ground") };
-   
 
-        if (_constr.OnUIDelay < Time.fixedTime)
+
+        if (Constr.OnUIDelay >= Time.fixedTime) return;
+        
+        if (GetComponent<ProgressionDraw>() == null)
         {
-            if (GetComponent<ProgressionDraw>() == null)
-            {
-                if (GetComponent<AudioSource>() != null)
-                    GetComponent<AudioSource>().Play();
+            if (GetComponent<AudioSource>() != null)
+                GetComponent<AudioSource>().Play();
 
           
-                SetObjectOnMouse(
-                    ObjectPrefs,
-                    SetObList,
-                    NumInList,
-                    TargetBrush,
-                    TargetMap, ID, null, null);
+            SetObjectOnMouse(
+                ObjectPrefs,
+                SetObList,
+                NumInList,
+                TargetBrush,
+                TargetMap, ID, null, null);
 
-            }
-            else
-            {
-                if (GetComponent<ProgressionDraw>().Active)
-                {
-                    GetComponent<AudioSource>().Play();
-                    SetObjectOnMouse(ObjectPrefs, SetObList, NumInList, TargetBrush, TargetMap, ID, GetComponent<ProgressionDraw>().ItemNeeded, GetComponent<ProgressionDraw>().ItemNeededCount);
-
-
-                }
-            }
-
-            _constr.OnUIDelay = Time.fixedTime + 0.1f;
         }
+        else
+        {
+            if (GetComponent<ProgressionDraw>().Active)
+            {
+                GetComponent<AudioSource>().Play();
+                SetObjectOnMouse(ObjectPrefs, SetObList, NumInList, TargetBrush, TargetMap, ID, GetComponent<ProgressionDraw>().ItemNeeded, GetComponent<ProgressionDraw>().ItemNeededCount);
+
+
+            }
+        }
+
+        Constr.OnUIDelay = Time.fixedTime + 0.1f;
+        
     }
 
     public void Shake(Vector3 newshake)
@@ -1884,12 +1649,12 @@ public class Inventory : MonoBehaviour
 
     void SetObjectOnMouse(GameObject n, int c, int numinlist, TileBase[] TargetTile, Tilemap TMAP, int ID, int[] NeedeItems, int[] ItemNeededCounts)
     {
-       _constr.MenuNumber = c;
+        Constr.MenuNumber = c;
 
-        if (_constr.transform.childCount > 0)
+        if (Constr.transform.childCount > 0)
         {
-            for (int j = 0; j < _constr.transform.childCount; j++)
-                Destroy(_constr.transform.GetChild(j).gameObject);
+            for (int j = 0; j < Constr.transform.childCount; j++)
+                Destroy(Constr.transform.GetChild(j).gameObject);
         }
 
         if (n.GetComponent<StatsControll>() != null)
@@ -1900,7 +1665,7 @@ public class Inventory : MonoBehaviour
 
 
         GameObject i = Instantiate<GameObject>(n,
-            _constr.transform);
+            Constr.transform);
 
         if (i.GetComponent<StatsControll>() != null)
             i.GetComponent<StatsControll>().enabled = false;
@@ -1921,8 +1686,8 @@ public class Inventory : MonoBehaviour
         if (i.GetComponent<MovementControll>() != null)
             i.GetComponent<MovementControll>().enabled = false;
 
-        if (i.GetComponent<CharacterMove>() != null)
-            i.GetComponent<CharacterMove>().enabled = false;
+        if (i.GetComponent<CharacterPath>() != null)
+            i.GetComponent<CharacterPath>().enabled = false;
 
         if (n.GetComponent<Animator>() != null)
             n.GetComponent<Animator>().enabled = false;
@@ -1936,27 +1701,47 @@ public class Inventory : MonoBehaviour
         if (i.GetComponent<PathUpdate>() != null)
             i.GetComponent<PathUpdate>().enabled = false;
 
-        i.transform.position = new Vector2(_constr.transform.position.x + 0.5f, _constr.transform.position.y + 0.5f);
+        i.transform.position = new Vector2(Constr.transform.position.x + 0.5f, Constr.transform.position.y + 0.5f);
         i.name = "Mouse" + n.name;
 
         i.GetComponent<PubObject>()._TileBase = TargetTile[0];
 
-        _constr.ItemNeeded = NeedeItems;
-        _constr.ItemNeededCount = ItemNeededCounts;
+        Constr.ItemNeeded = NeedeItems;
+        Constr.ItemNeededCount = ItemNeededCounts;
 
         i.GetComponent<PubObject>().MAPS = TMAP;
       
-        // i.GetComponent<PubObject>().floors = TMAP;
-
         i.GetComponent<PubObject>().TrueName.Add(n.name);
-        _constr.OnButtonID = ID;
+
+        Constr.OnButtonID = ID;
 
         if (!VaultUI.showthis)
-            _constr.ActivateBuilding();
-        
+            Constr.ActivateBuilding();
+
+        if (Constr.ShowChargeUI)
+        {
+            ONOFF(GameObject.Find("ButtonsUI"), true);
+            ONOFF(Controlls, true);
+        }
+
+
+        if (showjournal) JournalOB.DrawJournal(false);
+        if (showinvent) DrawInventory(false);
+        crafting = false;
+
+
+        showinvent = false;
+        showjournal = false;
+        DrawINV = false;
+
+        LeftArrow.SetActive(false);
+        RightArrow.SetActive(false);
+
+
+
         UpdateInvFolder();
-        _constr.RandomisedNumber = 0;
-        _constr.ChooseMouseObject = false;
+        Constr.RandomisedNumber = 0;
+        Constr.ChooseMouseObject = false;
      
     }
 
@@ -1968,17 +1753,14 @@ public class Inventory : MonoBehaviour
         if (BufferItem.itemID > -1)
         {
 
-            AddItem(pl.inv.BufferItem.itemID, pl.inv.BufferItem.Count, pl.inv.BufferItem.Durability, pl._transform.position);
+            AddItem(BufferItem.itemID, BufferItem.Count, BufferItem.Durability, pl._transform.position);
             PlaySoundsPitched(TakeItemClip, 1);
             BufferItem = new Item();
             //if (showinvent)
             //  pl.menu.ActionDelay = Time.fixedTime + 0.2f;
         }
 
-        //  pl.inv.ONOFF(gameObject, false);
-
-        //  if (crafting) return;
-
+        
 
         PauseInventory = false;
         ChooseTopSegmentSlot = false;
@@ -1989,18 +1771,18 @@ public class Inventory : MonoBehaviour
     void DropItemBody(Vector3 DropPos, int count, int[] ItemDrop_ID, int durability)
     {
 
-        if (_constr.DroppedItems.Count >= 500)
+        if (Constr.DroppedItems.Count >= 500)
         {
-            _constr.AddLogPart("Cant drop. Too many items on the floor", "Не можна кинути, забагато айтемів на підлозі", "落とせない。床にアイテムが多すぎる", gameObject);
+            Constr.AddLogPart("Cant drop. Too many items on the floor", "Не можна кинути, забагато айтемів на підлозі", "落とせない。床にアイテムが多すぎる", gameObject);
             return;
         }
    
 
 
-            for (int d = 0; d < _constr.DroppedItems.Count; d++)
-            {
-                CorrectDropPosition(ref DropPos, d);
-            }
+        for (int d = 0; d < Constr.DroppedItems.Count; d++)
+        {
+            CorrectDropPosition(ref DropPos, d);
+        }
 
 
 
@@ -2011,7 +1793,7 @@ public class Inventory : MonoBehaviour
             {
 
                 GameObject NewItem = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Objects/Item"));
-                NewItem.name = "Dropped Item " + _constr.DroppedItems.Count;
+                NewItem.name = "Dropped Item " + Constr.DroppedItems.Count;
                 NewItem.transform.position = DropPos + new Vector3(0.5f * j, 0, 0);
                 NewItem.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/" + GetItemInDatabase(ItemDrop_ID[j]).itemNames[0]);
                 NewItem.GetComponent<GetItem>().item = new int[1] { ItemDrop_ID[j] };
@@ -2024,7 +1806,7 @@ public class Inventory : MonoBehaviour
                 NewItem.GetComponent<StatsControll>().ItemCount = count;
 
 
-                _constr.DroppedItems.Add(NewItem);
+                Constr.DroppedItems.Add(NewItem);
 
                 if (pl.menu.SL.ObjectsToDestroy.Contains(NewItem.name)) pl.menu.SL.ObjectsToDestroy.Remove(NewItem.name);
             }
@@ -2039,26 +1821,26 @@ public class Inventory : MonoBehaviour
 
         WidthSlot = 120;
         ScreenBorder = new Vector2(WidthSlot/1.5f , WidthSlot/1.5f);
- 
+
+        WidthSlot = CanvasTransform.rect.width / 16f;
+        slotspace = CanvasTransform.rect.height / 192f;
 
         for (int i = 0; i < slots.Count; i++)
         {
-#if UNITY_SWITCH
+/*#if UNITY_SWITCH
                    
         slotspace = 5;
             Vector3 c = new Vector3(i * WidthSlot/1.2f - SlotSlide * WidthSlot/1.2f, ScreenBorder.y, 0);
             SlotsRect[i] = new Rect( c.x , c.y , WidthSlot - slotspace, WidthSlot  - slotspace);
-#endif
-#if UNITY_STANDALONE || UNITY_PS5 || UNITY_PS4
-            slotspace = 10;
-            Vector3 c = new Vector3(i * (WidthSlot + slotspace) - SlotSlide * WidthSlot, ScreenBorder.y, 0);
-            SlotsRect[i] = new Rect(c.x , c.y, WidthSlot - slotspace, WidthSlot - slotspace);
-#endif
+#endif*/
+        
+          
+            Vector2 pos = new Vector2(i * (WidthSlot + slotspace) - SlotSlide * WidthSlot, -CanvasTransform.rect.height/2+ ScreenBorder.y);
 
+            RectTransform rt = slots[i].GetComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(ScreenBorder.x + pos.x, pos.y);
 
-            slots[i].GetComponent<RectTransform>().position = new Vector2(ScreenBorder.x + SlotsRect[i].x, SlotsRect[i].y);
-            slots[i].GetComponent<RectTransform>().sizeDelta = new Vector2(WidthSlot, WidthSlot);
-
+            rt.sizeDelta = new Vector2(WidthSlot, WidthSlot);
         }
 
 
@@ -2163,9 +1945,9 @@ public class Inventory : MonoBehaviour
     public Item DeepCopyItem(int id, int count, int durability)
     {
         Item result = new Item();
-        Item T = pl.inv.GetItemInDatabase(id);
+        Item T = GetItemInDatabase(id);
 
-        if (pl.inv.GetItemInDatabase(id) == null)
+        if (GetItemInDatabase(id) == null)
         {
            
             return result;
@@ -2332,7 +2114,7 @@ public class Inventory : MonoBehaviour
 
 
 
-        if (pl.inv.GetItemInDatabase(i.itemID).Locked)
+        if (GetItemInDatabase(i.itemID).Locked)
         {
             s += "<color=" + red + ">" + LockedString + "</color>";
             s += "\n";
@@ -2578,7 +2360,7 @@ public class Inventory : MonoBehaviour
 
     void ShowControlls()
     {
-        if (showinvent || showjournal || blueprintshow) return;
+        if (showinvent || showjournal || blueprintshow || _menu.HideUI) return;
         
         crafting = false;
 
@@ -2586,7 +2368,7 @@ public class Inventory : MonoBehaviour
         {
 
             ONOFF(Controlls, false);
-            ONOFF(NewQuest, false);
+            ONOFF(JournalOB.NewQuest, false);
             DrawInvNo = false;
         }
         else
@@ -2594,7 +2376,7 @@ public class Inventory : MonoBehaviour
             if (!DrawInvNo)
             {
                 ONOFF(Controlls, true);
-                ONOFF(NewQuest, NewQuestBool);
+                ONOFF(JournalOB.NewQuest, JournalOB.NewQuestBool);
                 DrawInvNo = true;
             }
 
@@ -2610,48 +2392,7 @@ public class Inventory : MonoBehaviour
 
 
     }
-    public void DoneQuest(int id)
-    {
-        for (int i = 0; i < Quests.Count; i++)
-        {
-            if (Quests[i].ID == id && !Quests[i].Done)
-            {
-                Quests[i].Done = true;
-            }
-        }
-    }
-
-    public bool CheckQuestStart(int id)
-    {
-        bool d = false;
-
-        for (int i = 0; i < Quests.Count; i++)
-        {
-            if (Quests[i].ID == id && Quests[i].Started)
-            {
-                d = true;
-            }
-        }
-
-        return d;
-    }
-
-
-    public Quest GetQuest(int id)
-    {
-        Quest d = null;
-
-        for (int i = 0; i < QD.QuestsEN.Count; i++)
-        {
-            if (QD.QuestsEN[i].ID == id)
-            {
-                d = QD.QuestsEN[i];
-            }
-        }
-
-        return d;
-    }
-
+    
     public void SetCurrentFolder()
     {
 
@@ -2678,30 +2419,6 @@ public class Inventory : MonoBehaviour
     }
 
 
-    public bool CheckQuestDone(int id)
-    {
-        bool d = false;
-
-        for (int i = 0; i < QD.QuestsEN.Count; i++)
-        {
-            if (QD.QuestsEN[i].ID == id && QD.QuestsEN[i].Done)
-            {
-                d = true;
-            }
-        }
-
-        return d;
-    }
-
-    int GetQuestID(int id)
-    {
-        int r = 0;
-        for (int i = 0; i < QD.QuestsEN.Count; i++)
-        {
-            if (QD.QuestsEN[i].ID == id) r = i;
-        }
-        return r;
-    }
 
     public void SetAch(string name)
     {
@@ -2719,16 +2436,7 @@ public class Inventory : MonoBehaviour
         }
     }
 
-    public float GetDrawFinalItemTimer()
-    {
-        return DrawFinalItemTimer;
-    }
-    public void SetFinalItem(List<string> names)
-    {
-        DrawFinalItemTimer = Time.fixedTime + 3;
-        FinalItem = names;
-    }
-
+    
    
     public bool MouseCollideWithSlots()
     {

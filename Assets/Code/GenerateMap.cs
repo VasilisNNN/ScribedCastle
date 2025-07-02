@@ -7,6 +7,7 @@ using System;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 using Pathfinding;
+using NUnit;
 
 
 [System.Serializable]
@@ -111,7 +112,7 @@ public class GenerateMap : MonoBehaviour
     public float treenoiseScale = 0.1f;
 
     private Player pl;
-    private Constructor constr;
+    private Constructor Constr;
 
 
     private AstarPath AP;
@@ -225,10 +226,12 @@ public class GenerateMap : MonoBehaviour
         for (int i = 0; i < ObjectsWithStableGround_Buffer.Length; i++)
             LastPoints.Add(ObjectsWithStableGround_positions[i]);
 
-        pl = GameObject.Find("Player").GetComponent<Player>();
+
+        pl = InitializeObjects.PL;
+        Constr = InitializeObjects.Constr;
+        
         AP = GameObject.Find("PathFinding").GetComponent<AstarPath>();
-        constr = GameObject.Find("Constructor").GetComponent<Constructor>();
-  
+       
         pl.StartLoading = true;
 
         RND_Stable_Pos = UnityEngine.Random.Range(0, ObjectsWithStableGround_Buffer.Length);
@@ -320,7 +323,7 @@ public class GenerateMap : MonoBehaviour
             print("CreatingObjectsTimer < Time.fixedTime");
 
             if (ObjectsToSpawn.Length > 0)
-                CreateGroupOfObjects(constr.GreyMap, ObjectsToSpawn[CreatingObjectsNum], ObjectsToSpawn[CreatingObjectsNum].direction, out thebuildingisdone);
+                CreateGroupOfObjects(Constr.GreyMap, ObjectsToSpawn[CreatingObjectsNum], ObjectsToSpawn[CreatingObjectsNum].direction, out thebuildingisdone);
 
 
         }
@@ -371,7 +374,7 @@ public class GenerateMap : MonoBehaviour
 
         BufferObjects = new List<GameObject>();
 
-        pl.ResetFlippingObjects();
+        pl.LayerSort.ResetFlippingObjects();
   
 
 
@@ -1229,8 +1232,8 @@ public class GenerateMap : MonoBehaviour
                     ObjectsWithStableGround_Buffer[i].obj.transform.position = RNDPositions[iii];
 
 
-                    if (ObjectsWithStableGround_Buffer[i].obj.GetComponent<CharacterMove>() != null)
-                        ObjectsWithStableGround_Buffer[i].obj.GetComponent<CharacterMove>().StartPoint = RNDPositions[iii];
+                    if (ObjectsWithStableGround_Buffer[i].obj.GetComponent<CharacterPath>() != null)
+                        ObjectsWithStableGround_Buffer[i].obj.GetComponent<CharacterPath>().StartPoint = RNDPositions[iii];
 
                     iii++;
                 }

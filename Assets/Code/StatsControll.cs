@@ -1,21 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Tilemaps;
 using System;
 using TMPro;
 using Pathfinding;
-using static UnityEngine.GraphicsBuffer;
+
+
 
 public class StatsControll : MonoBehaviour
 {
     public int HP = 3;
     public int Speed = 3;
     public int Damage = 0;
-    #if UNITY_STANALONE
-    [Separator]
-     #endif
+   
     public int Gun_ToKill_ID = -1;
     public int MinVision = -99;
     public int MaxVision = 99;
@@ -57,19 +54,18 @@ public class StatsControll : MonoBehaviour
     public int MAXHP { get; set; }
     public float InvisTimer { get; set; }
 
-    public Material StartMaterial { get; set; }
+
 
     private List<AudioClip> DamageClips = new List<AudioClip>();
     public List<AudioClip> CollisionClips = new List<AudioClip>();
     public bool AudioPlayed;
 
-    private Constructor constr;
+    private Constructor Const;
     private GameObject WallBrakeEffect;
 
     public bool GettingDamageFromWalls;
     private TileBase BrushesPit;
-    public float AplhaColor { get; set; }
-
+  
     public bool ReduceAlphaOnColl;
     public Material NewMaterialOnColl;
 
@@ -94,7 +90,6 @@ public class StatsControll : MonoBehaviour
     public int Durability { get; set; }
     
     private Player pl;
-    private Inventory inv;
     private SpriteRenderer SR;
     private Gun gun;
 
@@ -110,13 +105,12 @@ public class StatsControll : MonoBehaviour
     public int PaymentAmount = 1;
     private float PaymentTimer;
     public bool Payed { get; private set; }
-    private Material StunMaterial;
+
 
 
 
    
     public int DurabilityMax = -1;
-    private AudioClip WorkerRebirthClip;
 
     [HideInInspector]
     public int Satiety = 10;
@@ -140,7 +134,7 @@ public class StatsControll : MonoBehaviour
 
     private AudioSource AU;
 
-    private CharacterMove CM;
+    private CharacterPath CM;
     private Character Charac;
     private PubObject PO;
 
@@ -152,37 +146,58 @@ public class StatsControll : MonoBehaviour
 
     [HideInInspector]
     public bool BuildedStructure = false;
-    private SpriteRenderer ChildSPRT;
+
 
     [HideInInspector]
     public string SpawnPointName;
     private Transform _transform;
 
-    private Color StartColor;
+
+
+    public ColorAndMaterial ColorMaterial;
+
     private void Awake()
     {
 
-
+        _PubObject = GetComponent<PubObject>();
+        AU = GetComponent<AudioSource>();
+        CM = GetComponent<CharacterPath>();
+        Charac = GetComponent<Character>();
+        PO = GetComponent<PubObject>();
+        DIA = GetComponent<DrawIfActive>();
+        MC = GetComponent<MovementControll>();
+        Coll = GetComponent<CollList>();
         _transform = transform;
+
+        pl = InitializeObjects.PL;
+        Const = InitializeObjects.Constr;
+        gameObject.AddComponent<ColorAndMaterial>();
+        ColorMaterial = GetComponent<ColorAndMaterial>();
+
+    }
+
+
+
+
+    void Start()
+    {
 
         DrawVision = true;
 
         ChangeTheName();
 
-        ObjectOnBoard OOB = new ObjectOnBoard(DatabaseID, transform.position, name, gameObject, GetComponent<StatsControll>(), GetComponent<PubObject>());
-
+      
         bool InList = false;
-        constr = GameObject.Find("Constructor").GetComponent<Constructor>();
-        pl = GameObject.Find("Player").GetComponent<Player>();
-        inv = GameObject.Find("Player").GetComponent<Inventory>();
 
-        for (int i = 0; i < constr.OBOnBoard.Count; i++)
+ 
+        
+        for (int i = 0; i < Const.OBOnBoard.Count; i++)
         {
-            if (constr.OBOnBoard[i].Object == gameObject) InList = true;
+            if (Const.OBOnBoard[i].Object == gameObject) InList = true;
 
         }
 
-        DatabaseOriginalID = inv.GetItemInDatabase(DatabaseID).OriginalitemID;
+        DatabaseOriginalID = pl.inv.GetItemInDatabase(DatabaseID).OriginalitemID;
 
         if (transform.parent != null)
         {
@@ -193,15 +208,16 @@ public class StatsControll : MonoBehaviour
         }
 
 
-        if (DatabaseID > -1 && transform.parent != constr.transform && !InList)
+        if (DatabaseID > -1 && transform.parent != Const.transform && !InList)
         {
 
+            ObjectOnBoard OOB = new ObjectOnBoard(DatabaseID, transform.position, name, gameObject, this, GetComponent<PubObject>());
 
-            constr.OBOnBoard.Add(OOB);
-            constr.OBOnBoard[constr.OBOnBoard.Count-1].Place = transform.position;
-            
+            Const.OBOnBoard.Add(OOB);
+            Const.OBOnBoard[Const.OBOnBoard.Count - 1].Place = transform.position;
 
-            ConstructorID = constr.OBOnBoard.Count - 1;
+
+            ConstructorID = Const.OBOnBoard.Count - 1;
             if (GrowingSprites.Length > 0)
                 CurrentGrowState = UnityEngine.Random.Range(1, GrowingSprites.Length);
 
@@ -212,29 +228,22 @@ public class StatsControll : MonoBehaviour
 
         if (DatabaseID > -1)
         {
-            DurabilityMax = inv.GetItemInDatabase(DatabaseID).Durability;
+            DurabilityMax = pl.inv.GetItemInDatabase(DatabaseID).Durability;
             Durability = DurabilityMax;
         }
 
 
-    }
 
+    
 
-    private void Start()
-    {
-        _PubObject = GetComponent<PubObject>();
-
-        AU = GetComponent<AudioSource>();
-        CM = GetComponent<CharacterMove>();
+     
         if (CM != null)
             CM.SpeedMultiplier = Speed;
 
-        Charac = GetComponent<Character>();
-        PO = GetComponent<PubObject>();
-        DIA = GetComponent<DrawIfActive>();
 
-        FloorTM = GameObject.Find("Floor").GetComponent<Tilemap>();
-        Coll = GetComponent<CollList>();
+ 
+        FloorTM = InitializeObjects.FloorTilemap;
+       
 
 
         SatietyMax = 20;
@@ -243,7 +252,7 @@ public class StatsControll : MonoBehaviour
         if (!CanBeHungry) Satiety = 999;
 
         Draw = true;
-        MC = GetComponent<MovementControll>();
+  
         if(MC!=null)
         MC.MinDamage = Damage;
 
@@ -251,19 +260,18 @@ public class StatsControll : MonoBehaviour
 
         PaymentTimer = Time.fixedTime + 700;
         Payed = true;
-        StunMaterial = Resources.Load<Material>("Materials/DoodleHorizontal");
-        WorkerRebirthClip = Resources.Load<AudioClip>("Sound/Objects/WorkerRebirth_1");
+     
 
         SR = GetComponent<SpriteRenderer>();
 
 
-        StartColor = SR.color;
+      
 
 
 
 
 
-        gun = GameObject.Find("Player").GetComponent<Gun>();
+        gun = pl.GetComponent<Gun>();
 
 
 
@@ -276,9 +284,9 @@ public class StatsControll : MonoBehaviour
 
 
 
-        if (constr.ShowChargeUI)
+        if (Const.ShowChargeUI)
         { 
-            if (constr.ShowChargeUI && GrowingSprites.Length > 0)
+            if (Const.ShowChargeUI && GrowingSprites.Length > 0)
             {
                
                 ChargeUI = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/ChargeUI"), GameObject.Find("Canvas").transform);
@@ -312,7 +320,7 @@ public class StatsControll : MonoBehaviour
 
 
 
-        AplhaColor = 1;
+    
         if (GettingDamageFromWalls)
         {
             WallBrakeEffect = Resources.Load<GameObject>("Prefabs/Effects/WallBrakeEffect");
@@ -324,8 +332,7 @@ public class StatsControll : MonoBehaviour
         
         GrowTimer = Time.fixedTime + GrowDelay + UnityEngine.Random.Range(0, 6);
 
-        if (SR != null)
-        StartMaterial = SR.material;
+
 
 
         if (SR != null && GrowingSprites.Length > 0)
@@ -338,13 +345,6 @@ public class StatsControll : MonoBehaviour
 
         if(DeathClip==null)
         SetDeathClip();
-
-        //&& !constr.OBOnBoard.Contains(new ObjectOnBoard(DatabaseID, transform.position, inv.GetItemInDatabase(DatabaseID).itemNames[0], gameObject))
-
-        // HungerTimer = pl.DayNight.DayLength / 1.5f;
-
-
-        //if (GameObject.Find(name) != null && GameObject.Find(name) != gameObject) Destroy(gameObject);
 
     }
 
@@ -421,128 +421,7 @@ public class StatsControll : MonoBehaviour
         }
     }
 
-    void SetColorToSPRT(SpriteRenderer SPRT, Material material)
-    {
-        if (SPRT == null) return;
-        
-            if (material != null)
-                SR.material = material;
-
-
-        Vector3 TargetPos = pl.MainCamera.transform.position;
-
-    
-
-        if (BuildedStructure && tag == "Flipping" && _transform.parent ==null)
-        {
-
-            if (_transform.position.y > TargetPos.y-2)
-            {
-                float Camdepth = ((_transform.position.y - 2) - (pl.MainCamera.transform.position.y - 2)) / 6;
-                float Mousedepth = (_transform.position.y - pl.MainCamera.ScreenToWorldPoint(pl.IM.MousePosition).y) / 20;
-
-                float colordepth = Camdepth + Mousedepth;
-
-
-               // colordepth = Mathf.Clamp(colordepth, 0f, 0.25f);
-                colordepth = 0;
-
-                SR.color = new Color(StartColor.r - colordepth / 1.5f, StartColor.g - colordepth / 1.1f, StartColor.b - colordepth , Mathf.Lerp(SR.color.a, Alpha, Time.deltaTime * 10));
-                for (int i = 0; i < transform.childCount; i++)
-                    SetChildColor(material, i, new Color(StartColor.r - colordepth / 1.5f, StartColor.g - colordepth / 1.1f, StartColor.b - colordepth ));
-
-            }
-            else
-
-            {
-                SR.color = new Color(StartColor.r, StartColor.g, StartColor.b, Mathf.Lerp(SR.color.a, Alpha, Time.deltaTime * 10));
-                for (int i = 0; i < transform.childCount; i++)
-                    SetChildColor(material, i, StartColor);
-
-            }
-            
-        }
-        else
-        {
-            for (int i = 0; i < transform.childCount; i++)
-                SetChildColor(material, i, transform.GetChild(i).GetComponent<SpriteRenderer>().color);
-
-            SR.color = new Color(SR.color.r, SR.color.g, SR.color.b, Mathf.Lerp(SR.color.a, Alpha, Time.deltaTime * 10));
-        }
-
-
-        
-    }
-
-
-    void SetChildColor(Material material, int i, Color color)
-    {
-        if (transform.GetChild(i).GetComponent<SpriteRenderer>() == null) return;
-            ChildSPRT = transform.GetChild(i).GetComponent<SpriteRenderer>();
-
-        if (ChildSPRT == null || transform.GetChild(i).GetComponent<Blinking>() != null) return;
-
-        if (material != null)
-            ChildSPRT.material = material;
-
-        if (transform.GetChild(i).name == "Base") return;
-        
-        ChildSPRT.color = new Color(color.r, color.g, color.b, Alpha);
-
-        for (int j = 0; j < ChildSPRT.transform.childCount; j++)
-        {
-            if (ChildSPRT.transform.GetChild(j).GetComponent<SpriteRenderer>() != null)
-                ChildSPRT.transform.GetChild(j).GetComponent<SpriteRenderer>().color = ChildSPRT.color;
-        }
-
-    }
-
-
-
-
-    public void SetColorAndMaterial(float alpha, Material material)
-    {
-        Alpha = alpha;
-        SetColorToSPRT(SR, material);
-
-        if (!BuildedStructure) return;
-
-        if (transform.localScale.x<1)
-        transform.localScale = new Vector3(
-            transform.localScale.x + Time.deltaTime,
-            transform.localScale.y ,
-            transform.localScale.z );
-        
-        if (transform.localScale.y < 1)
-            transform.localScale = new Vector3(
-                transform.localScale.x ,
-                transform.localScale.y + Time.deltaTime,
-                transform.localScale.z );
-
-        if (transform.localScale.y > 1 || transform.localScale.x > 1)
-        {
-            transform.localScale = new Vector3(1, 1, 1);
-            for (int i = 0; i < transform.childCount; i++)
-            {
-                transform.GetChild(i).name = transform.GetChild(i).name.Replace("(Clone)", null);
-                transform.GetChild(i).localScale = transform.localScale;
-                if (GetComponent<Animator>() != null)
-                {
-                    GetComponent<Animator>().enabled = true;
-                    GetComponent<Animator>().applyRootMotion = true;
-        
-                    GetComponent<Animator>().Rebind();
-                    GetComponent<Animator>().Update(0f);
-                }
-            }
-           
-
-
-        }
-
-
-    }
-
+   
 
     public void GetDamage(int damage)
     {
@@ -557,7 +436,7 @@ public class StatsControll : MonoBehaviour
         }
 
         if(pl.Showdamage)
-        inv.ADDPickedName(damage.ToString(),  1, transform.position);
+        pl.inv.ADDPickedName(damage.ToString(),  1, transform.position);
 
 
 
@@ -624,7 +503,7 @@ public class StatsControll : MonoBehaviour
         {
             if (pl.inv.CheckItem(9))
             {
-                constr.AddLogPart("You payed sallery (-1 Gold)!", "Ви заплатили зарплату (-1 Золото)", "あなたはギャラリー（-1金）を支払った！", gameObject);
+                Const.AddLogPart("You payed sallery (-1 Gold)!", "Ви заплатили зарплату (-1 Золото)", "あなたはギャラリー（-1金）を支払った！", gameObject);
 
                 pl.inv.ReduceItemCount(9, PaymentAmount);
                 Payed = true;
@@ -637,7 +516,7 @@ public class StatsControll : MonoBehaviour
         {
             if (pl.inv.GetItem(9) != null)
             {
-                constr.AddLogPart("You payed sallery (" + PaymentAmount + " Gold)!", "Ви заплатили зарплату (" + PaymentAmount + " Золото)", "あなたはギャラリー（" + PaymentAmount + "金）を支払った！", gameObject);
+                Const.AddLogPart("You payed sallery (" + PaymentAmount + " Gold)!", "Ви заплатили зарплату (" + PaymentAmount + " Золото)", "あなたはギャラリー（" + PaymentAmount + "金）を支払った！", gameObject);
 
                 pl.inv.ReduceItemCount(9, PaymentAmount);
                 Payed = true;
@@ -645,7 +524,7 @@ public class StatsControll : MonoBehaviour
             }
             else
             {
-                constr.AddLogPart("A worker needs payment (" + PaymentAmount + " Gold) and you dont have it!", "У вас недостатньо золота для зарплати. Треба " + PaymentAmount + " Золота", "労働者が支払い（" + PaymentAmount + " 金）を必要としているのですが、あなたはそれを持っていません！", gameObject);
+                Const.AddLogPart("A worker needs payment (" + PaymentAmount + " Gold) and you dont have it!", "У вас недостатньо золота для зарплати. Треба " + PaymentAmount + " Золота", "労働者が支払い（" + PaymentAmount + " 金）を必要としているのですが、あなたはそれを持っていません！", gameObject);
 
                 Payed = false;
             }
@@ -659,22 +538,21 @@ public class StatsControll : MonoBehaviour
 
     public void GrowControll()
     {
-        
- 
 
-        DamageObject();
+        ColorMaterial.ObjectColorAlpha();
 
-        if (MC != null && ConstructorID>-1 && ConstructorID < constr.OBOnBoard.Count)
-        constr.OBOnBoard[ConstructorID].Place = transform.position;
+            DamageObject();
+
+        if (MC != null && ConstructorID>-1 && ConstructorID < Const.OBOnBoard.Count)
+            Const.OBOnBoard[ConstructorID].Place = transform.position;
         
         if (Durability <= 0 && DurabilityMax > -1 && CanTurnInEgg)
             {
-            constr.AddLogPart("WORKER " + pl.inv.GetItemInDatabase(DatabaseID).itemNames[0] + " DIED! You can pick an egg",
+            Const.AddLogPart("WORKER " + pl.inv.GetItemInDatabase(DatabaseID).itemNames[0] + " DIED! You can pick an egg",
                               "РОБИЧИЙ ПОМЕР! Можете підібрати яйце", "ロボットが死ぬ！卵を拾う", gameObject);
 
 
 
-            pl.PlayHandsAudio(WorkerRebirthClip,1);
                 HP = 0;
         }
         
@@ -740,7 +618,7 @@ public class StatsControll : MonoBehaviour
                 Destroy(HPUI);
                 Destroy(ChargeUI);
                 Destroy(ComfortUI);
-                constr.BlowObject(GetComponent<StatsControll>());
+                Const.BlowObject(GetComponent<StatsControll>());
 
             }
 
@@ -752,43 +630,6 @@ public class StatsControll : MonoBehaviour
 
 
     }
-
-
-
-    void DestroyObjectsToDestroy(GameObject obj)
-    {
-        if (pl == null)
-        {
-            return;
-        }
-
-        if (pl.menu == null)
-        {
-            return;
-        }
-        if (pl.menu.SL == null)
-        {
-            return;
-        }
-
-
-        if (pl.menu.SL.ObjectsToDestroy == null)
-        {
-
-            return;
-        }
-
-        if (!pl.menu.SL.ObjectsToDestroy.Contains(name))
-        {
-            return;
-        }
-
-        ObjectsDeath();
-                   
-                
-
-    }
-
 
     public void WallDamage()
     {
@@ -806,11 +647,11 @@ public class StatsControll : MonoBehaviour
                 BE.transform.position = transform.position;
                 BE.name = "WallBrakeEffect";
 
-                for (int j = 0; j < constr.OBOnBoard.Count; j++)
+                for (int j = 0; j < Const.OBOnBoard.Count; j++)
                 {
-                    if (constr.OBOnBoard[j].Object == Coll.WallColl)
+                    if (Const.OBOnBoard[j].Object == Coll.WallColl)
                     {
-                        constr.OBOnBoard.RemoveAt(j);
+                        Const.OBOnBoard.RemoveAt(j);
 
 
                     }
@@ -844,9 +685,9 @@ public class StatsControll : MonoBehaviour
     public void PlaySoundsPitched(AudioClip AC, float pitch)
     {
         //print("P");
-        constr.GetComponent<AudioSource>().clip = AC;
-        constr.GetComponent<AudioSource>().pitch = pitch;
-        constr.GetComponent<AudioSource>().Play();
+        Const.GetComponent<AudioSource>().clip = AC;
+        Const.GetComponent<AudioSource>().pitch = pitch;
+        Const.GetComponent<AudioSource>().Play();
     }
 
     public void UIControll()
@@ -862,9 +703,9 @@ public class StatsControll : MonoBehaviour
         }
         
 
-        if (!constr.ShowChargeUI) return;
+        if (!Const.ShowChargeUI) return;
 
-        if (Mathf.Abs(constr.pl._transform.position.x - transform.position.x) < 1.7f && Mathf.Abs(constr.pl._transform.position.y - transform.position.y) < 1.7f)
+        if (Mathf.Abs(pl._transform.position.x - transform.position.x) < 1.7f && Mathf.Abs(pl._transform.position.y - transform.position.y) < 1.7f)
         {
             if (Alpha < 1)
                 Alpha += Time.deltaTime;
@@ -926,13 +767,13 @@ public class StatsControll : MonoBehaviour
     public void ObjectsDeath()
     {
 
-        if (GetComponent<Character>() != null)
-            pl.inv.DoneQuest(GetComponent<Character>().QuestIDOnDeath);
+        if (Charac != null)
+            pl.journal.DoneQuest(Charac.QuestIDOnDeath);
 
         if (MC != null)
         {
-            if (MC.Enemy) constr.EnemiesCount--;
-            if (MC.Soldier) constr.SoldiersCount--;
+        
+     
 
             if (MC.MoveToObject != null)
             {
@@ -996,25 +837,25 @@ public class StatsControll : MonoBehaviour
 
 
         
-        for (int i = 0; i < constr.OBOnBoard.Count; i++)
+        for (int i = 0; i < Const.OBOnBoard.Count; i++)
         {
-            if (constr.OBOnBoard[i].Object == gameObject)
-                constr.OBOnBoard.RemoveAt(i);
+            if (Const.OBOnBoard[i].Object == gameObject)
+                Const.OBOnBoard.RemoveAt(i);
         }
 
-        for (int i = 0; i < constr.Enemies.Count; i++)
+        for (int i = 0; i < Const.Enemies.Count; i++)
         {
-            if (constr.Enemies[i].Object == gameObject)
-                constr.Enemies.RemoveAt(i);
+            if (Const.Enemies[i].Object == gameObject)
+                Const.Enemies.RemoveAt(i);
         }
 
         if (_PubObject != null)
         {
-            if (constr.AllTrash>= _PubObject.Trash)
-            constr.AllTrash -= _PubObject.Trash;
+            if (Const.AllTrash>= _PubObject.Trash)
+            Const.AllTrash -= _PubObject.Trash;
 
-            if (constr.AllPoop >= _PubObject.Poop)
-                constr.AllPoop -= _PubObject.Poop;
+            if (Const.AllPoop >= _PubObject.Poop)
+                Const.AllPoop -= _PubObject.Poop;
         }
 
 
@@ -1037,7 +878,7 @@ public class StatsControll : MonoBehaviour
         Destroy(HPUI);
         Destroy(ChargeUI);
         Destroy(ComfortUI);
-        constr.BlowObject(GetComponent<StatsControll>());
+        Const.BlowObject(GetComponent<StatsControll>());
 
         
 

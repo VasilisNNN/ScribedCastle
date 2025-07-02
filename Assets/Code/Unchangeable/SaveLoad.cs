@@ -272,10 +272,10 @@ public class SaveLoad : MonoBehaviour
 
         if (GameObject.Find("Player") != null)
         {
-            pl = GameObject.Find("Player").GetComponent<Player>();
-            inv = GameObject.Find("Player").GetComponent<Inventory>();
+            
+            pl = InitializeObjects.PL;
+            inv = pl.inv;
           
-
         }
 
 
@@ -433,6 +433,8 @@ public class SaveLoad : MonoBehaviour
         PlayerPrefs.SetFloat("MasterSliderValue", _menu.MasterSliderValue);
         PlayerPrefs.SetFloat("BGSliderValue", _menu.BGSliderValue);
         PlayerPrefs.SetFloat("ObjectsSliderValue", _menu.ObjectsSliderValue);
+
+        PlayerPrefs.SetInt("HideUIValue", _menu.HideUIValue);
 
         PlayerPrefs.SetInt("DrawTutorial", _menu.DrawTutorial);
         PlayerPrefs.SetInt("FirstStart", _menu.FirstStart);
@@ -1050,6 +1052,7 @@ public class SaveLoad : MonoBehaviour
             writer.Write((double)_menu.MasterSliderValue);
             writer.Write((double)_menu.BGSliderValue);
             writer.Write((double)_menu.ObjectsSliderValue);
+            writer.Write(_menu.HideUIValue);
 
             writer.Write(_menu.DrawTutorial);
             writer.Write(_menu.FirstStart);
@@ -1171,6 +1174,7 @@ public class SaveLoad : MonoBehaviour
             writer.Write((double)_menu.MasterSliderValue);
             writer.Write((double)_menu.BGSliderValue);
             writer.Write((double)_menu.ObjectsSliderValue);
+            writer.Write(_menu.HideUIValue);
 
             writer.Write(_menu.DrawTutorial);
             writer.Write(_menu.FirstStart);
@@ -1988,6 +1992,8 @@ public class SaveLoad : MonoBehaviour
         _menu.MasterSliderValue = PlayerPrefs.GetFloat("MasterSliderValue");
         _menu.BGSliderValue = PlayerPrefs.GetFloat("BGSliderValue");
         _menu.ObjectsSliderValue = PlayerPrefs.GetFloat("ObjectsSliderValue");
+        _menu.HideUIValue = PlayerPrefs.GetInt("HideUIValue");
+
 
         _menu.DrawTutorial = PlayerPrefs.GetInt("DrawTutorial");
         _menu.FirstStart = PlayerPrefs.GetInt("FirstStart");
@@ -2529,11 +2535,9 @@ public class SaveLoad : MonoBehaviour
 
         
             _constr.AllTables += PO.tables;
-            if (PO.tag == "Pers" && !PO.GetComponent<MovementControll>().Soldier && !PO.GetComponent<MovementControll>().Enemy) _constr.AllPeople++;
+            if (PO.tag == "Pers"  ) _constr.AllPeople++;
 
-            if (PO.tag == "Pers" && PO.GetComponent<MovementControll>().Soldier && !PO.GetComponent<MovementControll>().Enemy) _constr.SoldiersCount++;
-            if (PO.tag == "Pers" && !PO.GetComponent<MovementControll>().Soldier && PO.GetComponent<MovementControll>().Enemy) _constr.EnemiesCount++;
-
+           
 
 
         }
@@ -2788,8 +2792,9 @@ public class SaveLoad : MonoBehaviour
         _menu.MasterSliderValue = (float)reader.ReadDouble();
         _menu.BGSliderValue = (float)reader.ReadDouble();
         _menu.ObjectsSliderValue = (float)reader.ReadDouble();
-
-        _menu.DrawTutorial = reader.ReadInt32();
+        _menu.HideUIValue = reader.ReadInt32();
+        
+         _menu.DrawTutorial = reader.ReadInt32();
         _menu.FirstStart = reader.ReadInt32();
      
 
@@ -2839,6 +2844,7 @@ public class SaveLoad : MonoBehaviour
             _menu.MasterSliderValue = (float)reader.ReadDouble();
         _menu.BGSliderValue = (float)reader.ReadDouble();
         _menu.ObjectsSliderValue = (float)reader.ReadDouble();
+                _menu.HideUIValue = reader.ReadInt32();
 
         _menu.DrawTutorial = reader.ReadInt32();
         _menu.FirstStart = reader.ReadInt32();
@@ -3432,7 +3438,7 @@ public class SaveLoad : MonoBehaviour
                     if (_constr.TOnBoard[i].Name == GrassBrush[f].name)
                     {
                         _constr.GrassMap.SetTile(new Vector3Int(_constr.TOnBoard[i].xPOS, _constr.TOnBoard[i].yPOS, 0), GrassBrush[f]);
-                        _constr.Grass++;
+                    
                     }
                 }
             }
@@ -3936,9 +3942,7 @@ public class SaveLoad : MonoBehaviour
         {
             _constr.Tile.ClearAllTiles();
 
-            _constr.TopScafolds.ClearAllTiles();
-
-
+       
             _constr.TOnBoard = new List<TilesOnBoard>();
 
         }

@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class ItemDatabase : MonoBehaviour {
+public class ItemDatabase {
 	public List<Item> items = new List<Item>();
     string totalJP = "";
     //Pink - #FF7FA3
@@ -23,8 +23,11 @@ public class ItemDatabase : MonoBehaviour {
     [HideInInspector]
     public Tilemap MudTileBase;
 
+    public ItemDatabase()
+    { 
     
-    void Awake()
+    }
+    public void SetData()
     {
 
 
@@ -621,31 +624,20 @@ new string[7] { "You can plant crops in the dirt", "Ви можете висад
 
         items.Add(new Item(
 354, 354, Item.type.item,
-new string[7] { "Bank", "Банк", "銀行", "", "", "", "" },
-new string[7] { "Earns 10 gold", "Заробляє 10 золота", "", "", "", "", "" },
+new string[7] { "River", "Ріка", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
 /*Cost*/ 180
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
         items[items.Count - 1].TargetTileMap = MainTileBase;
-        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+        items[items.Count - 1]._StructureType = Item.StructureType.Tiles;
 
-
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Structures/Bank");
-
-        items[items.Count - 1].TargetBrush = new TileBase[2] {
-        Resources.Load<TileBase>("Brushes/Grass"),
-        Resources.Load<TileBase>("Brushes/Floor")};
-
-        items[items.Count - 1].ObjectPrefsBottom = new GameObject[4]
-      {Resources.Load<GameObject>("Prefabs/Structures/Bank"),
-            Resources.Load<GameObject>("Prefabs/Structures/Bank 1"),
-            Resources.Load<GameObject>("Prefabs/Structures/Bank 2"),
-           Resources.Load<GameObject>("Prefabs/Structures/Bank 3")};
-
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Structures/River");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/River") };
         items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
-        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
-        items[items.Count - 1].BuildingCost = 12;
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 1 };
+
 
         items.Add(new Item(
 355, 355, Item.type.item,
@@ -3293,7 +3285,7 @@ new string[7] { "", "", "", "", "", "", "" },
 
         }
 
-        print("Total JP Characters " + totalJP);
+      //  Debug.Log("Total JP Characters " + totalJP);
 
     }
 

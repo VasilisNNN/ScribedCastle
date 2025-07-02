@@ -1,10 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
+﻿using System.Collections.Generic;
 using System.Linq;
 
-public class TextDatabase : MonoBehaviour
+public class TextDatabase
 {
     public List<TextA> textEN = new List<TextA>();
     public List<TextA> textUA = new List<TextA>();
@@ -12,7 +9,7 @@ public class TextDatabase : MonoBehaviour
     private List<TextA> _Text;
     string totalJP = "";
 
-    void Awake()
+    public void SetData()
     {
         //<link=Quest> - Quest Start
         //<link=Quest2> - Quest Done
@@ -308,7 +305,7 @@ new TextA(6, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
-                       "Buy a lake"
+                       "Buy grass"
                        })
 
 }
@@ -318,7 +315,7 @@ new TextA(6, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
-                       "Купіть озеро"
+                       "Купіть траву"
                        })
 
 }
@@ -367,41 +364,9 @@ new StringList[1]{
 
 
 
-        textEN.Add(
-new TextA(8, "Note",
-new string[1] { "Note" },
-new StringList[1]{
-                      new StringList(new string[1]{
-                       "Build a lake"
-                       })
-
-}
-));
-        textUA.Add(
-new TextA(8, "Note",
-new string[1] { "Note" },
-new StringList[1]{
-                      new StringList(new string[1]{
-                       "Побудуйте озеро"
-                       })
-
-}
-));
-        textJP.Add(
-new TextA(8, "Note",
-new string[1] { "Note" },
-new StringList[1]{
-                      new StringList(new string[1]{
-                       "湖を作る"
-                       })
-
-}
-));
-
-
 #if UNITY_SWITCH
         textEN.Add(
-new TextA(9, "Note",
+new TextA(8, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -412,7 +377,7 @@ new StringList[1]{
 ));
 
         textUA.Add(
-new TextA(9, "Note",
+new TextA(8, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -422,7 +387,7 @@ new StringList[1]{
 }
 ));
         textJP.Add(
-new TextA(9, "Note",
+new TextA(8, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -436,7 +401,7 @@ new StringList[1]{
 #if UNITY_STANDALONE
 
            textEN.Add(
-new TextA(9, "Note",
+new TextA(8, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -447,7 +412,7 @@ new StringList[1]{
 ));
 
         textUA.Add(
-new TextA(9, "Note",
+new TextA(8, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -457,7 +422,7 @@ new StringList[1]{
 }
 ));
         textJP.Add(
-new TextA(9, "Note",
+new TextA(8, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -470,7 +435,7 @@ new StringList[1]{
 #if UNITY_PS5 || UNITY_PS4
 
         textEN.Add(
-new TextA(9, "Note",
+new TextA(8, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -481,7 +446,7 @@ new StringList[1]{
 ));
 
         textUA.Add(
-new TextA(9, "Note",
+new TextA(8, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -491,7 +456,7 @@ new StringList[1]{
 }
 ));
         textJP.Add(
-new TextA(9, "Note",
+new TextA(8, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -502,7 +467,7 @@ new StringList[1]{
 ));
 #endif
         textEN.Add(
-new TextA(10, "Note",
+new TextA(9, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -512,7 +477,7 @@ new StringList[1]{
 }
 ));
         textUA.Add(
-new TextA(10, "Note",
+new TextA(9, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -522,7 +487,7 @@ new StringList[1]{
 }
 ));
         textJP.Add(
-new TextA(10, "Note",
+new TextA(9, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -534,7 +499,7 @@ new StringList[1]{
 
 
         textEN.Add(
-new TextA(11, "Note",
+new TextA(10, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -544,7 +509,7 @@ new StringList[1]{
 }
 ));
         textUA.Add(
-new TextA(11, "Note",
+new TextA(10, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -554,7 +519,7 @@ new StringList[1]{
 }
 ));
         textJP.Add(
-new TextA(11, "Note",
+new TextA(10, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -565,7 +530,7 @@ new StringList[1]{
 ));
 
         textEN.Add(
-new TextA(12, "Note",
+new TextA(11, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -575,7 +540,7 @@ new StringList[1]{
 }
 ));
         textUA.Add(
-new TextA(12, "Note",
+new TextA(11, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -585,7 +550,7 @@ new StringList[1]{
 }
 ));
         textJP.Add(
-new TextA(12, "Note",
+new TextA(11, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -596,7 +561,7 @@ new StringList[1]{
 ));
 
         textEN.Add(
-new TextA(13, "Note",
+new TextA(12, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -606,7 +571,7 @@ new StringList[1]{
 }
 ));
         textUA.Add(
-new TextA(13, "Note",
+new TextA(12, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -616,7 +581,7 @@ new StringList[1]{
 }
 ));
         textJP.Add(
-new TextA(13, "Note",
+new TextA(12, "Note",
 new string[1] { "Note" },
 new StringList[1]{
                       new StringList(new string[1]{
@@ -682,7 +647,7 @@ new StringList[1]{
             }
         }
 
-        print("Total JP Characters Text data" + totalJP);
+       // print("Total JP Characters Text data" + totalJP);
     }
 
 

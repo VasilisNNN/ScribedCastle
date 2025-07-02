@@ -121,7 +121,7 @@ public class CharactersGun : MonoBehaviour
 
         if (Enemy == null || Enemy.GetComponent<MovementControll>() == null) return;
 
-        if (!Enemy.GetComponent<MovementControll>().Enemy || enemies.Contains(Enemy.transform))
+        if ( enemies.Contains(Enemy.transform))
             return;
 
             enemies.Add(Enemy.transform);

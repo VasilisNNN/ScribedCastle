@@ -5,6 +5,7 @@ using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 using System.Linq;
 using TMPro;
+using NUnit;
 
 public class BlueprintMenu : MonoBehaviour
 {
@@ -23,7 +24,7 @@ public class BlueprintMenu : MonoBehaviour
     private int CurrentBP;
     public bool showbp { get;  set; }
     private Inventory inv;
-    private Constructor _constr;
+    private Constructor Constr;
     private Player pl;
     private bool MenuCreated;
 
@@ -40,12 +41,10 @@ public class BlueprintMenu : MonoBehaviour
     private bool Assembled;
     private AudioSource AS;
 
-    private float ConstrcuctedDelay;
     private GameObject StatsOBJ;
 
     private int[] ConstructionStates;
 
-    private Canvas _canvas;
     private float ScrollDelay = 0;
     public int LastBlueprint { get; set; }
 
@@ -90,11 +89,12 @@ public class BlueprintMenu : MonoBehaviour
             Constructed = new AudioClip[1] { Resources.Load<AudioClip>("Sound/UI/Click_0") };
         
 
-        _constr = GameObject.Find("Constructor").GetComponent<Constructor>();
-        menu = GameObject.Find("Constructor").GetComponent<MenuCustom>();
-        inv = GameObject.Find("Player").GetComponent<Inventory>();
-        pl = GameObject.Find("Player").GetComponent<Player>();
 
+    
+        pl = InitializeObjects.PL;
+        inv = pl.inv;
+        Constr = InitializeObjects.Constr;
+        menu = Constr.GetComponent<MenuCustom>();
 
 
         BlueprintsButton = GameObject.Find("BlueprintsButton");
@@ -107,8 +107,7 @@ public class BlueprintMenu : MonoBehaviour
         }
         Assembled = true;
 
-        _canvas =  GameObject.Find("Canvas").GetComponent<Canvas>();
-
+        
         menu.ONOFFUI(transform, false);
 
     }
@@ -162,10 +161,6 @@ public class BlueprintMenu : MonoBehaviour
             for (int ii = 0; ii < BP[i].ObjectList.Count; ii++)
             {
             
-             
-
-               
-
                 GameObject BluePrintBrick = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/BlueprintPart"), BluePr.transform);
                 BluePrintBrick.GetComponent<RectTransform>().anchoredPosition = new Vector2(BP[i].ObjectList[ii].Place.x * partWidth, BP[i].ObjectList[ii].Place.y * partWidth);
                 BluePrintBrick.GetComponent<Image>().sprite = BP[i].ObjectList[ii].Object.GetComponent<SpriteRenderer>().sprite;
@@ -175,7 +170,6 @@ public class BlueprintMenu : MonoBehaviour
                 BluePrintBrick.GetComponent<Image>().enabled = false;
                 BluePrintBrick.transform.SetSiblingIndex(Mathf.Abs(BP[i].ObjectOrder[ii]));
 
-             
             }
             
 
@@ -243,8 +237,7 @@ public class BlueprintMenu : MonoBehaviour
         transform.Find("BG").GetComponent<Image>().enabled = false;
         menu.ONOFFUI(LeftArrow.transform, false);
 
-
-       // _canvas.ForceUpdateCanvases();
+        StartBluePrintsDone();
     }
 
 
@@ -252,23 +245,23 @@ public class BlueprintMenu : MonoBehaviour
 
     void Update()
     {
-        if (!pl.StartLoading)
+        if (pl.StartLoading) return;
+        
+        if (!MenuCreated)
         {
-            if (!MenuCreated)
-            {
 
-                CreateMenu();
-                StartBluePrintsDone();
-                MenuCreated = true;
-            }
-
-            EnableDisableMenu();
-            MenuControlls();
-            RewardsControl();
-
-            GetRewards();
-
+            CreateMenu();
+              
+            MenuCreated = true;
         }
+
+        EnableDisableMenu();
+        MenuControlls();
+        RewardsControl();
+
+        GetRewards();
+
+        
 
     }
 
@@ -332,21 +325,19 @@ void MoveBlueprints()
             if (BlueFloorObjects[i].transform.Find("BluePrintDone") != null)
                 BlueFloorObjects[i].transform.Find("BluePrintDone").GetComponent<RectTransform>().anchoredPosition = new Vector2(BlueFloorObjects[i].GetComponent<RectTransform>().anchoredPosition.x + BPSlotWidth / 3, BlueFloorObjects[i].GetComponent<RectTransform>().anchoredPosition.y - BPSlotWidth / 3);
 
-            if (menu.SL.BPConstructed[i] != 0) return;
-
-            if (ReadObject(BP[i].ObjectList)  && BP[i].Rewards.Length>0)
+           
+            if (ReadObject(BP[i].ObjectList)  && BP[i].Rewards.Length>0 && menu.SL.BPConstructed[i] != 1)
             {
           
                 for (int r = 0; r < BP[i].Rewards.Length; r++)
                     inv.AddItem(BP[i].Rewards[r].itemID, BP[i].Rewards[r].Count, inv.GetItemInDatabase(BP[i].Rewards[r].itemID).Durability, inv.transform.position);
 
                
-                if (BlueFloorObjects[i].transform.Find("BluePrintDone") == null)
-                {
-                    GameObject BluePrintDone = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/BlueprintDone"), BlueFloorObjects[i].transform);
-                     BluePrintDone.name = "BluePrintDone";
+                
+                GameObject BluePrintDone = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/BlueprintDone"), BlueFloorObjects[i].transform);
+                    BluePrintDone.name = "BluePrintDone";
 
-                }
+                
                
                 LastBlueprint = i;
                 menu.SL.BPConstructed[i] = 1;
@@ -427,7 +418,7 @@ void MoveBlueprints()
     void LayersAnimation()
     {
         Vector2 pos = pl.IM.MousePosition;
-        float pw = partWidth;
+        float pw = partWidth*2;
 
 
         if (!pl.IM.MouseMode)
@@ -588,7 +579,7 @@ void MoveBlueprints()
 
         if (!showbp) return;
 
-      
+        menu.MenuActionDelay = Time.fixedTime + 0.1f;
 
         if (pl.menu.Language==0)
             BlueprintText.text = "Orders to scribe";
@@ -686,7 +677,7 @@ void MoveBlueprints()
 
             menu.ONOFFUI(GameObject.Find("ButtonsUI").transform, true);
             menu.IM.ActionDelay = Time.fixedTime + 0.1f;
-            menu.MenuActionDelay = Time.fixedTime + 0.1f;
+       
             showbp = false;
             
 
@@ -730,9 +721,7 @@ void MoveBlueprints()
 
             if (showbp)
             {
-                if (_constr != null)
-                 _constr.UnsetBigTips();
-
+              
 
                 inv.PlaySoundsPitched(inv.UIOpen, 1);
 
@@ -786,16 +775,17 @@ void MoveBlueprints()
 
     void SetALLCandidate(int i, ObjectOnBoard OBN, ref List<ObjectOnBoard> AllCandidates)
     {
-        if (_constr.OBOnBoard[i].ID != OBN.ID || AllCandidates.Contains(_constr.OBOnBoard[i]))
+        if (Constr.OBOnBoard[i].ID != OBN.ID || AllCandidates.Contains(Constr.OBOnBoard[i]))
         {
+
             return;
         }
 
 
 
-        if (_constr.OBOnBoard[i].Object == null) return;
-        AllCandidates.Add(_constr.OBOnBoard[i]);
-        Transform prnt = _constr.OBOnBoard[i].Object.transform.parent;
+        if (Constr.OBOnBoard[i].Object == null) return;
+        AllCandidates.Add(Constr.OBOnBoard[i]);
+        Transform prnt = Constr.OBOnBoard[i].Object.transform.parent;
 
         if (prnt == null)
          return;
@@ -825,11 +815,11 @@ void MoveBlueprints()
         List<ObjectOnBoard> StartCandidates = new List<ObjectOnBoard>();
         List<ObjectOnBoard> AllCandidates = new List<ObjectOnBoard>();
 
-        for (int i = 0; i < _constr.OBOnBoard.Count; i++)
+        for (int i = 0; i < Constr.OBOnBoard.Count; i++)
         {
-            if (_constr.OBOnBoard[i].ID == objectList[0].ID)
+            if (Constr.OBOnBoard[i].ID == objectList[0].ID)
             {
-                StartCandidates.Add(_constr.OBOnBoard[i]);
+                StartCandidates.Add(Constr.OBOnBoard[i]);
 
             }
 
@@ -875,10 +865,12 @@ void MoveBlueprints()
             }
 
 
-
             if (ConstructionStates != null)
             {
-                if (ConstructionStates.Sum() == objectList.Count) return true;
+                if (ConstructionStates.Sum() == objectList.Count)
+                {
+                   return true;
+                }
             }
 
         }

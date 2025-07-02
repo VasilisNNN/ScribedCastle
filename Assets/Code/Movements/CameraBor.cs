@@ -34,7 +34,7 @@ public class CameraBor : MonoBehaviour {
 
     private float YPlusMoveWay = 0;
     private float XPlusMoveWay = 0;
-    private Constructor _constr;
+    private Constructor Constr;
 
     public Vector2 MoveinaWayOfMovemementBorder = new Vector2 (-1,1);
 
@@ -48,29 +48,28 @@ public class CameraBor : MonoBehaviour {
     private Vector3 CamStartPos;
 
     private PixelPerfectCamera PixelCam; 
-    private void Awake()
+   
+	public void Start()
 	{
 
         PixelCam = GetComponent<PixelPerfectCamera>();
 
-        _constr = GameObject.Find("Constructor").GetComponent<Constructor>();
-        pl = GameObject.Find("Player").GetComponent<Player>();
+        pl = InitializeObjects.PL;
+        Constr = InitializeObjects.Constr;
+
 
         CamStartPos = transform.position;
 
         _bounds = GameObject.Find("CameraBox").GetComponent<BoxCollider2D>();
 
-		if (Margin.x == 0) {
-			Margin.x = 0.2f;
-			Margin.y = 0.2f;
-		}
-      
-		isFollowing = true;
-	}
-	public void Start()
-	{
+        if (Margin.x == 0)
+        {
+            Margin.x = 0.2f;
+            Margin.y = 0.2f;
+        }
 
-		PlayerV = GameObject.Find ("Player").GetComponent<Transform>();
+        isFollowing = true;
+        PlayerV = GameObject.Find ("Player").GetComponent<Transform>();
 		x = PlayerV.position.x;
 		y = PlayerV.position.y + YPlus;
 
@@ -87,7 +86,7 @@ public class CameraBor : MonoBehaviour {
 
 	public void Update()
 	{
-        if (_constr.TutorialPause || pl.menu.MenuONOFF || pl.inv.showinvent || pl.inv.showjournal || pl.inv.blueprintshow) return;
+        if (Constr.TutorialPause || pl.menu.MenuONOFF || pl.inv.showinvent || pl.inv.showjournal || pl.inv.blueprintshow) return;
 
 
         if (pl.IM.MouseScroll > 0.1 && PixelCam.assetsPPU < 256) PixelCam.assetsPPU+=10;
@@ -97,7 +96,7 @@ public class CameraBor : MonoBehaviour {
 
         if (DirectMove && !pl.StartLoading) MoveCameraOnTheField();
 
-        if (MoveinaWayOfMovemement && !_constr.Building )
+        if (MoveinaWayOfMovemement && !Constr.Building )
         {
            
             Vector2 XBorder = new Vector2(Screen.width / 12, Screen.width - Screen.width / 12);
@@ -105,7 +104,7 @@ public class CameraBor : MonoBehaviour {
 
             Vector2 MousePos = new Vector2(0, 0);
             
-                MousePos = _constr.transform.position;
+                MousePos = Constr.transform.position;
 
             if (MousePos.x < XBorder.x || MousePos.x > XBorder.y ||
               MousePos.y < YBorder.x || MousePos.y > YBorder.y)

@@ -8,6 +8,8 @@ using UnityEngine.SceneManagement;
 using System;
 using TMPro;
 using System.Linq;
+using static UnityEngine.EventSystems.StandaloneInputModule;
+
 
 
 
@@ -61,7 +63,7 @@ public class MenuCustom : MonoBehaviour
     private int DropNum = 0;
     public float MenuActionDelay { get; set; }
     public bool ShowAchivements { get; set; }
-
+    public bool HideUI { get; private set; }
     public InputMode IM { get; private set; }
     public float ScrollDelay { get; set; }
     private List<GameObject> Slots = new List<GameObject>();
@@ -70,7 +72,9 @@ public class MenuCustom : MonoBehaviour
     private Transform MenuAllTransform, OptionsAllTransform, SaveSlotsUI, ModeMenu, YesNoOB_Transform;
     [HideInInspector]
     public float MasterSliderValue, BGSliderValue, ObjectsSliderValue;
- 
+    [HideInInspector]
+    public int HideUIValue;
+
     [HideInInspector]
     public string[] CurrentSlotLocations, CurrentSlotDates, CurrentSlotTimes;
     [HideInInspector]
@@ -107,6 +111,9 @@ public class MenuCustom : MonoBehaviour
     private string LoadText = "Load";
 
     private string ExitBuildingMode_text;
+    private string ScreenZoomText;
+    private string BuildingModeText;
+    private string HideUIText;
 
     private string[] LanguageNames_EN, LanguageNames_UA, LanguageNames_JP;
     private string SceneToTransition = "";
@@ -118,9 +125,12 @@ public class MenuCustom : MonoBehaviour
 
     private bool SetLanguageNoSaveFile;
     private float StartLanguageDelay;
+
+    private Transform CanvasTransform;
+    private Toggle HideUIToggle; 
     void Start()
     {
-
+        CanvasTransform = InitializeObjects.CanvasTransform;
         StartLanguageDelay = Time.fixedTime + 0.25f;
 
         if (Screen.currentResolution.width<=20)
@@ -131,9 +141,9 @@ public class MenuCustom : MonoBehaviour
         BackFromSaveSlots = GameObject.Find("BackFromSaveSlots");
         ExitBuildingMode = GameObject.Find("ExitBuildingMode");
 
-        LanguageNames_EN = new string[3] { "English", "Ukrainian", "Japanese" };
-        LanguageNames_UA = new string[3] { "Англійська", "Українська", "Японська" };
-        LanguageNames_JP = new string[3] { "英語", "ウクライナ語", "日本語" };
+        LanguageNames_EN = new string[] { "English", "Ukrainian" };
+        LanguageNames_UA = new string[] { "Англійська", "Українська" };
+        LanguageNames_JP = new string[] { "英語", "ウクライナ語" };
 
         constrr = GameObject.Find("Constructor").GetComponent<Constructor>();
 
@@ -173,17 +183,13 @@ public class MenuCustom : MonoBehaviour
         MasterSliderValue = 0;
         BGSliderValue = 0;
         ObjectsSliderValue = 0;
-        // nn.account.Account.Initialize();
-
+        HideUIValue = 0;
+       
 
         CurrentSlotLocations = new string[10] { "", "", "", "", "", "", "", "", "", "" };
         CurrentSlotDates = new string[10] { "", "", "", "", "", "", "", "", "", "" };
         CurrentSlotTimes = new string[10] { "", "", "", "", "", "", "", "", "", "" };
      
-
-        //Load();
-
-      
         ChooseUITransfrom = GameObject.Find("MenuChoose").transform;
 
         ChooseSubMenu = GameObject.Find("ChooseUI");
@@ -191,11 +197,20 @@ public class MenuCustom : MonoBehaviour
 
         MenuAllTransform = GameObject.Find("MenuAll").transform;
         OptionsAllTransform = GameObject.Find("OptionsAll").transform;
+        if (OptionsAllTransform == null)
+        {
+            GameObject OptionsObject = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/OptionsAll"), CanvasTransform);
+            OptionsObject.name = "OptionsAll";
+            OptionsAllTransform = GameObject.Find("OptionsAll").transform;
+        }
         MouseObject = GameObject.Find("MouseUI");
 
         ResDropDown = GameObject.Find("ResDropdown");
 
         LanguageDropdown = GameObject.Find("LanguageDropdown1");
+
+        HideUIToggle = GameObject.Find("HideUI").GetComponent<Toggle>();
+
         ToolTipsYesNoOB = GameObject.Find("ToolTipsYesNo");
         WindowDropdown = GameObject.Find("WindowDropdown");
 
@@ -252,26 +267,32 @@ public class MenuCustom : MonoBehaviour
 
    
         if (GameObject.Find("LanguageDropdown1") != null)
-            OptionsButtons.Add(GameObject.Find("OptionsAll").transform.Find("LanguageDropdown1").gameObject);
+            OptionsButtons.Add(OptionsAllTransform.Find("LanguageDropdown1").gameObject);
 
         if (GameObject.Find("ResDropdown") != null)
-            OptionsButtons.Add(GameObject.Find("OptionsAll").transform.Find("ResDropdown").gameObject);
+            OptionsButtons.Add(OptionsAllTransform.Find("ResDropdown").gameObject);
 
         if (GameObject.Find("WindowDropdown") != null)
-            OptionsButtons.Add(GameObject.Find("OptionsAll").transform.Find("WindowDropdown").gameObject);
+            OptionsButtons.Add(OptionsAllTransform.Find("WindowDropdown").gameObject);
 
 
-        OptionsButtons.Add(GameObject.Find("OptionsAll").transform.Find("MasterSlider").gameObject);
-        OptionsButtons.Add(GameObject.Find("OptionsAll").transform.Find("BGSlider").gameObject);
-        OptionsButtons.Add(GameObject.Find("OptionsAll").transform.Find("ObjectsSlider").gameObject);
-        OptionsButtons.Add(GameObject.Find("OptionsAll").transform.Find("OptionsApply").gameObject);
+        OptionsButtons.Add(OptionsAllTransform.Find("MasterSlider").gameObject);
+        OptionsButtons.Add(OptionsAllTransform.Find("BGSlider").gameObject);
+        OptionsButtons.Add(OptionsAllTransform.Find("ObjectsSlider").gameObject);
+
+        OptionsButtons.Add(HideUIToggle.gameObject);
+
+
+        OptionsButtons.Add(OptionsAllTransform.Find("OptionsApply").gameObject);
+
+ 
 
         ONOFFUI(OptionsAllTransform, false);
         YesNoButtons.Add(ToolTipsYesNoOB.transform.Find("YesButton").gameObject);
         YesNoButtons.Add(ToolTipsYesNoOB.transform.Find("NoButton").gameObject);
 
         if (GameObject.Find("Player")!=null)
-        pl = GameObject.Find("Player").GetComponent<Player>();
+            pl = InitializeObjects.PL;
 
         MenuONOFF = false;
         if (SceneManager.GetActiveScene().name == "StartMenu") MenuONOFF = true;
@@ -279,20 +300,16 @@ public class MenuCustom : MonoBehaviour
 
         if (MenuAllObject == null)
         {
-            GameObject MenuObject = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/MenuAll"), GameObject.Find("Canvas").transform);
+            GameObject MenuObject = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/MenuAll"), CanvasTransform);
             MenuObject.name = "MenuAll";
         }
 
-        if (OptionsAllTransform == null)
-        {
-            GameObject OptionsObject = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/OptionsAll"), GameObject.Find("Canvas").transform);
-            OptionsObject.name = "OptionsAll";
-        }
+        
 
 
         if (ToolTipsYesNoOB == null)
         {
-            ToolTipsYesNoOB = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/ToolTipsYesNo"), GameObject.Find("Canvas").transform);
+            ToolTipsYesNoOB = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/ToolTipsYesNo"), CanvasTransform);
             ToolTipsYesNoOB.name = "ToolTipsYesNo";
         }
 
@@ -1137,9 +1154,6 @@ public class MenuCustom : MonoBehaviour
                 if (OptionsButtons[MenuButtonNum].name == "BGSlider") BGSliderValue = OptionsButtons[MenuButtonNum].GetComponent<Slider>().value;
                 if (OptionsButtons[MenuButtonNum].name == "ObjectsSlider") ObjectsSliderValue = OptionsButtons[MenuButtonNum].GetComponent<Slider>().value;
                    
-                Debug.Log("MasterSlider Value" + MasterSliderValue);
-                Debug.Log("BGSlider Value" + BGSlider);
-
                 ScrollDelay = Time.fixedTime + 0.2f;
                 IM.ActionDelay = Time.fixedTime + 0.2f;
             }
@@ -1156,8 +1170,26 @@ public class MenuCustom : MonoBehaviour
         }
 
 
+        if (OptionsButtons[MenuButtonNum].GetComponent<Toggle>() != null)
+        {
+            if (IM.enter_b)
+            {
+                OptionsButtons[MenuButtonNum].GetComponent<Toggle>().isOn = !OptionsButtons[MenuButtonNum].GetComponent<Toggle>().isOn;
+               
+                if (HideUIToggle.isOn)
+                HideUIValue = 1;
+                else HideUIValue = 0;
+            }
+        }
+
+        HideUI = HideUIToggle.isOn;
+
         if (!IM.joystick)
         {
+            if (HideUIToggle.isOn)
+                HideUIValue = 1;
+            else HideUIValue = 0;
+
             MasterSliderValue = MasterSlider.value;
             BGSliderValue = BGSlider.value;
             ObjectsSliderValue = ObjectsSlider.value;
@@ -1440,6 +1472,7 @@ public class MenuCustom : MonoBehaviour
             ObjectsSliderValue = 0.8f;
             BGSliderValue = 0.8f;
             MasterSliderValue = 0.8f;
+            HideUIValue = 0;
         }
 
 
@@ -1545,7 +1578,10 @@ public class MenuCustom : MonoBehaviour
         mg.SetFloat("Master", master);
 
 
+        if (HideUIValue == 0) HideUIToggle.isOn = false;
+        else HideUIToggle.isOn = true;
 
+        HideUI = HideUIToggle.isOn;
 
         if (LanguageDropdown != null)
             LanguageDropdown.GetComponent<TMP_Dropdown>().value = Language;
@@ -1742,9 +1778,24 @@ public class MenuCustom : MonoBehaviour
         if (Language == 1) ExitBuildingMode_text = "Вихід з режиму будування";
         if (Language == 2) ExitBuildingMode_text = "ビルディング・モードの終了";
 
-        
-        if(ExitBuildingMode!=null)
-        ExitBuildingMode.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = ExitBuildingMode_text;
+    
+        if (Language == 0) BuildingModeText = "Fade mode";
+        if (Language == 1) BuildingModeText = "Прозорість";
+        if (Language == 2) BuildingModeText = "フェード・モード";
+
+
+        if (Language == 0) ScreenZoomText = "Zoom in / out";
+        if (Language == 1) ScreenZoomText = "Зум екрану";
+        if (Language == 2) ScreenZoomText = "ズームイン/ズームアウト";
+
+        if (ExitBuildingMode != null)
+        {
+           ExitBuildingMode.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = ExitBuildingMode_text;
+            ExitBuildingMode.transform.Find("BuildingModeButton").Find("Text").GetComponent<TextMeshProUGUI>().text = BuildingModeText;
+            ExitBuildingMode.transform.Find("ScreenZoomButton").Find("Text").GetComponent<TextMeshProUGUI>().text = ScreenZoomText;
+
+
+        }
 
         if (BackFromSaveSlots != null)
         {
@@ -1931,8 +1982,14 @@ public class MenuCustom : MonoBehaviour
 
         }
 
-       
- 
+        if (Language == 0) HideUIText = "Hide UI buttons";
+        if (Language == 1) HideUIText = "Сховати кнопки";
+        if (Language == 2) HideUIText = "UIボタンを隠す";
+
+        if (OptionsAllTransform != null)
+            OptionsAllTransform.Find("HideUI").Find("Label").GetComponent<TextMeshProUGUI>().text = HideUIText;
+
+
 
         if (Language == 0)
         {
@@ -2108,6 +2165,10 @@ public class MenuCustom : MonoBehaviour
 
     void SetComponentEnabled(Transform tr, bool enabled)
     {
+        if (tr.GetComponent<GamepadUI>() != null && HideUI)
+            return;
+
+
         Image image = tr.GetComponent<Image>();
         if (image != null)
             image.enabled = enabled;

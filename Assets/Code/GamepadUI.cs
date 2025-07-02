@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,9 +20,11 @@ public class GamepadUI : MonoBehaviour
     private Image IMG;
     private SpriteRenderer SPRT;
 
+    private MenuCustom _Menu;
     private void Awake()
     {
-
+        if(InitializeObjects.Constr!=null)
+        _Menu = InitializeObjects.Constr.GetComponent<MenuCustom>();
         IMG = GetComponent<Image>();
         SPRT = GetComponent<SpriteRenderer>();
 
@@ -57,12 +60,24 @@ public class GamepadUI : MonoBehaviour
     
     void Update()
     {
-        
-        if (IMG != null)
-            IMG.enabled = false;
-        if (SPRT != null)
-            SPRT.enabled = false;
-            
+        if (_Menu != null)
+        {
+            if (_Menu.HideUI)
+            {
+                if (IMG != null)
+                    IMG.enabled = false;
+                if (SPRT != null)
+                    SPRT.enabled = false;
+
+                for (int i = 0; i < transform.childCount; i++)
+                {
+                    if (transform.GetChild(i).GetComponent<TextMeshProUGUI>() != null)
+                        transform.GetChild(i).GetComponent<TextMeshProUGUI>().enabled = false;
+                }
+                return;
+            }
+        }
+
 
 #if UNITY_STANDALONE
         if (!IM.joystick)

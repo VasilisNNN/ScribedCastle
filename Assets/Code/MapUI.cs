@@ -1,3 +1,4 @@
+using NUnit;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -18,8 +19,9 @@ public class MapUI : MonoBehaviour
 
         HomeTracker = GameObject.Find("HomeTracker");
 
-        pl = GameObject.Find("Player").GetComponent<Player>();
-        menu = GameObject.Find("Constructor").GetComponent<MenuCustom>();
+        pl = InitializeObjects.PL;
+        menu = pl.GetComponent<MenuCustom>();
+       
     }
 
  

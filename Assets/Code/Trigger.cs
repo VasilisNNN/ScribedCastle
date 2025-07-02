@@ -52,7 +52,7 @@ public class Trigger : MonoBehaviour
     public bool BloodEffectOnSelfDestroy;
 
     private List<GameObject> NeedItemGameobject = new List<GameObject>();
-    private Constructor constr;
+    private Constructor Constr;
     public bool StartCutscene;
 
     public int Damage = 0;
@@ -63,8 +63,10 @@ public class Trigger : MonoBehaviour
     {
         ViewTrigger = GameObject.Find("ViewTrigger");
 
-        pl = GameObject.Find("Player").GetComponent<Player>();
-        constr = GameObject.Find("Constructor").GetComponent<Constructor>();
+        pl = InitializeObjects.PL;
+        inv = pl.inv;
+        Constr = InitializeObjects.Constr;
+
         if (StartOFF)
         {
             for (int i = 0; i < TF.Length; i++)
@@ -107,11 +109,11 @@ public class Trigger : MonoBehaviour
         if (NeedBuildingsToConstruct.Length > 0)
         {
 
-            for (int i = 0; i < constr.OBOnBoard.Count; i++)
+            for (int i = 0; i < Constr.OBOnBoard.Count; i++)
             {
                 for (int j = 0; j < NeedBuildingsToConstruct.Length; j++)
                 {
-                    if (constr.OBOnBoard[i].ID == NeedBuildingsToConstruct[j])
+                    if (Constr.OBOnBoard[i].ID == NeedBuildingsToConstruct[j])
                     {
                         BuildingsMatch[j] = 1;
                     }
@@ -139,7 +141,7 @@ public class Trigger : MonoBehaviour
         if (pl.inv.showinvent || pl.inv.showjournal  || pl.menu.MenuONOFF || pl._gameover) return;
         if (NeedItem > -1) DrawNeedItemControll();
 
-        if (constr.TutorialPause) return;
+        if (Constr.TutorialPause) return;
         if (DestroyTimer > Time.fixedTime && DestroyTimer - 0.1f < Time.fixedTime)
         {
             for (int i = 0; i < ONObjects.Length; i++)
@@ -338,7 +340,7 @@ public class Trigger : MonoBehaviour
 
         for (int i = 0; i < NeedBuildingsToConstruct.Length; i++)
         {
-            if (NeedBuildingsToConstruct[i] == constr.LastBuildingConstructed)
+            if (NeedBuildingsToConstruct[i] == Constr.LastBuildingConstructed)
             {
                 BuildingsMatch[i] = 1;
 
@@ -483,9 +485,9 @@ public class Trigger : MonoBehaviour
             if (ONObjects[Obnum].GetComponent<ParticleSystem>() != null)
                 ONObjects[Obnum].GetComponent<ParticleSystem>().Stop(true);
         }
-
-        if (ONObjects[Obnum].GetComponent<CharacterMove>() != null)
-            ONObjects[Obnum].GetComponent<CharacterMove>().enabled = TF;
+            
+        if (ONObjects[Obnum].GetComponent<CharacterPath>() != null)
+            ONObjects[Obnum].GetComponent<CharacterPath>().enabled = TF;
 
         if (ONObjects[Obnum].GetComponent<Door>() != null)
             ONObjects[Obnum].GetComponent<Door>().enabled = TF;

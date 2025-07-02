@@ -57,7 +57,7 @@ public class Attacks : MonoBehaviour
 
     public GameObject Bullet;
 
-    private CharacterMove CM;
+    private CharacterPath CM;
 
     private List<AnimState> AnimatorStates = new List<AnimState>();
 
@@ -84,7 +84,7 @@ public class Attacks : MonoBehaviour
         AnimatorStates.Add(new AnimState("Shooting3", false));
         AnimatorStates.Add(new AnimState("ShootingCircle", false));
 
-        CM = GetComponent<CharacterMove>();
+        CM = GetComponent<CharacterPath>();
 
         if (Bullet == null) Bullet = Resources.Load<GameObject>("Prefabs/Bullets/Bullet");
         side = 1;
@@ -96,7 +96,8 @@ public class Attacks : MonoBehaviour
         FaceUpZone = transform.Find("FaceUpZone").gameObject;
 
         AttackDurationMax = 1;
-        pl = GameObject.Find("Player").GetComponent<Player>();
+        pl = InitializeObjects.PL;
+       
         _transform = transform;
        
         DelayBetweenAttacks = Time.fixedTime + DelayBetweenAttacks_MAX;
@@ -970,7 +971,7 @@ public class Attacks : MonoBehaviour
                
                 BulletsSpeeds.Add(new Vector2(0, 0));
                 Bullets.Add(bullet);
-                bullet.GetComponent<CharacterMove>().SpeedMultiplier = 35;
+                bullet.GetComponent<CharacterPath>().SpeedMultiplier = 35;
             }
             
             HSpeed = 0;

@@ -12,13 +12,7 @@ public class Sit
 
 public class PubObject : MonoBehaviour
 {
-    public bool Red;
-    public bool Green;
-    public bool Gold;
-
-    public int Cost;
-    public int CornCost;
-
+ 
     public bool Table;
     public bool Shield;
     public bool TransperentWall;
@@ -32,13 +26,12 @@ public class PubObject : MonoBehaviour
     public float TableTimer { get;  set; }
     public float FarmingTimer { get;  set; }
 
-    private float Waiting, DinerTimer, PauseBetweenClients,StartCliantTimer;
+    private float Waiting, PauseBetweenClients;
 
-    private float TableEmptyTimer;
+
 
     public List<Sit> Sits = new List<Sit>();
-    public List<GameObject> Clients { get; private set; }
-
+   
     private Constructor Const;
 
     public bool Hungry { get; set; }
@@ -60,10 +53,6 @@ public class PubObject : MonoBehaviour
 
     public List<GameObject> CharactersOnThisStructure = new List<GameObject>();
 
-    public bool Shielded { get; set; }
-
-    public GameObject ShieldObject { get; set; }
-
     public TileBase _TileBase { get; set; }
     public Tilemap MAPS { get; set; }
 
@@ -75,8 +64,6 @@ public class PubObject : MonoBehaviour
     public bool Crowded { get; set; }
 
     private SpriteRenderer ObjSPRT;
-    private Vector3 CameraPos;
-    private Camera MainCam;
 
     public int TopObjectsCount { get; set; }
 
@@ -84,9 +71,6 @@ public class PubObject : MonoBehaviour
     private GameObject WalkingClient, BrakedownOB;
 
     public bool Draw = true;
-
-    public bool CleanerIsGoing { get; set; }
-    public bool RepairerIsGoing { get; set; }
 
     public int[] ItemNeeded { get; set; }
     public int[] ItemNeededCount { get; set; }
@@ -105,6 +89,7 @@ public class PubObject : MonoBehaviour
     void Start()
     {
         _transform = transform;
+        Const = InitializeObjects.Constr;
 
         _GetItem = GetComponent<GetItem>();
         if (DishObject == null && Table)
@@ -133,24 +118,18 @@ public class PubObject : MonoBehaviour
       
         if (wall <= 0) TopObjectsCount = 99;
 
-        MainCam = GameObject.Find("Main Camera").GetComponent<Camera>();
-
+       
         ObjSPRT = GetComponent<SpriteRenderer>();
         if (wall<=0)
         durability = 20;
         //durability = 1;
 
-        Clients = new List<GameObject>();
+    
 
-        Const = GameObject.Find("Constructor").GetComponent<Constructor>();
         Waiting = 20;
         PauseBetweenClients = 10;
-        DinerTimer = 10;
         TableTimer =  Random.Range(2,6);
-        StartCliantTimer = Time.fixedTime + Random.Range(0, 2);
-
-
-
+       
         Const.AllPeople += people;
         Const.AllTables += tables;
         Const.Comfort += ComfortPlus;
@@ -353,20 +332,6 @@ public class PubObject : MonoBehaviour
 
  
     
-
-    public void AddClient(GameObject Client)
-    {
-        if (Clients.Count < Sits.Count)
-        {
-            Clients.Add(Client);
-            Const.ClientsList.Add(Client);
-        }
-
-    }
-
-
- 
-
   
 
     /*public void SetDinerTimer()

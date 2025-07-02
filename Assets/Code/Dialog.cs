@@ -8,9 +8,7 @@ using System.Linq;
 using System.Text;
 using System;
 using TMPro;
-
-[RequireComponent(typeof(TextDatabase))]
-
+using NUnit;
 
 
 public class Dialog : MonoBehaviour
@@ -58,11 +56,12 @@ public class Dialog : MonoBehaviour
 
 
         AS = GetComponent<AudioSource>();
-        textdatabase = GetComponent<TextDatabase>();
+        textdatabase =InitializeObjects.Textdatabase;
 
         if (GameObject.Find("Player") != null)
         {
-            pl = GameObject.Find("Player").GetComponent<Player>();
+
+            pl = InitializeObjects.PL;
             IM = pl.IM;
         }
         else
@@ -136,13 +135,13 @@ public class Dialog : MonoBehaviour
 
         if (gameObject.activeInHierarchy)
         {
-            TextScroll(StripRichTagsFromStr(LinesEn[NumberInData(DialogID)].
+            TextScroll(LinesEn[NumberInData(DialogID)].
               line[CurrentDPart].
-              line[CurrentLine]));
+              line[CurrentLine]);
 
-            print(StripRichTagsFromStr(LinesEn[NumberInData(DialogID)].
+            print(LinesEn[NumberInData(DialogID)].
               line[CurrentDPart].
-              line[CurrentLine]));
+              line[CurrentLine]);
         }
 
        
@@ -189,81 +188,61 @@ public class Dialog : MonoBehaviour
 
 
 
-    public void SetSubDialog(string text, Vector2 pos)
-    {
-        Transform SubText_Transform = GameObject.Find("SubDialog").transform;
-
-        SubText_Transform.position = pos;
-        SubText_Transform.Find("Text").GetComponent<TextMeshProUGUI>().text = StripRichTagsFromStr(text);
-        SubText_Transform.SetAsLastSibling();
-
-    }
     
     void NextLine()
     {
 
-        if (!isTyping)
-        {
-            if (timer < Time.fixedTime)
-            {
-                isTyping = true;
-                PrefabName = "";
-                CurrentItem = -1;
-                QuestName = "";
-                QuestTag = false;
-                DialogString = "";
-                leter = 0;
+        if (isTyping) return;
+        
+        if (timer >=Time.fixedTime) return;
+        
+        isTyping = true;
+        PrefabName = "";
+        CurrentItem = -1;
+        QuestName = "";
+        QuestTag = false;
+        DialogString = "";
+        leter = 0;
 
-                if (CurrentLine < LinesEn[NumberInData(DialogID)].line[CurrentDPart].line.Length - 1)
-                {
-                    CurrentLine++;
+        if (CurrentLine < LinesEn[NumberInData(DialogID)].line[CurrentDPart].line.Length - 1)
+        {
+            CurrentLine++;
 
                    
-                }
-                else
-                {
-
-                    if (CurrentDPart < LinesEn[NumberInData(DialogID)].line.Length - 1)
-                    {
-                        CurrentDPart++;
-                        if (LinesEn[NumberInData(DialogID)].line.Length > 1)
-                            PlayerTurn = !PlayerTurn;
-                    }
-                    else
-                    {
-                        DialogString = "";
-                        PlayerTurn = true;
-                        LastLine = true;
-                        CurrentDPart = 0;
-                        CurrentLine = 0;
-                        ONOFFUI(transform, false);
-                        pl.inv.ONOFF(GameObject.Find("ButtonsUI"), true);
-
-                        //gameObject.SetActive(false);
-                    }
-
-
-
-
-                    CurrentLine = 0;
-
-                }
-
-
-
-                //EventSystem.current = null;
-                // EventSystem e = GameObject.Find("EventSystem").GetComponent<EventSystem>();
-
-                // GameObject.Find("EventSystem").GetComponent<StandaloneInputModule>().poin = null;
-
-                //  AS.clip = Accept;
-                //   AS.Play();
-                timer = Time.fixedTime + 0.1f;
-            }
         }
-       
+        else
+        {
+
+            if (CurrentDPart < LinesEn[NumberInData(DialogID)].line.Length - 1)
+            {
+                CurrentDPart++;
+                if (LinesEn[NumberInData(DialogID)].line.Length > 1)
+                    PlayerTurn = !PlayerTurn;
+            }
+            else
+            {
+                DialogString = "";
+                PlayerTurn = true;
+                LastLine = true;
+                CurrentDPart = 0;
+                CurrentLine = 0;
+                ONOFFUI(transform, false);
+                pl.inv.ONOFF(GameObject.Find("ButtonsUI"), true);
+
+                //gameObject.SetActive(false);
+            }
 
 
+
+
+            CurrentLine = 0;
+
+        }
+
+
+
+         timer = Time.fixedTime + 0.1f;
+        
       
     }
 
@@ -333,242 +312,7 @@ public class Dialog : MonoBehaviour
     }
 
 
-    public string RemoveItemTags(string richStr)
-    {
-        print("RemoveItemTags");
-        try
-        {
-            StringBuilder sb = new StringBuilder(richStr.Length);
-            bool tag = false;
-            string tagfull = "";
-
-            bool ItemTag = false;
-            for (int index = 0; index < richStr.Length; index++)
-            {
-                char c = richStr[index];
-                tagfull.Append(c);
-
-
-
-                if (tag)
-                {
-                    if (c == '>')
-                    {
-                        tag = false;
-                    }
-                }
-                
-                else
-                {
-
-                    if (c == '<')
-                    {
-
-                        tag = true;
-
-
-                        for (int i = index; i < richStr.Length; i++)
-                        {
-                            char cc = richStr[i];
-                            tagfull += cc;
-
-                            print(tagfull);
-
-                            for (int j = 0; j < 40; j++)
-                            {
-
-                                if (tagfull == "<link=GetItem" + j + "><color=red>")
-                                {
-                                    print("GotItem" + DialogID + CurrentLine);
-
-                                    if (PlayerPrefs.GetInt("GotItem" + DialogID + CurrentLine) != 1)
-                                    {
-                                        sb.Append("<link=GetItem" + j + "><color=red>");
-                                        CurrentItem = j;
-                                    }
-
-
-                                    index = i;
-
-                                    tagfull = "";
-                                    tag = false;
-                                    ItemTag = true;
-                                    break;
-                                }
-
-                            }
-
-                            if (tagfull == "<link=Quest>")
-                            {
-                                index = i;
-                                sb.Append("<link=Quest>");
-                                print("QQQQQQQ");
-                                for (int jj = i; jj < richStr.Length; jj++)
-                                {
-                                    char ccc = richStr[jj];
-
-                                    QuestTag = true;
-                                    // index = i;
-                                    print("Add QuestName");
-                                    if (ccc == '<')
-                                    {
-                                  
-                                        sb.Append(QuestName + "</link>");
-                                        index = jj - 1;
-                                        tagfull = "";
-                                        tag = false;
-
-                                        break;
-                                    }
-                                    if (ccc != '>')
-                                        QuestName += ccc;
-                                }
-
-                            }
-
-                            if (tagfull == "<link=Prefab>")
-                            {
-                                index = i;
-                                sb.Append("<link=Prefab>");
-
-                                for (int jj = i; jj < richStr.Length; jj++)
-                                {
-                                    char ccc = richStr[jj];
-
-                                    PrefabTag = true;
-                                    // index = i;
-
-                                    if (ccc == '<')
-                                    {
-                                        print("Add Prefab");
-                                        sb.Append(PrefabName + "</link>");
-                                        index = richStr.Length - 1;
-                                        tagfull = "";
-                                        tag = false;
-
-                                        break;
-                                    }
-                                    if (ccc != '>')
-                                        PrefabName += ccc;
-                                }
-                            }
-                            if (tagfull == "</color></link>")
-                            {
-                                index = i;
-                                sb.Append("</color></link>");
-                            }
-
-                            /*if (tagfull == "</link>")
-                            {
-                                index = i;
-                                sb.Append("</link>");
-                            }*/
-
-                            if (tagfull == "<link=Dialog><color=yellow>")
-                            {
-                                index = i;
-                                sb.Append("<link=Dialog><color=yellow>");
-
-
-
-                            }
-
-                            if (ItemTag)
-                            {
-                                if (tagfull == "</color>")
-                                {
-                                    index = i;
-
-                                    tagfull = "";
-                                    tag = false;
-                                    break;
-                                }
-
-                                if (tagfull == "</link>")
-                                {
-                                    index = i;
-
-                                    tagfull = "";
-                                    tag = false;
-                                    ItemTag = false;
-                                    break;
-                                }
-
-                            }
-
-
-                            if (QuestTag)
-                            {
-                                //pl.inv.AddQuest(QuestName);
-                                print("ADD QUEST");
-
-                                if (tagfull == "</color>")
-                                {
-                                    index = i;
-
-                                    tagfull = "";
-                                    tag = false;
-                                    break;
-                                }
-
-                                if (tagfull == "</link>")
-                                {
-                                    index = i;
-
-                                    tagfull = "";
-                                    tag = false;
-                                    ItemTag = false;
-                                    break;
-                                }
-
-                                QuestTag = false;
-                            }
-
-                        }
-
-                        print(sb);
-
-                    }
-                    else
-                    {
-                        sb.Append(c);
-
-                    }
-                }
-            }
-
-            // -----------------------------------
-            string strippedStr = sb.ToString();
-            //Debug.Log(strippedStr);
-
-            return strippedStr;
-        }
-        catch (Exception e)
-        {
-            Debug.LogError("[Common]**ERR @ StripRichTagsFromStr: " + e);
-            return "";
-        }
-
-
-
-        //for (int i=0;i<100;i++)
-        //    {
-        //        if (richStr.Contains("<link=GetItem" + i + ">"))
-        //        {
-
-        //            richStr.Replace("<link=GetItem" + i + "><color=red>", "");
-        //            richStr.Replace("<color=red>", "");
-        //            richStr.Replace("</color></link>", "");
-        //        }
-        //    }
-
-        //print("richStr " + richStr);
-
-        //return richStr;
-
-    }
-
-
+  
 
     public int NumberInData(int ID)
     {
@@ -586,149 +330,11 @@ public class Dialog : MonoBehaviour
     }
 
 
-    public static string StripRichTagsFromStr(string richStr)
+    private void OnDestroy()
     {
-        try
-        {
-            StringBuilder sb = new StringBuilder(richStr.Length);
-            bool tag = false;
-            string tagfull = "";
-            string PrefabName = "";
-            string QuestName = "";
-           Player PPl = GameObject.Find("Player").GetComponent<Player>();
-
-            for (int index = 0; index < richStr.Length; index++)
-            {
-                char c = richStr[index];
-                if (tag)
-                {
-                    if (c == '>')
-                    {
-                        tag = false;
-                    }
-                }
-                else
-                {
-                    if (c == '<')
-                    {
-                        
-                        for (int i = index; i < richStr.Length; i++)
-                        {
-                            char cc = richStr[i];
-                            tagfull += cc;
-
-                            if (tagfull == "<link=Quest>")
-                            {
-                                // sb.Append(cc);
-                                print("link=Quest");
-                                index = i + 1;
-
-                                for (int j = index; j < richStr.Length; j++)
-                                {
-                                    char ccc = richStr[j];
-                                    PrefabName += ccc;
-                                   // print("ccc " + ccc);
-
-
-                                    if (ccc == '<')
-                                    {
-                                        index = j + 1;
-                                        // sb.Append(ccc);
-
-                                        break;
-                                    }
-
-                                    
-                                        QuestName += ccc;
-
-                                    //print("QuestName " + QuestName);
-                                }
-
-                                if (QuestName.Length > 1)
-                                {
-                                    if(PPl!=null)
-                                    PPl.inv.AddQuest(QuestName);
-                                    QuestName = "";
-                                }
-                                
-                                break;
-                            }
-
-                            if (tagfull == "<link=Quest2>")
-                            {
-                                // sb.Append(cc);
-                               // print("link=Quest");
-                                index = i + 1;
-
-                                for (int j = index + tagfull.Length; j < richStr.Length; j++)
-                                {
-                                    char ccc = richStr[j];
-                                    PrefabName += ccc;
-
-                                    if (ccc == '<')
-                                    {
-                                        index = j + 1;
-                                        // sb.Append(ccc);
-
-                                    }
-
-                                }
-
-
-                             
-                               
-                                break;
-                            }
-
-                            if (tagfull == "<link=Prefab>")
-                            {
-                               // sb.Append(cc);
-                              //  print("link=Prefab");
-                                index = i+1;
-
-                                for (int j = index + tagfull.Length; j < richStr.Length; j++)
-                                {
-                                    char ccc = richStr[j];
-                                    PrefabName += ccc;
-
-                                    if (ccc == '<')
-                                    {
-                                        index = j+1;
-                                       // sb.Append(ccc);
-
-                                    }
-                                    
-                                }
-                                break;
-                            }
-
-
-
-                        
-
-                        }
-                        tag = true;
-                    }
-                    else
-                    {
-                        sb.Append(c);
-                    }
-                }
-            }
-
-            // -----------------------------------
-            string strippedStr = sb.ToString();
-            //Debug.Log(strippedStr);
-
-            return strippedStr;
-        }
-        catch (Exception e)
-        {
-            //Debug.LogError("[Common]**ERR @ StripRichTagsFromStr: " + e);
-            return "";
-        }
+        ResetDialog();
+       
     }
-
     public void ResetDialog()
     {
         leter = 0;

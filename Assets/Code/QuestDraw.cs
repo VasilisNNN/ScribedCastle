@@ -5,7 +5,7 @@ using UnityEngine;
 public class QuestDraw : MonoBehaviour
 {
    
-    private Inventory inv;
+    private Journal journal;
     public int QuestID=0;
     private bool Draw;
     public bool DrawGoal = true;
@@ -13,7 +13,9 @@ public class QuestDraw : MonoBehaviour
     public bool OnFinish = false;
     void Start()
     {
-        inv = GameObject.Find("Player").GetComponent<Inventory>();
+
+        journal = InitializeObjects.PL.journal;
+        
         ONOFF(gameObject, !DrawGoal);
     }
 
@@ -23,7 +25,7 @@ public class QuestDraw : MonoBehaviour
 
         if (OnStart)
         {
-            if (inv.CheckQuestStart(QuestID))
+            if (journal.CheckQuestStart(QuestID))
             {
                 if (!Draw)
                 {
@@ -35,7 +37,7 @@ public class QuestDraw : MonoBehaviour
 
         if (OnFinish)
         {
-            if (inv.CheckQuestDone(QuestID))
+            if (journal.CheckQuestDone(QuestID))
             {
                 if (!Draw)
                 {

@@ -1,16 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 
-using System.Text;
-using UnityEngine.SceneManagement;
-using System.IO;
-using System.Linq;
 using System;
 using TMPro;
-
 
 
 [Serializable]
@@ -51,34 +45,23 @@ public class Constructor : MonoBehaviour
     public bool ChooseMouseObject { get; set;}
 
     public bool DEMO { get; private set; }
-
+ 
 
     public Tilemap Tile;
 
-    public Tilemap TopScafolds;
     private Tilemap UnsettingTile;
     public Tilemap StartBlock;
     public Tilemap TileBlock;
 
-    private Vector3Int UndeadFloorTile;
 
     private int XPos, YPos;
 
     public InputMode IM { get; private set; }
     public int MenuNumber { get; set; }
-    public int CurrenQuest { get; set; }
-    private int QuestPageNum,UnlockPage;
-
-    private string[] TableNames, Tech, TreesNames, FloorNames;
-    private string[] BrushesNames;
-    private string[] PersNames, DecorNames, PlantsNames, DecorWallsNames;
-
    
-    private Vector2 MouthPosPrev;
-    public int Cost { get; set; }
     public int Money { get; set; }
     public int Crowded { get; set; }
-    private int[] SaveMoney;
+
     public int Comfort { get; set; }
     public int ComfortMax, ComfortMin;
     public int TimerStay { get; set; }
@@ -92,10 +75,6 @@ public class Constructor : MonoBehaviour
     private int AllPeopleMax = 30;
     private int AllTablesMax = 50;
 
-    public int AllMeatCost { get; set; }
-    public int AllVegCost { get; set; }
-    public int AllBeerCost { get; set; }
-    
     public int Humans { get; set; }
     public int Language { get; set; }
 
@@ -111,46 +90,30 @@ public class Constructor : MonoBehaviour
     public List<GameObject> DroppedItems = new List<GameObject>();
     [HideInInspector]
     public List<TilesOnBoard> TOnBoard = new List<TilesOnBoard>();
-   // [HideInInspector]
-    //public List<TilesOnBoard> PitsOnBoard = new List<TilesOnBoard>();
+
     [HideInInspector]
 
     public List<ObjectOnBoard> Enemies = new List<ObjectOnBoard>();
 
-    //private List<GameObject> MoneyDifference = new List<GameObject>();
-    private float  BuildDelay, SetObjectDelay;
-
-    //public List<int> UIBrushINT = new List<int>();
+    private float  BuildDelay;
+    public float SetObjectDelay { get; set; }
+   
 
     public List<Item> Dishes { get; set; }
-    private DishesDatabase DD;
 
-    private AudioClip Place, QuestBook;
+
+    private AudioClip Place;
 
     public int Floors { get;  set; }
     public int KitchenFloors { get;  set; }
     public int Walls { get;  set; }
     public int Grounds { get;  set; }
 
-    public int Plants { get;  set; }
-    public int PlantFarms { get;  set; }
-
-    public int Grass { get;  set; }
-    public int Veggies { get;  set; }
-    public int Squids { get;  set; }
-    public int SoldiersCount { get; set; }
-    public int EnemiesCount { get; set; }
-
-    public int SoldiersCountMAX = 30;
-    public int EnemiesCountMAX = 30;
 
     [HideInInspector]
     public List<string> UnlockedText = new List<string>();
 
-    private Vector2 MinField = new Vector2(-10, -9);
-    private Vector2 MaxField = new Vector2(10, 7);
     private Transform _transform;
-    private float XShake, YShake;
     private bool _DestroyObject;
 
     public int MinimumWage { get; private set; }
@@ -178,21 +141,20 @@ public class Constructor : MonoBehaviour
     private Camera MainCamera;
     private TextMeshProUGUI SalariesOB, AllMoneyObject, AllComfortObject, AllTimeObject, AllMetalObject, AllStoneObject, AllWoodObject, AllPeopleObject, AllTablesObject, IncomeOB;
     public GameObject GodEncounter { get; set; }
-    private GameObject QPage0, QPage1, QPage2, PlayButton, PauseButton, Play2Button; 
+    private GameObject PlayButton, PauseButton, Play2Button; 
     private Transform CanvasTransform;
     private QuestDatabase QD;
  
 
     private Vector2 ConstructorObjectPosition;
 
-    private GameObject ExitBuildingMode,ConstructorButtons,  MoneyDifferenceOB, BeerDifferenceOB, MeatDifferenceOB, VegDifferenceOB , QuestPartOB, MenuQuestOB, TipsPause;
+    private GameObject ExitBuildingMode,ConstructorButtons;
 
     public int MinIncome { get; set; }
     public int MaxIncome { get; set; }
 
     public SaveLoad SL { get; set; }
-    [HideInInspector]
-    public List<int> TutorialPhaseBigTip = new List<int>();
+
     private Image ToolTip_IMG;
     [HideInInspector]
     public TextMeshProUGUI ToolTip_Text { get; set; }
@@ -222,9 +184,6 @@ public class Constructor : MonoBehaviour
     public Tilemap WaterMap { get; set; }
     public Tilemap PitsTileBase { get; set; }
 
-    private Material StunMaterial;
-
-
     private Image PLAY_ButtonImage ;
     private Image PAUSE_ButtonImage ;
     private Image SPEED2_ButtonImage ;
@@ -249,7 +208,7 @@ public class Constructor : MonoBehaviour
     public int AllPoop { get; set; }
     public int MaxTrash { get; private set; }
     public int AllTrash { get; set; }
-    private Material WhiteMaterial;
+
 
     private List<ObjectOnBoard> batch;
     private ObjectOnBoard batchpart;
@@ -274,15 +233,17 @@ public class Constructor : MonoBehaviour
 
     private GameObject BuildEffect, DemolishEffect;
     private TextDatabase textdatabase;
-    private CollList _CollList;
+
+
+    public bool AlphaBuildingFade { get; private set; }
     void Start()
     {
         CurrentMerchantID = MerchantsIds[0];
         MerchantNameText = GameObject.Find("MerchantNameText").GetComponent<TextMeshProUGUI>();
 
-        _CollList = GetComponent<CollList>();
-        gameObject.AddComponent<TextDatabase>();
-        textdatabase = GetComponent<TextDatabase>();
+     
+  
+        textdatabase = InitializeObjects.Textdatabase;
         
         AllPoop = 20;
         AllTrash = 20;
@@ -298,44 +259,30 @@ public class Constructor : MonoBehaviour
            PAUSE_ButtonImage = GameObject.Find("PAUSE_Button").GetComponent<Image>();
            SPEED2_ButtonImage = GameObject.Find("SPEED2_Button").GetComponent<Image>();
 
-        StunMaterial = Resources.Load<Material>("Materials/DoodleHorizontal");
-        WhiteMaterial = Resources.Load<Material>("Materials/DamageLight");
+        
         GreyMap = GameObject.Find("Grid").transform.Find("GreyGround").GetComponent<Tilemap>();
         GrassMap = GameObject.Find("Grid").transform.Find("Grass").GetComponent<Tilemap>();
         WaterMap = GameObject.Find("Grid").transform.Find("Water").GetComponent<Tilemap>();
-
+        Tile = GameObject.Find("Grid").transform.Find("Floor").GetComponent<Tilemap>();
+        StartBlock = GameObject.Find("Grid").transform.Find("StartBlock").GetComponent<Tilemap>();
+        TileBlock = GameObject.Find("Grid").transform.Find("Block").GetComponent<Tilemap>();
+  
         PitsTileBase = GameObject.Find("Grid").transform.Find("PitsTileBase").GetComponent<Tilemap>();
-
 
         ConstructorButtons = GameObject.Find("ConstructorButtons");
 
         ChooseUI = GameObject.Find("ChooseUI");
-        pl = GameObject.Find("Player").GetComponent<Player>();
-        inv = GameObject.Find("Player").GetComponent<Inventory>();
+
+        pl = InitializeObjects.PL;
+        inv = pl.inv;
         SL = GetComponent<SaveLoad>();
-
-        TipsPause = GameObject.Find("TipsPause");
-        MoneyDifferenceOB = Resources.Load<GameObject>("Prefabs/UI/MoneyDifference");
-        BeerDifferenceOB = Resources.Load<GameObject>("Prefabs/UI/BearDifference");
-        MeatDifferenceOB = Resources.Load<GameObject>("Prefabs/UI/MeatDifference");
-        VegDifferenceOB = Resources.Load<GameObject>("Prefabs/UI/VegDifference");
-        QuestPartOB = Resources.Load<GameObject>("Prefabs/UI/QuestPart");
-        MenuQuestOB = Resources.Load<GameObject>("Prefabs/UI/MenuQuest");
-
+        CanvasTransform = InitializeObjects.CanvasTransform;
 
         _menu = GetComponent<MenuCustom>();
 
-
-        //MAYBE CAUSES A BUG ON SECOND LOAD
-
-        Debug.Log("STARTED");
-        
-
-
-
         QD = GameObject.Find("QuestDatabase").GetComponent<QuestDatabase>();
       
-        CanvasTransform = GameObject.Find("Canvas").transform;
+
         AllMoneyObject = GameObject.Find("AllMoney").GetComponent<TextMeshProUGUI>();
         if (GameObject.Find("AllComfort")!=null)
         AllComfortObject =  GameObject.Find("AllComfort").GetComponent<TextMeshProUGUI>();
@@ -343,9 +290,6 @@ public class Constructor : MonoBehaviour
         AllPeopleObject = GameObject.Find("AllPeople").GetComponent<TextMeshProUGUI>();
         AllTablesObject = GameObject.Find("AllTables").GetComponent<TextMeshProUGUI>();
 
-        QPage0 = GameObject.Find("QPage0");
-        QPage1 = GameObject.Find("QPage1");
-        QPage2 = GameObject.Find("QPage2");
 
         if (GameObject.Find("GodEncounter") != null)
         {
@@ -364,18 +308,12 @@ public class Constructor : MonoBehaviour
         ToolTip_Text = GameObject.Find("ToolTipText").GetComponent<TextMeshProUGUI>();
 
 
-        AllMeatCost = 200;
-        AllVegCost = 200;
-        AllBeerCost = 200;
-
         MinimumWage = 0;
       
         DEMO = false;
         _transform = transform;
         Place = Resources.Load<AudioClip>("Sound/UI/Build");
-        QuestBook = Resources.Load<AudioClip>("Sound/UI/Button2");
-
-      
+       
         Dishes = new List<Item>();
 
         int dishcount = 0;
@@ -397,19 +335,8 @@ public class Constructor : MonoBehaviour
         TimerStayMax = 50;
 
      
-        FloorNames = new string[2] { "Floor", "FloorKitchen" };
-        TableNames = new string[5] { "Table_0", "Table_1", "Table_2", "Table_3", "Bar" };
-        BrushesNames = new string[4] { "Brush_0", "Brush_1", "Brush_2", "Brush_3" };
-        PersNames = new string[4] { "Pers_0", "Pers_1", "Pers_2", "Pers_3" };
-        DecorNames = new string[3] { "Decor_0", "Decor_1", "Decor_2"};
-        DecorWallsNames = new string[9] { "DecorWall_0", "DecorWall_1", "DecorWall_2", "DecorWall_3", "DecorWall_4", "DecorWall_5", "DecorWall_6", "DecorWall_7", "DecorWall_8" };
-
-        Tech = new string[3] { "Oven", "Veg", "Meat"};
-        
-        PlantsNames = new string[2] { "Tree_0", "Tree_1" };
         IM = GetComponent<InputMode>();
-
-        TipsPause.SetActive(false);
+      
         if(GameObject.Find("Gameover")!=null)
             inv.ONOFF( GameObject.Find("Gameover"), false);
         
@@ -419,16 +346,7 @@ public class Constructor : MonoBehaviour
             inv.ONOFF( GameObject.Find("QuestPart" + i), false);
         }
 
-        inv.ONOFF(GameObject.Find("QuestBookBG2Text"), false);
-        inv.ONOFF(GameObject.Find("QuestBookBG2"), false);
-        inv.ONOFF(GameObject.Find("QuestBookBG"), false);
-        inv.ONOFF( QPage0, false);
-        inv.ONOFF(QPage1, false);
-        inv.ONOFF( QPage2, false);
-     
-        UndeadFloorTile = new Vector3Int(0, 0, 0);
-       
-
+        
         for (int x = -30; x < 30; x++)
         {
 
@@ -457,14 +375,12 @@ public class Constructor : MonoBehaviour
         
        DeActivateBuilding();
    
-        GameStarted = true;
+       GameStarted = true;
         
-     
-        
-        PopulateGrid();
-        UpdateObjectsInRange();
+       PopulateGrid();
+       UpdateObjectsInRange();
 
-        inv.ONOFF(ExitBuildingMode, false);
+       inv.ONOFF(ExitBuildingMode, false);
     }
 
 
@@ -532,63 +448,48 @@ public class Constructor : MonoBehaviour
     {
         objectsInRange.Clear();
 
-         playerGridPosition = GetGridPosition(MainCamera.gameObject.transform.position);
+        Vector3 playerPos = MainCamera.transform.position;
+        Vector2Int playerGridPosition = GetGridPosition(playerPos);
+
+        Vector2Int gridPosition;
+        ObjectOnBoard obj;
+        Vector3 objPos;
+        Vector3 distance;
 
         for (int xOffset = -2; xOffset <= 2; xOffset++)
         {
             for (int yOffset = -2; yOffset <= 2; yOffset++)
             {
-               gridPosition = new Vector2Int(playerGridPosition.x + xOffset, playerGridPosition.y + yOffset);
+                gridPosition = new Vector2Int(playerGridPosition.x + xOffset, playerGridPosition.y + yOffset);
 
-                if (grid.TryGetValue(gridPosition, out List<ObjectOnBoard> objectsInGrid))
+                if (!grid.TryGetValue(gridPosition, out List<ObjectOnBoard> objectsInGrid))
+                    continue;
+
+                for (int i = 0; i < objectsInGrid.Count; i++)
                 {
-                    for (int i = 0; i < objectsInGrid.Count; i++)
-                    {
-                        distance =  MainCamera.gameObject.transform.position - objectsInGrid[i].Object.transform.position;
+                    obj = objectsInGrid[i];
+                    objPos = obj.Object.transform.position;
 
-                       
-                        if (Mathf.Abs(distance.x) <= UpdateInRange || Mathf.Abs(distance.y) <= UpdateInRange)
-                        {
-                            if (!objectsInRange.Contains(objectsInGrid[i]))
-                            {
-                                objectsInRange.Add(objectsInGrid[i]);
-                            }
-                        }
+                    distance = playerPos - objPos;
+
+                    if (Mathf.Abs(distance.x) <= UpdateInRange && Mathf.Abs(distance.y) <= UpdateInRange)
+                    {
+                      
+                        if (!objectsInRange.Contains(obj))
+                            objectsInRange.Add(obj);
                     }
                 }
             }
         }
 
-        for (int i = 0; i < objectsInRange.Count; i ++)
+      
+        for (int i = 0; i < objectsInRange.Count; i++)
         {
-            batchpart = objectsInRange[i];
-            ObjectOnBoardControll(ref batchpart);
-        }
-
-
-      //  SequentialBatchProcessing(ref objectsInRange, 100);
-
-        // Now you have a smaller list "objectsInRange" containing objects within the radius of 3 units from the player
-        // You can do whatever you need with this list
-    }
-
-    void SequentialBatchProcessing(ref List<ObjectOnBoard> list, int batchSize)
-    {
-        for (int i = 0; i < list.Count; i += batchSize)
-        {
-            batch = list.Skip(i).Take(batchSize).ToList();
-            ProcessBatch(batch);
-        }
-    }
-
-    void ProcessBatch(List<ObjectOnBoard> batch)
-    {
-        for (int i = 0; i < batch.Count; i++)
-        {
-            batchpart = batch[i];
+            ObjectOnBoard batchpart = objectsInRange[i];
             ObjectOnBoardControll(ref batchpart);
         }
     }
+
 
 
 
@@ -598,9 +499,15 @@ public class Constructor : MonoBehaviour
         if (destructibleOB == null || destructibleOB.Object == null) return;
 
         FO = destructibleOB.Stats;
+        FO = destructibleOB.Object.GetComponent<StatsControll>();
 
-        if (FO == null) return;
+        if (FO == null)
+        {
+            
+            return;
+        }
 
+ 
         distanceX = Mathf.Abs(FO.transform.position.x - pl.MainCamera.transform.position.x);
         distanceY = Mathf.Abs(FO.transform.position.y - pl.MainCamera.transform.position.y);
 
@@ -635,10 +542,6 @@ public class Constructor : MonoBehaviour
                FO.HungerConroll();
                FO.PaymentConroll();
                 if (FO.GettingDamageFromWalls) FO.WallDamage();
-
-                // FO.PoopConroll();
-
-
 
                 // Handle object collisions and vision draw
                 if (pl.coll_obj.Contains(FO.gameObject))
@@ -677,9 +580,7 @@ public class Constructor : MonoBehaviour
 
            FO.GrowControll();
 
-            if (FO.Draw)
-                ObjectColorAlpha(ref FO);
-
+           
         
         }
 
@@ -715,20 +616,13 @@ public class Constructor : MonoBehaviour
         if (UnsettingTile == null && IM.ActionDelay < Time.fixedTime)
         {
 
-            if (TopScafolds.GetTile(new Vector3Int(XPos, YPos - 1, 0)) != null)
+
+            if (Tile.GetTile(new Vector3Int(XPos, YPos, 0)) != null)
             {
-                UnsettingTile = TopScafolds;
+                UnsettingTile = Tile;
 
             }
-            else
-            {
-
-                if (Tile.GetTile(new Vector3Int(XPos, YPos - 1, 0)) != null)
-                {
-                    UnsettingTile = Tile;
-
-                }
-            }
+            
         }
        
 
@@ -756,8 +650,8 @@ public class Constructor : MonoBehaviour
 
         if (OnUIDelay < Time.fixedTime && IM.ActionDelay < Time.fixedTime && Building)
         {
+            pl.menu.MenuActionDelay = Time.fixedTime + 0.2f;
 
-               
             if (_transform.childCount > 0 && ChildPubObject._TileBase != null && ChildPubObject.floors > 0)
             {
                 
@@ -944,33 +838,7 @@ public class Constructor : MonoBehaviour
                 IncomeOB.text = "利益: \n" + MinIncome + " - " + MaxIncome;
         }
 
-        if (TutorialPause)
-        {
-            if (!IM.joystick)
-            {
-                if ((pl.GetMouseCollList().Contains(GameObject.Find("CloseBigTips")) && IM.LeftMouseButtonDown) || IM.exit_b || IM.menu_b || IM.enter_b)
-                {
-                    UnsetBigTips();
-                }
-
-            }
-            else
-            {
-                if (( IM.menu_b || IM.exit_b || IM.enter_b)&& TutorialPause && TipsPause.activeInHierarchy && IM.ActionDelay < Time.fixedTime)
-                {
-
-                    TipsPause.SetActive(false);
-                 
-
-                    OnUIDelay = Time.fixedTime + 0.1f;
-                    IM.ActionDelay = Time.fixedTime + 0.1f;
-                    SetObjectDelay = Time.fixedTime + 1;
-                }
-
-
-
-            }
-        }
+       
 
 
 
@@ -982,18 +850,9 @@ public class Constructor : MonoBehaviour
             ChooseMouseObject = false;
         }*/
 
-
-        
-        if (AllMeatCost < 0) AllMeatCost = 0;
-            if (AllVegCost < 0) AllVegCost = 0;
-            if (AllBeerCost < 0) AllBeerCost = 0;
         
     }
 
-    private void LateUpdate()
-    {
-        MouthPosPrev = Input.mousePosition;
-    }
 
     void ObjFlip(GameObject Child, ref int LayerPlus, string LLayer, int ParentLayerOrder, int i, int pluslayer)
     {
@@ -1013,6 +872,7 @@ public class Constructor : MonoBehaviour
     {
 
         SpriteRenderer spriteRenderer = obj.GetComponent<SpriteRenderer>();
+
 
         if (obj.tag != "Flipping")
         {
@@ -1035,7 +895,9 @@ public class Constructor : MonoBehaviour
         if (spriteRenderer != null)
         {
             spriteRenderer.sortingLayerName = lLayer;
-            spriteRenderer.sortingOrder = (int)(obj.transform.position.y * -200) + 5 + (int)(obj.transform.position.x * -200) + 5;
+            spriteRenderer.sortingOrder = (int)(obj.transform.position.y * -200) + (int)(obj.transform.position.x); 
+            
+            
         }
 
 
@@ -1233,8 +1095,8 @@ public class Constructor : MonoBehaviour
 
 
 
-        if (OBOnTile != null || Map.GetTile(new Vector3Int(XPos, YPos , 0)) == null 
-             || _menu.MenuONOFF || show_questbook  )
+        if (OBOnTile!=null ||
+             _menu.MenuONOFF || show_questbook  )
             return;
 
         /*if (Floors <= 2)
@@ -1312,7 +1174,7 @@ public class Constructor : MonoBehaviour
 
 
      
-        if (ObjectToDestory.GetComponent<PubObject>() != null || (ObjectToDestory.GetComponent<PubObject>() != null && ObjectToDestory.GetComponent<MovementControll>() != null && !ObjectToDestory.GetComponent<MovementControll>().Enemy))
+        if (ObjectToDestory.GetComponent<PubObject>() != null || (ObjectToDestory.GetComponent<PubObject>() != null && ObjectToDestory.GetComponent<MovementControll>() != null ))
         {
             PubObject POPO = ObjectToDestory.GetComponent<PubObject>();
             
@@ -1340,8 +1202,8 @@ public class Constructor : MonoBehaviour
 
             if (POPO.GetComponent<MovementControll>() != null)
             {
-                if (POPO.tag == "Pers" && !POPO.GetComponent<MovementControll>().Soldier && !POPO.GetComponent<MovementControll>().Enemy) AllPeople--;
-                if (POPO.GetComponent<MovementControll>().Soldier && !POPO.GetComponent<MovementControll>().Enemy) SoldiersCount--;
+                if (POPO.tag == "Pers") AllPeople--;
+
             }
 
             if (ObjectToDestory.GetComponent<Enemies>() != null)
@@ -1569,8 +1431,8 @@ public class Constructor : MonoBehaviour
     void SetComponents_in_ObjectToBuild(ref GameObject objecttobuild , GameObject ObjectOnGround)
     {
 
-        if (objecttobuild.GetComponent<CharacterMove>() != null)
-            objecttobuild.GetComponent<CharacterMove>().enabled = true;
+        if (objecttobuild.GetComponent<CharacterPath>() != null)
+            objecttobuild.GetComponent<CharacterPath>().enabled = true;
 
 
         PubObject _PubObject = objecttobuild.GetComponent<PubObject>();
@@ -1615,8 +1477,8 @@ public class Constructor : MonoBehaviour
 
         }
 
-        if (objecttobuild.GetComponent<CharacterMove>() != null)
-        objecttobuild.GetComponent<CharacterMove>().enabled = true;
+        if (objecttobuild.GetComponent<CharacterPath>() != null)
+        objecttobuild.GetComponent<CharacterPath>().enabled = true;
 
         
 
@@ -1686,7 +1548,7 @@ public class Constructor : MonoBehaviour
 
         if (POPO.GetComponent<MovementControll>() != null)
         {
-            if (_PubObject.tag == "Pers" && !_PubObject.GetComponent<MovementControll>().Soldier && !_PubObject.GetComponent<MovementControll>().Enemy) AllPeople++;
+            if (_PubObject.tag == "Pers" ) AllPeople++;
         }
         
     }
@@ -1711,7 +1573,7 @@ public class Constructor : MonoBehaviour
 
         if (pl.GetMouseCollList().Contains(GameObject.Find("CloseBigTips")) ||
                pl.GetMouseCollList().Contains(pl.inv.InventoryButton) ||
-               pl.GetMouseCollList().Contains(pl.inv.JournalButton))
+               pl.GetMouseCollList().Contains(pl.journal.JournalButton))
         {
 
             ChildOnMouse.position = new Vector3(_transform.GetChild(0).position.x, _transform.position.y + 0.5f, _transform.GetChild(0).position.z);
@@ -2203,6 +2065,10 @@ public class Constructor : MonoBehaviour
     
     void DirectControlls()
     {
+        if (IM.FadeMode)
+        {
+            AlphaBuildingFade = !AlphaBuildingFade;
+        }
 
         if (IM.HorizontalFlip)
         {
@@ -2306,9 +2172,6 @@ public class Constructor : MonoBehaviour
             YPos = Tile.WorldToCell(v).y;
 
         }
-
-        MaxField = bounds.max;
-        MinField = bounds.min;
 
         if (ConstructorObjectPosition != new Vector2(v.x + ObshiftOnBoardX, v.y + 0.5f))
         {
@@ -2592,150 +2455,7 @@ public class Constructor : MonoBehaviour
 
 
 
-    void ObjectColorAlpha(ref StatsControll FO)
-    {
-        minimalalpha = 0.3f;
-
-        ObjectsUI();
-
-        if (inv.GetItemInDatabase(FO.DatabaseID).Structure && Building)
-        {
-            if (FO.transform.parent == null)
-            {
-
-                float alpha = MathF.Abs(FO.transform.position.x - _transform.position.x)/10 - 1;
-                alpha = Mathf.Clamp(alpha, 0.1f, 1);
-
-                if (FO.transform.position.y < _transform.position.y)
-                {
-                    FO.SetColorAndMaterial(alpha, FO.StartMaterial);
-                    return;
-                }else if (FO.transform.position.y > _transform.position.y+1)
-                {
-                        FO.SetColorAndMaterial(alpha, FO.StartMaterial);
-                    return;
-                }
-                else 
-                {
-                    FO.SetColorAndMaterial(1, FO.StartMaterial);
-                    return;
-                }
-
-           
-            }
-           
-         
-        }
-
-
-        if (!Building)
-            FO.SetColorAndMaterial(1, FO.StartMaterial);
-
-        if (FO.InvisTimer - 0.8f > Time.fixedTime)
-        {
-           
-            if (!FO.Stunned)
-            {
-                FO.SetColorAndMaterial(0.5f, WhiteMaterial);
-            }
-            else
-                FO.SetColorAndMaterial(1, StunMaterial);
-
-            return;
-        }
-       
-
-
-        if (FO.InvisTimer > Time.fixedTime && FO.InvisTimer > Time.fixedTime + 0.05f)
-        {
-
-            FO.AplhaColor = 0.5f;
-            FO.SetColorAndMaterial(0.5f, FO.StartMaterial);
-            return;
-        }
-
-        if (FO.InvisTimer > Time.fixedTime && FO.InvisTimer < Time.fixedTime+0.05f)
-        {
-
-            FO.AplhaColor = 1;
-            FO.SetColorAndMaterial(1, FO.StartMaterial);
-            return;
-        }
-
-        if (FO.ReduceAlphaOnColl)
-        {
-           // print("ReduceAlphaOnColl " + FO.name);
-
-            if (pl.coll_obj.Contains(FO.gameObject) || (Mathf.Abs(pl.transform.position.x - FO.transform.position.x)<1 && Mathf.Abs(pl.transform.position.y - FO.transform.position.y) < 1))
-            {
-                if (FO.AplhaColor > minimalalpha && FO.name !="Base")
-                    FO.AplhaColor -= 1 * Time.deltaTime*3;
-
-                FO.SetColorAndMaterial(FO.AplhaColor, FO.StartMaterial);
-            }
-            else
-            {
-
-                if (FO.AplhaColor < 1)
-                {
-                    if (FO.AplhaColor > 0.9f) FO.AplhaColor = 1;
-                    FO.SetColorAndMaterial(FO.AplhaColor, FO.StartMaterial);
-                    FO.AplhaColor += 1 * Time.deltaTime;
-                }
-
-
-            }
-        }
-        else
-        {
-            if (FO.AplhaColor < 1)
-
-            {
-                FO.AplhaColor += 1 * Time.deltaTime;
-                if (FO.AplhaColor > 0.9f) FO.AplhaColor = 1;
-                FO.SetColorAndMaterial(FO.AplhaColor, FO.StartMaterial);
-            }
-        }
-
-        
-        if (FO.Stunned)
-        {
-            FO.SetColorAndMaterial(FO.AplhaColor, StunMaterial);
-            return;
-        }
-
- 
-
-      if (!pl.coll_obj.Contains(FO.gameObject) && FO.NewMaterialOnColl!=null)
-      {
-          FO.StartColl = false;
-          FO.SetColorAndMaterial(FO.AplhaColor, FO.StartMaterial);
-          return;
-      }
-
-
-
-      if (!FO.StartColl)
-      {
-
-          FO.CollMaterialTimer = Time.fixedTime + 0.5f;
-          FO.StartColl = true;
-
-      }
-
-       
-
-
-        if (FO.CollMaterialTimer > Time.fixedTime)
-        {
-            if(FO.CollMaterialTimer > Time.fixedTime+0.05f)
-            FO.SetColorAndMaterial(FO.AplhaColor, FO.NewMaterialOnColl);
-            else FO.SetColorAndMaterial(FO.AplhaColor, FO.StartMaterial);
-        }
-
-         
-    }
-
+  
 
 
     GameObject FindConstructedObject(string name)
@@ -2909,97 +2629,7 @@ public class Constructor : MonoBehaviour
     }
 
 
-    public void UnsetBigTips()
-    {
-        if (!TutorialPause) return;
-
-        if(pl!=null && pl.inv!=null && TipsPause!=null)
-        TipsPause.SetActive(false);
-        TutorialPause = false;
-
-        OnUIDelay = Time.fixedTime + 0.1f;
-        if(IM!=null)
-        IM.ActionDelay = Time.fixedTime + 0.1f;
-        SetObjectDelay = Time.fixedTime + 1;
-
-    }
-
-
-
-    public void SetBigTip(int texttipnum)
-    {
-        print("SetBigTip 0");
-
-        if (TutorialPhaseBigTip.Contains(texttipnum))
-        {
-            TutorialPause = false;
-            TipsPause.SetActive(false);
-            TutorialPhaseBigTip.Add(texttipnum);
-
-            return;
-        }
-        print("SetBigTip 1");
-
-        if (texttipnum <= -1)
-        {
-
-            TutorialPhaseBigTip.Add(texttipnum);
-            return;
-        }
-        print("SetBigTip 2");
-
-        if (_menu.DrawTutorial == 0)
-        {
-            TutorialPause = false;
-            TipsPause.SetActive(false);
-            TutorialPhaseBigTip.Add(texttipnum);
-            return;
-        }
-        print("SetBigTip 3");
-
-
-
-        if (textdatabase.textEN[NumberInData(texttipnum)].line[0].line[0] != "" && !TutorialPause)
-        {
-            print("SetBigTip 4");
-         
-            TipsPause.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = textdatabase.GetFirstLine(texttipnum, _menu.Language);
-
-            
-            TutorialPause = true;
-            TipsPause.SetActive(true);
-            
-        
-        }
-       
-        TutorialPhaseBigTip.Add(texttipnum);
-    }
-
-    public void TipsReminder(int texttipnum)
-    {
-        if (_menu.MenuONOFF || pl.inv.showinvent) return;
-
-        TipsPause.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = textdatabase.GetFirstLine(texttipnum, _menu.Language);
-        TutorialPause = true;
-        TipsPause.SetActive(true);
    
-     
-    }
-    void ONOFF_QUESTBOOK(int StartQuest,int EndQuest, bool TF)
-    {
-        for (int i = StartQuest; i < EndQuest; i++)
-        {
-            pl.inv.ONOFF(GameObject.Find("QuestPart" + i), TF);
-        }
-
-        pl.inv.ONOFF(GameObject.Find("QuestBookBG2Text"), TF);
-        pl.inv.ONOFF(GameObject.Find("QuestBookBG2"), TF);
-        pl.inv.ONOFF(GameObject.Find("QuestBookBG"), TF);
-        pl.inv.ONOFF( QPage0, TF);
-        pl.inv.ONOFF(QPage1, TF);
-        pl.inv.ONOFF(QPage2, TF);
-    }
-
     void CreateEffectUI(string Name, GameObject Target)
     {
         if (GameObject.Find(Name) != null) return;
@@ -3012,37 +2642,8 @@ public class Constructor : MonoBehaviour
     }
 
 
-    public int NumberInData(int ID)
-    {
-       
-        int r = 0;
-        for (int i = 0; i < textdatabase.textEN.Count; i++)
-        {
-            if (textdatabase.textEN[i].ID == ID)
-            {
-                // print("textdatabase.textEN[i].ID" + textdatabase.textEN[i].ID);
-                r = i;
-            }
-            //   else print("ID NOT FOUND!");
-        }
-        return r;
-    }
-    public void ShakeCam()
-    {
-        XShake = UnityEngine.Random.Range(-0.01f, 0.01f);
-        YShake = UnityEngine.Random.Range(-0.01f, 0.01f);
-    }
-    public void ShakeCamY()
-    {
-        YShake = UnityEngine.Random.Range(-0.03f, 0.03f);
-        XShake = UnityEngine.Random.Range(-0.01f, 0.01f);
-    }
-    public void NOShakeCam()
-    {
-        XShake = 0;
-        YShake = 0;
-    }
-
+   
+    
     void ExplosionDestroy()
     {
         GameObject[] EXPL = GameObject.FindGameObjectsWithTag("Explosion");
@@ -3057,7 +2658,7 @@ public class Constructor : MonoBehaviour
             else Destroy(EXPL[i]);
         }
 
-        pl.ResetFlippingObjects();
+        pl.LayerSort.ResetFlippingObjects();
     }
 
   
@@ -3166,7 +2767,7 @@ public class Constructor : MonoBehaviour
             pl.menu.SL.ObjectsToDestroy.Add(FO.gameObject.name);
         }
 
-        pl.ResetFlippingObjects();
+        pl.LayerSort.ResetFlippingObjects();
 
     }
 
@@ -3244,12 +2845,12 @@ public class Constructor : MonoBehaviour
 
         if (Target.GetComponent<GetItem>() != null)
             if (Target.GetComponent<GetItem>().QuestID > -1)
-                pl.inv.DoneQuest(Target.GetComponent<GetItem>().QuestID);
+                pl.journal.DoneQuest(Target.GetComponent<GetItem>().QuestID);
 
 
         Destroy(Target);
 
-        pl.ResetFlippingObjects();
+        pl.LayerSort.ResetFlippingObjects();
     }
 
     int RNDMAX(GameObject ChildOnMouse, ref GameObject ObjectOnGround, ref StatsControll _StatsControll)
@@ -3280,7 +2881,6 @@ public class Constructor : MonoBehaviour
     bool BottomCheck(ref StatsControll _StatsControll)
     {
 
-        //if (ObjectOnGround != null) return false;
         
         if (pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsBottom == null) return false;
 

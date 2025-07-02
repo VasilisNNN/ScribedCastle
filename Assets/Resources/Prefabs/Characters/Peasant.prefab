@@ -390,12 +390,12 @@ GameObject:
   - component: {fileID: 5062304670444103664}
   - component: {fileID: 8026156174420339184}
   - component: {fileID: 2931147228370975798}
-  - component: {fileID: 7976804865568401773}
   - component: {fileID: 7676687251500870770}
   - component: {fileID: 1014306684247863610}
   - component: {fileID: 6908824512042607772}
   - component: {fileID: 1440657771734962078}
   - component: {fileID: 400425327}
+  - component: {fileID: 8316603889132864452}
   m_Layer: 0
   m_Name: Peasant
   m_TagString: Flipping
@@ -487,11 +487,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 968c0051690728c46b0bb41c47ea1dfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Red: 0
-  Green: 0
-  Gold: 0
-  Cost: 100
-  CornCost: 0
   Table: 0
   Shield: 0
   TransperentWall: 0
@@ -566,31 +561,6 @@ MonoBehaviour:
   ItemsTheyDropAfterEating: 
   GoBackOffScreen: 0
   NoAudioOnItems: 0
---- !u!114 &7976804865568401773
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5062304670444103666}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63db08a8f8173b240b017ec491ed9b76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MovePoints: []
-  OnPointDelay: 0
-  DirectionUpdate: 0
-  SpeedMultiplier: 4
-  FollowTime: 20
-  AttackDelayTime: 1
-  Suicide: 0
-  Dodging: 0
-  Zombie: 0
-  GoBackAfterDamage: 0
-  slope: 0
-  Fliping: 1
-  FollowPlayer: 0
 --- !u!50 &7676687251500870770
 Rigidbody2D:
   serializedVersion: 4
@@ -719,6 +689,7 @@ MonoBehaviour:
   IgnoreDestroyList: 0
   BuildedStructure: 0
   SpawnPointName: 
+  ColorMaterial: {fileID: 0}
 --- !u!114 &1440657771734962078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -754,6 +725,31 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &8316603889132864452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5062304670444103666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 558ea03f5f2881449b59604b5de24102, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MovePoints: []
+  OnPointDelay: 0
+  DirectionUpdate: 0
+  SpeedMultiplier: 4
+  FollowTime: 7
+  AttackDelayTime: 1
+  Suicide: 0
+  Dodging: 0
+  Zombie: 0
+  GoBackAfterDamage: 0
+  slope: 0
+  Fliping: 1
+  FollowPlayer: 0
 --- !u!1 &5573960189501578030
 GameObject:
   m_ObjectHideFlags: 0
