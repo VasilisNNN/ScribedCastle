@@ -346,7 +346,7 @@ public class Player : MonoBehaviour {
         if (TEST)
         {
 
-           
+            Cursor.visible = false;
             if (Input.GetKeyDown(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.A))
             {
 

@@ -133,22 +133,6 @@ new string[7] { "", "", "", "", "", "", "" },
 
 
         items.Add(new Item(
-80, 80, Item.type.item,
-new string[7] { "Waitress", "", "", "", "", "", "" },
-new string[7] { "Waitress", "", "", "", "", "", "" },
-/*Cost*/ 0
-));
-
-
-        items[items.Count - 1].CanStack = true;
-        items[items.Count - 1].TargetTileMap = MainTileBase;
-
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Characters/Waitress");
-        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
-        items[items.Count - 1].NeedItemsIDs = new int[1] { 43 };
-        items[items.Count - 1].NeedItemsCounts = new int[1] { 1 };
-
-        items.Add(new Item(
 81, 81, Item.type.item,
 new string[7] { "Client1", "", "", "", "", "", "" },
 new string[7] { "Client1", "", "", "", "", "", "" },
@@ -413,7 +397,7 @@ new string[7] { "You can build walls on this floor", "На цій підлозі
         items.Add(new Item(
 302, 302, Item.type.item,
 new string[7] { "Sand floor", "Піщана підлога", "砂の床", "", "", "", "" },
-new string[7] { "You can build sand walls on this floor", "На цій підлозі можна будувати піщані стіни", "このフロアに砂壁を作ることができる", "", "", "", "" },
+new string[7] { "Scribe some sand", "На цій підлозі можна будувати піщані стіни", "このフロアに砂壁を作ることができる", "", "", "", "" },
 /*Cost*/ 1
 ));
         items[items.Count - 1].CanStack = true;
@@ -430,7 +414,7 @@ new string[7] { "You can build sand walls on this floor", "На цій підл�
         items.Add(new Item(
 303, 303, Item.type.item,
 new string[7] { "Rock floor", "Кам'яна підлога", "岩床", "", "", "", "" },
-new string[7] { "You can build rock walls on this floor", "На цій підлозі можна будувати кам'яні стіни", "このフロアに岩壁を作ることができる", "", "", "", "" },
+new string[7] { "Some rocks to scribe", "На цій підлозі можна будувати кам'яні стіни", "このフロアに岩壁を作ることができる", "", "", "", "" },
 /*Cost*/ 1
 ));
         items[items.Count - 1].CanStack = true;
@@ -445,23 +429,7 @@ new string[7] { "You can build rock walls on this floor", "На цій підл�
         items[items.Count - 1].NeedItemsCounts = new int[1] { 1 };
 
 
-        items.Add(new Item(
-304, 304, Item.type.item,
-new string[7] { "Pit", "Прірва", "穴", "", "", "", "" },
-new string[7] { "Hole in the ground", "Діра у землі", "地面の穴", "", "", "", "" },
-/*Cost*/ 1
-));
-        items[items.Count - 1].CanStack = true;
-        items[items.Count - 1].Structure = true;
-   
-        items[items.Count - 1].TargetTileMap = MainTileBase;
-        items[items.Count - 1]._StructureType = Item.StructureType.Tiles;
-
-
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Structures/Pit");
-        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Pit") };
-        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
-        items[items.Count - 1].NeedItemsCounts = new int[1] { 1 };
+       
 
         items.Add(new Item(
 305, 305, Item.type.item,
@@ -484,7 +452,7 @@ new string[7] { "", "", "", "", "", "", "" },
         items.Add(new Item(
 306, 306, Item.type.item,
 new string[7] { "Road", "Дорога", "道路", "", "", "", "" },
-new string[7] { "", "", "", "", "", "", "" },
+new string[7] { "Roads for the town", "", "", "", "", "", "" },
 /*Cost*/ 1
 ));
         items[items.Count - 1].CanStack = true;
@@ -654,75 +622,6 @@ new string[7] { "Expands available land on the island", "Розширює дос
         items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Ground") };
         items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
         items[items.Count - 1].NeedItemsCounts = new int[1] { 1 };
-
-
-
-        items.Add(new Item(
-356, 354, Item.type.item,
-new string[7] { "Bank 1", "", "", "", "", "", "" },
-new string[7] { "Bank 1", "", "", "", "", "", "" },
-/*Cost*/ 180
-));
-        items[items.Count - 1].CanStack = true;
-        items[items.Count - 1].Structure = true;
-        items[items.Count - 1].TargetTileMap = MainTileBase;
-        items[items.Count - 1]._StructureType = Item.StructureType.Building;
-
-
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Structures/Bank 1");
-
-        items[items.Count - 1].TargetBrush = new TileBase[2] {
-        Resources.Load<TileBase>("Brushes/Grass"),
-        Resources.Load<TileBase>("Brushes/Floor")};
-        
-        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
-        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
-        items[items.Count - 1].BuildingCost = 12;
-
-        items.Add(new Item(
-357, 354, Item.type.item,
-new string[7] { "Bank 2", "", "", "", "", "", "" },
-new string[7] { "Bank 2", "", "", "", "", "", "" },
-/*Cost*/ 180
-));
-        items[items.Count - 1].CanStack = true;
-        items[items.Count - 1].Structure = true;
-        items[items.Count - 1].TargetTileMap = MainTileBase;
-        items[items.Count - 1]._StructureType = Item.StructureType.Building;
-
-
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Structures/Bank 2");
-
-        items[items.Count - 1].TargetBrush = new TileBase[2] {
-        Resources.Load<TileBase>("Brushes/Grass"),
-        Resources.Load<TileBase>("Brushes/Floor")};
-
-        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
-        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
-        items[items.Count - 1].BuildingCost = 12;
-
-
-        items.Add(new Item(
-358, 354, Item.type.item,
-new string[7] { "Bank 3", "", "", "", "", "", "" },
-new string[7] { "Bank 3", "", "", "", "", "", "" },
-/*Cost*/ 180
-));
-        items[items.Count - 1].CanStack = true;
-        items[items.Count - 1].Structure = true;
-        items[items.Count - 1].TargetTileMap = MainTileBase;
-        items[items.Count - 1]._StructureType = Item.StructureType.Building;
-
-
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Structures/Bank 3");
-
-        items[items.Count - 1].TargetBrush = new TileBase[2] {
-        Resources.Load<TileBase>("Brushes/Grass"),
-        Resources.Load<TileBase>("Brushes/Floor")};
-
-        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
-        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
-        items[items.Count - 1].BuildingCost = 12;
 
 
 
@@ -2288,7 +2187,7 @@ new string[7] { "", "", "", "", "", "", "" },
         items.Add(new Item(
 960, 960, Item.type.item,
 new string[7] { "Devil wall", "Темна стіна", "暗い壁", "", "", "", "" },
-new string[7] { "", "", "", "", "", "", "" },
+new string[7] { "Abandon all hope, ye who enter here.", "", "", "", "", "", "" },
 /*Cost*/ 10
 ));
         items[items.Count - 1].CanStack = true;
@@ -2362,7 +2261,7 @@ new string[7] { "", "", "", "", "", "", "" },
         items.Add(new Item(
    963, 963, Item.type.item,
    new string[7] { "Devil green wall", "Темна стіна", "暗い壁", "", "", "", "" },
-   new string[7] { "", "", "", "", "", "", "" },
+   new string[7] { "Through me the way into the suffering city…", "", "", "", "", "", "" },
    /*Cost*/ 4
    ));
         items[items.Count - 1].CanStack = true;
@@ -2435,7 +2334,7 @@ new string[7] { "", "", "", "", "", "", "" },
         items.Add(new Item(
    966, 966, Item.type.item,
    new string[7] { "Devil blue wall", "", "", "", "", "", "" },
-   new string[7] { "", "", "", "", "", "", "" },
+   new string[7] { "In His will is our peace.", "", "", "", "", "", "" },
    /*Cost*/ 4
    ));
         items[items.Count - 1].CanStack = true;
@@ -2507,7 +2406,7 @@ new string[7] { "", "", "", "", "", "", "" },
         items.Add(new Item(
 970, 970, Item.type.item,
 new string[7] { "Assassins wall", "", "", "", "", "", "" },
-new string[7] { "", "", "", "", "", "", "" },
+new string[7] { "Those who bring death rest here", "", "", "", "", "", "" },
 /*Cost*/ 8
 ));
         items[items.Count - 1].CanStack = true;
@@ -2580,7 +2479,7 @@ new string[7] { "", "", "", "", "", "", "" },
         items.Add(new Item(
 980, 980, Item.type.item,
 new string[7] { "Arch wall", "Стіна з аркою", "", "", "", "", "" },
-new string[7] { "", "", "", "", "", "", "" },
+new string[7] { "Beautiful structure for developed town", "", "", "", "", "", "" },
 /*Cost*/ 5
 ));
         items[items.Count - 1].CanStack = true;
@@ -2769,14 +2668,13 @@ new string[7] { "", "", "", "", "", "", "" },
         items.Add(new Item(
 1015, 1015, Item.type.item,
 new string[7] { "Flower wall", "Квіткова стіна", "", "", "", "", "" },
-new string[7] { "", "", "", "", "", "", "" },
+new string[7] { "Structure with flower decoration", "", "", "", "", "", "" },
 /*Cost*/ 6
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
         items[items.Count - 1].TargetTileMap = MainTileBase;
         items[items.Count - 1]._StructureType = Item.StructureType.Building;
-
 
         items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/Flower wall");
 
@@ -3071,50 +2969,9 @@ new string[7] { "", "", "", "", "", "", "" },
         //--------------------ENEMIES--------------------//
 
 
-        items.Add(new Item(
-3000, 3000, Item.type.item,
-new string[3] { "Enemy Bird", "", "" },
-new string[1] { "Enemy Bird" },
-/*Cost*/ 0
-));
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Enemies/Enemy Bird");
-
-
         //--------------------------------------------------------------FRIENDS---------------------------------------------------------//
 
     
-        items.Add(new Item(
-3503, 3503, Item.type.item,
-new string[7] { "Miner", "", "", "", "", "", "" },
-new string[7] { "This frog picks 10 stones for you, then it turns back into the egg.", "", "", "", "", "", "" },
-/*Cost*/ 0
-));
-        items[items.Count - 1].TargetTileMap = MainTileBase;
-
-        items[items.Count - 1].CanStack = true;
-        items[items.Count - 1].Structure = true;
-        items[items.Count - 1].Durability = 10;
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Characters/Friend miner");
-        items[items.Count - 1].NeedItemsIDs = new int[2] { 43, 9 };
-        items[items.Count - 1].NeedItemsCounts = new int[2] { 1, 2 };
-
-        items.Add(new Item(
-3504, 3504, Item.type.item,
-new string[7] { "Lumber", "", "", "", "", "", "" },
-new string[7] { "This frog chops 15 trees for you, then it turns back into the egg.", "", "", "", "", "", "" },
-/*Cost*/ 0
-));
-        items[items.Count - 1].TargetTileMap = MainTileBase;
-
-        items[items.Count - 1].CanStack = true;
-        items[items.Count - 1].Structure = true;
-        items[items.Count - 1].Durability = 15;
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Characters/Friend lumber");
-        items[items.Count - 1].NeedItemsIDs = new int[2] { 43, 9 };
-        items[items.Count - 1].NeedItemsCounts = new int[2] { 1,2 };
-
-
-
         //------------------------------------NATURE---------------------------------//
         items.Add(new Item(
 4000, 4000, Item.type.item,

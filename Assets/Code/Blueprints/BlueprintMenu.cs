@@ -1,16 +1,16 @@
-﻿using System.Collections;
+﻿
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 using System.Linq;
 using TMPro;
-using NUnit;
+
 
 public class BlueprintMenu : MonoBehaviour
 {
     public List<Blueprint> BP = new List<Blueprint>();
-
+    public List<GameObject> BlueprintsBG = new List<GameObject>();
 
     private List<GameObject> BluePrintObjects = new List<GameObject>();
     private List<GameObject> BlueFloorObjects = new List<GameObject>();
@@ -58,8 +58,13 @@ public class BlueprintMenu : MonoBehaviour
 
     private int FadePosition;
     private GameObject FadeCursor;
+
+    private RectTransform CanvasTransform;
     void Start()
     {
+        CanvasTransform = InitializeObjects.CanvasTransform.GetComponent<RectTransform>();
+
+
         BData = gameObject.AddComponent<BlueprintDatabase>();
         BlueprintNameText = GameObject.Find("BlueprintNameText").GetComponent<TextMeshProUGUI>();
         BlueprintDescText = GameObject.Find("BlueprintDescText").GetComponent<TextMeshProUGUI>();
@@ -145,8 +150,11 @@ public class BlueprintMenu : MonoBehaviour
 
         for (int i = 0; i < BP.Count; i++)
         {
-            
+
+
             GameObject BluePr = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/BlueprintBase"), transform);
+       
+
             Vector2 BluePrPOS = new Vector2(i * 500, 1);
             BluePr.GetComponent<RectTransform>().anchoredPosition = BluePrPOS;
             BluePrintObjects.Add(BluePr);
@@ -171,8 +179,8 @@ public class BlueprintMenu : MonoBehaviour
                 BluePrintBrick.transform.SetSiblingIndex(Mathf.Abs(BP[i].ObjectOrder[ii]));
 
             }
-            
 
+            
             float color =1;
      
             for (int x = -5; x < 6; x++)
@@ -210,6 +218,12 @@ public class BlueprintMenu : MonoBehaviour
 
 
             BlueFloor.transform.SetAsFirstSibling();
+
+            GameObject BluePrBG = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/BlueprintBaseBG"), transform);
+            BluePrBG.GetComponent<Image>().enabled = false;
+            BluePrBG.transform.SetAsFirstSibling();
+            BlueprintsBG.Add(BluePrBG);
+          
         }
 
 
@@ -301,6 +315,9 @@ void MoveBlueprints()
             Vector2 BluePrPOS = new Vector2(Mathf.Lerp(BluePrintObjects[i].GetComponent<RectTransform>().anchoredPosition.x, i * BPSlotWidth - CurrentBP* BPSlotWidth, Time.deltaTime*15), 1);
             BluePrintObjects[i].GetComponent<RectTransform>().anchoredPosition = BluePrPOS;
             BlueFloorObjects[i].GetComponent<RectTransform>().anchoredPosition = BluePrPOS;
+
+            BlueprintsBG[i].GetComponent<RectTransform>().anchoredPosition = BluePrPOS;
+
 
         }
 
@@ -415,10 +432,34 @@ void MoveBlueprints()
             BackToNormalNumber = 0;
         Assembled = false;
     }
+
+    bool FindMouseAnchore(out Vector2 cursorpos)
+    {
+        if (!pl.IM.MouseMode)
+        {
+            float pw = CanvasTransform.rect.width / 24f;
+            cursorpos = new Vector2(0, FadePosition * pw);
+            return true;
+        }
+
+        bool found = RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            CanvasTransform,
+            pl.IM.MousePosition,
+            null,
+            out cursorpos
+        );
+
+        return found;
+    }
     void LayersAnimation()
     {
-        Vector2 pos = pl.IM.MousePosition;
+        Vector2 cursorpos = new Vector2(CanvasTransform.rect.width / pl.IM.MousePosition.x, (CanvasTransform.rect.height / pl.IM.MousePosition.y));
         float pw = partWidth*2;
+
+
+       
+
+        pw = CanvasTransform.rect.width / 24f;
 
 
         if (!pl.IM.MouseMode)
@@ -434,16 +475,16 @@ void MoveBlueprints()
                 pl.IM.ActionDelay = Time.fixedTime + 0.1f;
             }
 
-       
+
 #if UNITY_SWITCH
             pw = partWidth / 2 + partWidth/6;
 #endif
+            
+            cursorpos = new Vector2(0,  FadePosition * pw);
 
-            pos = new Vector2(0, BluePrintObjects[CurrentBP].GetComponent<RectTransform>().position.y + FadePosition * pw);
-
-            FadeCursor.GetComponent<RectTransform>().position = 
+            FadeCursor.GetComponent<RectTransform>().anchoredPosition = 
                
-                new Vector2(BluePrintObjects[CurrentBP].GetComponent<RectTransform>().position.x + pw * 5, BluePrintObjects[CurrentBP].GetComponent<RectTransform>().position.y + FadePosition * pw );
+                new Vector2( pw * 5, FadePosition * pw );
 
 
         }
@@ -453,9 +494,11 @@ void MoveBlueprints()
 
         if (pl.IM.MouseMode)
         {
+            Vector2 bppos = BluePrintObjects[CurrentBP].GetComponent<RectTransform>().position;
+
             FadeCursor.SetActive(false);
-            if ((Mathf.Abs(BluePrintObjects[CurrentBP].GetComponent<RectTransform>().position.x - pos.x) > 500) ||
-                Mathf.Abs(BluePrintObjects[CurrentBP].GetComponent<RectTransform>().position.y - pos.y) > 300)
+            if (Mathf.Abs(pl.IM.MousePosition.x - bppos.x) > 300f ||
+                Mathf.Abs(pl.IM.MousePosition.y - bppos.y) > 500f)
             {
                 for (int i = 0; i < CountCount; i++)
                     ChangePartColor(i, 1);
@@ -492,20 +535,26 @@ void MoveBlueprints()
         
         for (int i = 0; i < CountCount; i++)
         {
-           
-            if (!BP[CurrentBP].ObjectList[i].hasParrent)
-            {
-            
-                if (Mathf.Abs(pos.y - BluePrintObjects[CurrentBP].transform.GetChild(i).GetComponent<RectTransform>().position.y) < pw/2)
-                    ChangePartColor(i, 1);
-                else ChangePartColor(i, 0);
-            }
-            else
+            Vector2 bppos = BluePrintObjects[CurrentBP].transform.GetChild(i).GetComponent<RectTransform>().anchoredPosition;
+
+            if (FindMouseAnchore(out cursorpos))
             {
 
-                if (Mathf.Abs((pos.y + BP[CurrentBP].ObjectList[i].orderinParrent * pw) - BluePrintObjects[CurrentBP].transform.GetChild(i).GetComponent<RectTransform>().position.y) < pw/2)
-                    ChangePartColor(i, 1);
-                else ChangePartColor(i, 0);
+
+                if (!BP[CurrentBP].ObjectList[i].hasParrent)
+                {
+                  
+                    if (Mathf.Abs(cursorpos.y - bppos.y) < pw / 2)
+                        ChangePartColor(i, 1);
+                    else ChangePartColor(i, 0);
+                }
+                else
+                {
+
+                    if (Mathf.Abs((cursorpos.y + BP[CurrentBP].ObjectList[i].orderinParrent * pw) - bppos.y) < pw / 2)
+                        ChangePartColor(i, 1);
+                    else ChangePartColor(i, 0);
+                }
             }
 
         }
@@ -603,11 +652,8 @@ void MoveBlueprints()
         {
             if (CurrentBP > 0)
             {
-             
-
                 menu.ONOFFUI(RightArrow.transform, true);
 
-         
                 CurrentBP--;
                 pl.PlaySoundsPitched(AC[Random.Range(0, AC.Length)], 0.8f + CurrentBP * (0.2f / BP.Count));
 
@@ -659,7 +705,8 @@ void MoveBlueprints()
             DisassembleTimer = Time.fixedTime + 0.5f;
         }
 
-       
+   
+
             AnimationDisAssemble();
             AnimationBackToNormal();
         LayersAnimation();
@@ -891,11 +938,6 @@ void MoveBlueprints()
         float x = (ObjectListPlace.x*2);
         float y = (ObjectListPlace.y*4);
         
-
-        // Vector2 BlueFloorPartPOS = new Vector3( Mathf.Round(ObjectListPlace.x * 100), Mathf.Round(ObjectListPlace.y * 100));
-        
-        // Vector2 BlueFloorPartPOS = new Vector2(x * width - y * width, y * (width / 2) + x * (width / 2) + (width / 2));
-
 
         Vector2 BlueFloorPartPOS = new Vector2(ObjectListPlace.x , ObjectListPlace.y  - 25f);
       
