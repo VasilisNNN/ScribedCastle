@@ -105,21 +105,15 @@ public class TutorialPhase
 
             }
             else
+            if ((IM.menu_b || IM.exit_b || IM.enter_b) && Constr.TutorialPause && TipsPause.activeInHierarchy && IM.ActionDelay < Time.fixedTime)
             {
-                if ((IM.menu_b || IM.exit_b || IM.enter_b) && Constr.TutorialPause && TipsPause.activeInHierarchy && IM.ActionDelay < Time.fixedTime)
-                {
 
-                    TipsPause.SetActive(false);
-
-
-                    Constr.OnUIDelay = Time.fixedTime + 0.1f;
-                    IM.ActionDelay = Time.fixedTime + 0.1f;
-                    Constr.SetObjectDelay = Time.fixedTime + 1;
-                }
-
-
-
+                UnsetBigTips();
             }
+
+
+
+            
 
             pl.menu.MenuActionDelay = Time.fixedTime + 0.2f;
         }

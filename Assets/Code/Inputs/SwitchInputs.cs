@@ -81,6 +81,7 @@ public class SwitchInputs :MonoBehaviour, IInputs
 
 
     public bool LeftMouseButton => Input.GetMouseButton(0);
+    public bool RightMouseButton => Input.GetMouseButton(1);
 
     public bool LeftMouseButtonDown => Input.GetMouseButtonDown(0);
     public bool RightMouseButtonDown => Input.GetMouseButtonDown(1);
@@ -172,7 +173,7 @@ public class SwitchInputs :MonoBehaviour, IInputs
     public bool R2 => npadState.GetButtonDown(NpadButton.ZR);
     public bool L2 => npadState.GetButtonDown(NpadButton.ZL);
 
-    public bool FadeMode => npadState.GetButtonDown(NpadButton.Y);
+    public bool FadeMode => false;
 
 
     private Image JoyConImage, ProGamepadImage;

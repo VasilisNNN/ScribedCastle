@@ -236,9 +236,12 @@ public class Constructor : MonoBehaviour
 
 
     public bool AlphaBuildingFade { get; private set; }
+
     void Start()
     {
+        CurrentMerchant = 0;
         CurrentMerchantID = MerchantsIds[0];
+
         MerchantNameText = GameObject.Find("MerchantNameText").GetComponent<TextMeshProUGUI>();
 
      
@@ -260,15 +263,7 @@ public class Constructor : MonoBehaviour
            SPEED2_ButtonImage = GameObject.Find("SPEED2_Button").GetComponent<Image>();
 
         
-        GreyMap = GameObject.Find("Grid").transform.Find("GreyGround").GetComponent<Tilemap>();
-        GrassMap = GameObject.Find("Grid").transform.Find("Grass").GetComponent<Tilemap>();
-        WaterMap = GameObject.Find("Grid").transform.Find("Water").GetComponent<Tilemap>();
-        Tile = GameObject.Find("Grid").transform.Find("Floor").GetComponent<Tilemap>();
-        StartBlock = GameObject.Find("Grid").transform.Find("StartBlock").GetComponent<Tilemap>();
-        TileBlock = GameObject.Find("Grid").transform.Find("Block").GetComponent<Tilemap>();
-  
-        PitsTileBase = GameObject.Find("Grid").transform.Find("PitsTileBase").GetComponent<Tilemap>();
-
+       
         ConstructorButtons = GameObject.Find("ConstructorButtons");
 
         ChooseUI = GameObject.Find("ChooseUI");
@@ -388,12 +383,9 @@ public class Constructor : MonoBehaviour
    void Update()
     {
 
-     
-
-        
         DirectControlls();
 
-        if (SL.Saving || SL.Loading) return;
+        if (SL.SaveLoadCurrent.Saving || SL.SaveLoadCurrent.Loading) return;
         
         ExplosionDestroy();
            
@@ -719,8 +711,8 @@ public class Constructor : MonoBehaviour
 
             if (ChildPubObject.floors <= 0 && _transform.GetChild(0) != null)
             {
-  
-                ConstructObject(pl.inv.GetItemInDatabase(_transform.GetChild(0).GetComponent<StatsControll>().DatabaseID).TargetTileMap,
+
+                ConstructStructure(pl.inv.GetItemInDatabase(_transform.GetChild(0).GetComponent<StatsControll>().DatabaseID).TargetTileMap,
                     pl.inv.GetItemInDatabase(_transform.GetChild(0).GetComponent<StatsControll>().DatabaseID).TargetBrush);
             }
         }
@@ -1108,8 +1100,6 @@ public class Constructor : MonoBehaviour
         Floors--;
 
      
-        if (Map.GetTile(new Vector3Int(XPos, YPos , 0)) == SL.KitchenBrush[0] && _transform.childCount > 0)
-        KitchenFloors -= _transform.GetChild(0).GetComponent<PubObject>().kitchenfloors;
         StatsControll _StatsControll = _transform.GetChild(0).GetComponent<StatsControll>();
 
 
@@ -1366,6 +1356,9 @@ public class Constructor : MonoBehaviour
                     CopyObject(objecttobuild, pl.inv.GetItemInDatabase(_statsControll.DatabaseID).ObjectPrefsTop[RandomisedNumber]);
                 else
                     CopyObject(objecttobuild, pl.inv.GetItemInDatabase(_statsControll.DatabaseID).ObjectPrefs);
+
+              
+
             }
 
 
@@ -1558,7 +1551,7 @@ public class Constructor : MonoBehaviour
 
 
 
-    void ConstructObject(Tilemap Map, TileBase[] Brush)
+    void ConstructStructure(Tilemap Map, TileBase[] Brush)
     {
         Transform ChildOnMouse = _transform.GetChild(0);
         if (BuildDelay > Time.fixedTime)
@@ -2065,10 +2058,8 @@ public class Constructor : MonoBehaviour
     
     void DirectControlls()
     {
-        if (IM.FadeMode)
-        {
-            AlphaBuildingFade = !AlphaBuildingFade;
-        }
+       
+        AlphaBuildingFade = _menu.TransparencyBuilding;
 
         if (IM.HorizontalFlip)
         {
@@ -2764,7 +2755,7 @@ public class Constructor : MonoBehaviour
             }
 
 
-            pl.menu.SL.ObjectsToDestroy.Add(FO.gameObject.name);
+            pl.menu.SL.SaveLoadCurrent.ObjectsToDestroy.Add(FO.gameObject.name);
         }
 
         pl.LayerSort.ResetFlippingObjects();
@@ -2796,6 +2787,7 @@ public class Constructor : MonoBehaviour
         else if (_object.GetComponent<Animator>() != null)  DestroyImmediate(_object.GetComponent<Animator>());
 
         _object.GetComponent<StatsControll>().DatabaseID = target.GetComponent<StatsControll>().DatabaseID;
+        _object.GetComponent<StatsControll>().MiddleReplacement = target.GetComponent<StatsControll>().MiddleReplacement;
 
         for (int i = 0; i < target.transform.childCount; i++)
         {
@@ -2826,7 +2818,7 @@ public class Constructor : MonoBehaviour
         StatsControll T_ST = Target.GetComponent<StatsControll>();
 
         if (T_ST == null)
-            pl.menu.SL.ObjectsToDestroy.Add(Target.name);
+            pl.menu.SL.SaveLoadCurrent.ObjectsToDestroy.Add(Target.name);
         else
         {
             if (T_ST.HPUI != null)
@@ -2839,7 +2831,7 @@ public class Constructor : MonoBehaviour
                 Destroy(T_ST.ComfortUI);
 
             if (!T_ST.BuildedStructure)
-                pl.menu.SL.ObjectsToDestroy.Add(Target.name);
+                pl.menu.SL.SaveLoadCurrent.ObjectsToDestroy.Add(Target.name);
         }
         
 
@@ -2991,8 +2983,11 @@ public class Constructor : MonoBehaviour
     {
         if (!inv.crafting)
             return;
+        if (IM.ActionDelay > Time.fixedTime) return;
 
-        MerchantNameText.text = inv.GetItemInDatabase(CurrentMerchantID).itemNames[_menu.Language];
+            MerchantNameText.text = inv.GetItemInDatabase(CurrentMerchantID).itemNames[_menu.Language];
+
+       
 
         if (!IM.R2) return;
         
@@ -3000,9 +2995,11 @@ public class Constructor : MonoBehaviour
             CurrentMerchant++;
         else CurrentMerchant = 0;
 
+
         CurrentMerchantID = MerchantsIds[CurrentMerchant];
-        
-    
+
+
+
     }
 
 

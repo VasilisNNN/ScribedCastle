@@ -16,9 +16,12 @@ public class InitializeObjects : MonoBehaviour
     public static TextDatabase Textdatabase;
 
     public bool TextOnly;
+
+ 
+
     void Awake()
     {
-
+      
 
         Textdatabase = new TextDatabase();
         Textdatabase.SetData();
@@ -46,13 +49,23 @@ public class InitializeObjects : MonoBehaviour
         GameObject ConstrOB = Instantiate(ConstructorPrefab);
         ConstrOB.name = "Constructor";
         Constr = ConstrOB.GetComponent<Constructor>();
+        Constr.transform.position = transform.position;
 
+
+        Constr.GreyMap = GameObject.Find("Grid").transform.Find("GreyGround").GetComponent<Tilemap>();
+        Constr.GrassMap = GameObject.Find("Grid").transform.Find("Grass").GetComponent<Tilemap>();
+        Constr.WaterMap = GameObject.Find("Grid").transform.Find("Water").GetComponent<Tilemap>();
+        Constr.Tile = GameObject.Find("Grid").transform.Find("Floor").GetComponent<Tilemap>();
+        Constr.StartBlock = GameObject.Find("Grid").transform.Find("StartBlock").GetComponent<Tilemap>();
+        Constr.TileBlock = GameObject.Find("Grid").transform.Find("Block").GetComponent<Tilemap>();
+
+        Constr.PitsTileBase = GameObject.Find("Grid").transform.Find("PitsTileBase").GetComponent<Tilemap>();
 
 
         GameObject PLOB = Instantiate(PlayerPrefab);
         PLOB.name = "Player";
         PL = PLOB.GetComponent<Player>();
-
+        PL.transform.position = transform.position;
 
     }
 

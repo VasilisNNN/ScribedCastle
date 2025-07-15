@@ -356,7 +356,7 @@ public class GenerateMap : MonoBehaviour
         }
 
 
-        pl.menu.SL.ResetPolygonColliders();
+        pl.menu.SL.SaveLoadCurrent.ResetPolygonColliders();
 
        
         pl.FadeInDelay = Time.fixedTime + 2f;

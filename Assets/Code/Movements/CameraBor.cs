@@ -89,7 +89,7 @@ public class CameraBor : MonoBehaviour {
         if (Constr.TutorialPause || pl.menu.MenuONOFF || pl.inv.showinvent || pl.inv.showjournal || pl.inv.blueprintshow) return;
 
 
-        if (pl.IM.MouseScroll > 0.1 && PixelCam.assetsPPU < 256) PixelCam.assetsPPU+=10;
+        if (pl.IM.MouseScroll > 0.1 && PixelCam.assetsPPU < 180) PixelCam.assetsPPU+=10;
         if (pl.IM.MouseScroll < -0.1 && PixelCam.assetsPPU>40) PixelCam.assetsPPU-=10;
 
         CamShake();

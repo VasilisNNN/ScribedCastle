@@ -728,6 +728,8 @@ MonoBehaviour:
   MasterSliderValue: 0
   BGSliderValue: 0
   ObjectsSliderValue: 0
+  HideUIValue: 0
+  TransparencyUIValue: 0
   CurrentSlotLocations: []
   CurrentSlotDates: []
   CurrentSlotTimes: []
@@ -917,12 +919,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SaveExists: 0
   StartStarts: []
-  FloorStates: 
-  RNDSTART_Y: 0
-  RNDSTART_X: 0
-  RNDStablePos: 0
-  ObjectPlacement_seed_Start: 0
-  RNDSHIFT: {x: 0, y: 0}
   Unlocked_IDs: 
   PreplacedObjects_Count: 0
   GenMap_GrowStates_Count: 0
@@ -934,23 +930,13 @@ MonoBehaviour:
   DroppedItems_Count: 0
   Inventory_Count: 0
   UnlockedItems_Count: 0
-  mountName: ScribedCSave
-  SavingState: 0
-  LoadingState: 0
   ACHNames: []
-  ObjectsToDestroy: []
   LocationsNames: []
   CreateLocationOnStart: 
   BPConstructed: 
   DayNumber: 0
   DayTime: 0
-  FloorBrush: []
-  KitchenBrush: []
-  TopBrush: []
-  GroundBrush: []
-  BaseBrush: []
-  GrassBrush: []
-  PitBrush: []
+  SaveLoadCurrent: {fileID: 0}
 --- !u!212 &139396748
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -5776,7 +5762,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 8311278176130470092, guid: 8cc0028b7826d254ab836cd5065840c6, type: 2}
-  m_audioClip: {fileID: 8300000, guid: af7b174fbc470c541a9526523473fd39, type: 3}
+  m_audioClip: {fileID: 8300000, guid: a6dcf6aeb361c894aa585d725ffdcfa5, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1

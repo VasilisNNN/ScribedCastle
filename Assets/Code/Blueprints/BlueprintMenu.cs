@@ -15,6 +15,7 @@ public class BlueprintMenu : MonoBehaviour
     private List<GameObject> BluePrintObjects = new List<GameObject>();
     private List<GameObject> BlueFloorObjects = new List<GameObject>();
     private List<GameObject> Rewards = new List<GameObject>();
+    private List<GameObject> BlueprintsDone = new List<GameObject>();
     public GameObject LeftArrow;
     public GameObject RightArrow;
     public GameObject PlayButton;
@@ -60,6 +61,7 @@ public class BlueprintMenu : MonoBehaviour
     private GameObject FadeCursor;
 
     private RectTransform CanvasTransform;
+    private int blueprintnum;
     void Start()
     {
         CanvasTransform = InitializeObjects.CanvasTransform.GetComponent<RectTransform>();
@@ -117,36 +119,37 @@ public class BlueprintMenu : MonoBehaviour
 
     }
 
-    void CleanMenu()
+
+
+    void UpdateBricks()
     {
-        for (int i = 0; i < BluePrintObjects.Count; i++)
+
+        for (int i = 0; i < BP.Count; i++)
         {
-            Destroy(BluePrintObjects[i]);
 
+
+            GameObject BluePr = BluePrintObjects[i];
+
+
+            for (int ii = 0; ii < BluePr.transform.childCount; ii++)
+            {
+
+                GameObject BluePrintBrick = BluePr.transform.GetChild(ii).gameObject;
+                BluePrintBrick.GetComponent<RectTransform>().anchoredPosition = new Vector2(BP[i].ObjectList[ii].Place.x * partWidth, BP[i].ObjectList[ii].Place.y * partWidth);
+                BluePrintBrick.GetComponent<Image>().sprite = BP[i].ObjectList[ii].Object.GetComponent<SpriteRenderer>().sprite;
+
+                if (BP[i].ObjectList[ii].hasParrent) BluePrintBrick.name += "Child";
+
+                BluePrintBrick.GetComponent<Image>().enabled = false;
+               // BluePrintBrick.transform.SetSiblingIndex(Mathf.Abs(BP[i].ObjectOrder[ii]));
+
+            }
         }
-
-
-        for (int i = 0; i < Rewards.Count; i++)
-        {
-                Destroy(Rewards[i]);
-
         }
-      
-        for (int i = 0; i < BlueFloorObjects.Count; i++)
-         {
-             Destroy(BlueFloorObjects[i]);
-
-         }
-
-       
-        Rewards = new List<GameObject>();
-
-        BlueFloorObjects = new List<GameObject>();
-        BluePrintObjects = new List<GameObject>();
-    }
  
     void CreateMenu()
     {
+        GameObject BPDoneOB = Resources.Load<GameObject>("Prefabs/Blueprints/BlueprintDone");
 
         for (int i = 0; i < BP.Count; i++)
         {
@@ -180,42 +183,7 @@ public class BlueprintMenu : MonoBehaviour
 
             }
 
-            
-            float color =1;
-     
-            for (int x = -5; x < 6; x++)
-            {
-                for (int y = -5; y < 6; y++)
-                {
-                    GameObject BlueFloorPart = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/BlueprintFloor"), BlueFloor.transform);
-                    Vector2 BlueFloorPartPOS = new Vector2(x * partWidth , y * (partWidth) );
-                    BlueFloorPart.GetComponent<RectTransform>().anchoredPosition = BlueFloorPartPOS;
-                    BlueFloorPart.transform.SetAsFirstSibling();
-
-
-                    for (int ii = 0; ii < BluePr.transform.childCount; ii++)
-                    {
-                        if (BP[i].ObjectList[ii].Object.GetComponent<StatsControll>() != null &&
-                            !BluePr.transform.GetChild(ii).name.Contains("Child") &&
-                            ConvertBlueFloorPart_To_BluePrintObjects(BluePr.transform.GetChild(ii).GetComponent<RectTransform>().anchoredPosition) == BlueFloorPart.GetComponent<RectTransform>().anchoredPosition)
-                        {
-                          
-                           
-                            TileBase tileBase = BP[i].ObjectList[ii]._TileBase;
-
-                            RuleTile ruleTile = tileBase as RuleTile;
-
-                            BlueFloorPart.GetComponent<Image>().sprite = ruleTile.m_DefaultSprite;
-
-                        }
-                    }
-
-                    BlueFloorPart.GetComponent<Image>().enabled = false;
-                    BlueFloorPart.GetComponent<Image>().color = new Color(color, color, color, 1);
-                    color -= 0.005f;
-                }
-            }
-
+          
 
             BlueFloor.transform.SetAsFirstSibling();
 
@@ -223,9 +191,17 @@ public class BlueprintMenu : MonoBehaviour
             BluePrBG.GetComponent<Image>().enabled = false;
             BluePrBG.transform.SetAsFirstSibling();
             BlueprintsBG.Add(BluePrBG);
-          
-        }
 
+
+            CreateFloors(BluePr, BlueFloor, i);
+            if (BlueprintsDone.Count < BP.Count)
+            {
+                GameObject BluePrintDone = Instantiate(BPDoneOB, transform);
+                BluePrintDone.name = "BluePrintDone";
+                BlueprintsDone.Add(BluePrintDone);
+            }
+
+        }
 
         for (int i = 0; i < BlueFloorObjects.Count; i++)
         {
@@ -236,14 +212,18 @@ public class BlueprintMenu : MonoBehaviour
             Reward.transform.Find("Text").GetComponent<TextMeshProUGUI>().enabled = false;
             Rewards.Add(Reward);
 
+
+        
         }
-     
+
+
+
 
         LeftArrow.transform.SetAsLastSibling();
      
         RightArrow.transform.SetAsLastSibling();
 
-
+       
         LeftArrow.GetComponent<Image>().enabled = false;
         RightArrow.GetComponent<Image>().enabled = false;
 
@@ -251,12 +231,50 @@ public class BlueprintMenu : MonoBehaviour
         transform.Find("BG").GetComponent<Image>().enabled = false;
         menu.ONOFFUI(LeftArrow.transform, false);
 
-        StartBluePrintsDone();
+    
     }
 
 
 
+    void CreateFloors(GameObject BluePr,GameObject BlueFloor, int i)
+    {
 
+        float color = 1;
+
+        for (int x = -5; x < 6; x++)
+        {
+            for (int y = -5; y < 6; y++)
+            {
+                GameObject BlueFloorPart = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/BlueprintFloor"), BlueFloor.transform);
+                Vector2 BlueFloorPartPOS = new Vector2(x * partWidth, y * (partWidth));
+                BlueFloorPart.GetComponent<RectTransform>().anchoredPosition = BlueFloorPartPOS;
+           
+
+
+                for (int ii = 0; ii < BluePr.transform.childCount; ii++)
+                {
+                    if (BP[i].ObjectList[ii].Object.GetComponent<StatsControll>() != null &&
+                        !BluePr.transform.GetChild(ii).name.Contains("Child") &&
+                        ConvertBlueFloorPart_To_BluePrintObjects(BluePr.transform.GetChild(ii).GetComponent<RectTransform>().anchoredPosition) == BlueFloorPart.GetComponent<RectTransform>().anchoredPosition)
+                    {
+
+
+                        TileBase tileBase = BP[i].ObjectList[ii]._TileBase;
+
+                        RuleTile ruleTile = tileBase as RuleTile;
+
+                        BlueFloorPart.GetComponent<Image>().sprite = ruleTile.m_DefaultSprite;
+
+                    }
+                }
+
+                BlueFloorPart.GetComponent<Image>().enabled = false;
+                BlueFloorPart.GetComponent<Image>().color = new Color(color, color, color, 1);
+                color -= 0.005f;
+            }
+        }
+
+    }
     void Update()
     {
         if (pl.StartLoading) return;
@@ -271,21 +289,19 @@ public class BlueprintMenu : MonoBehaviour
 
         EnableDisableMenu();
         MenuControlls();
-        RewardsControl();
-
+   
         GetRewards();
+        BluePrintsDoneManager();
 
-        
 
     }
 
 
-    void RewardsControl()
+    void RewardsControl(int i)
     {
 
      
-        for (int i = 0; i < Rewards.Count; i++)
-        {
+        
             TextMeshProUGUI TMesh = Rewards[i].transform.Find("Text").GetComponent<TextMeshProUGUI>();
 
 
@@ -301,7 +317,7 @@ public class BlueprintMenu : MonoBehaviour
 
             for (int j = 0; j < BP[i].Rewards.Length; j++)
                 TMesh.text += inv.GetItemInDatabase(BP[i].Rewards[j].itemID).itemNames[menu.Language] + " x" + BP[i].Rewards[j].Count + "\n";
-        }
+        
     }
 
 
@@ -318,77 +334,82 @@ void MoveBlueprints()
 
             BlueprintsBG[i].GetComponent<RectTransform>().anchoredPosition = BluePrPOS;
 
+          
+            BlueprintsDone[i].GetComponent<RectTransform>().anchoredPosition = BluePrPOS + new Vector2( BPSlotWidth / 2.5f, -BPSlotWidth / 2.5f);
 
+            if (i < CurrentBP - 1 || i > CurrentBP + 1)
+            {
+                BluePrintObjects[i].SetActive(false);
+                BlueprintsBG[i].SetActive(false);
+                BlueFloorObjects[i].SetActive(false);
+                Rewards[i].SetActive(false);
+            }
+            else
+            {
+                BluePrintObjects[i].SetActive(true);
+                BlueprintsBG[i].SetActive(true);
+                BlueFloorObjects[i].SetActive(true);
+                Rewards[i].SetActive(true);
+            }
         }
 
     }
 
     void GetRewards()
     {
-        
-        for (int i = 0; i < BP.Count; i++)
+        if (blueprintnum >= BP.Count) blueprintnum = 0;
+
+
+        int i = blueprintnum;
+
+        RewardsControl(i);
+
+        if (!BP[i].Unlocked && menu.SL.BPConstructed[i] >0)
         {
+              
+            BP[i].Unlocked = true;
+            BP[i].UpdateBP();
+            UpdateBricks();
 
-            if (!BP[i].Unlocked && menu.SL.BPConstructed[i] >0)
-            {
-                CleanMenu();
-                BP[i].Unlocked = true;
-                BP[i].UpdateBP();
-                CreateMenu();
-
-                BackToNormalNumber = 0;
-            }
-
-            if (BlueFloorObjects[i].transform.Find("BluePrintDone") != null)
-                BlueFloorObjects[i].transform.Find("BluePrintDone").GetComponent<RectTransform>().anchoredPosition = new Vector2(BlueFloorObjects[i].GetComponent<RectTransform>().anchoredPosition.x + BPSlotWidth / 3, BlueFloorObjects[i].GetComponent<RectTransform>().anchoredPosition.y - BPSlotWidth / 3);
+            BackToNormalNumber = 0;
+        }
 
            
-            if (ReadObject(BP[i].ObjectList)  && BP[i].Rewards.Length>0 && menu.SL.BPConstructed[i] != 1)
-            {
+        if (ReadObject(BP[i].ObjectList)  && BP[i].Rewards.Length>0 && menu.SL.BPConstructed[i] != 1)
+        {
           
-                for (int r = 0; r < BP[i].Rewards.Length; r++)
-                    inv.AddItem(BP[i].Rewards[r].itemID, BP[i].Rewards[r].Count, inv.GetItemInDatabase(BP[i].Rewards[r].itemID).Durability, inv.transform.position);
+            for (int r = 0; r < BP[i].Rewards.Length; r++)
+                inv.AddItem(BP[i].Rewards[r].itemID, BP[i].Rewards[r].Count, inv.GetItemInDatabase(BP[i].Rewards[r].itemID).Durability, inv.transform.position);
 
                
-                
-                GameObject BluePrintDone = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/BlueprintDone"), BlueFloorObjects[i].transform);
-                    BluePrintDone.name = "BluePrintDone";
-
-                
-               
-                LastBlueprint = i;
-                menu.SL.BPConstructed[i] = 1;
+            LastBlueprint = i;
+            menu.SL.BPConstructed[i] = 1;
 
                 
 
-            }
-
-
-         
         }
 
 
 
-        
+        blueprintnum++;
+
     }
 
 
-    public void StartBluePrintsDone()
+    public void BluePrintsDoneManager()
     {
       
 
         for (int i = 0; i < BP.Count; i++)
         {
 
-            if (BlueFloorObjects[i].transform.Find("BluePrintDone") == null && menu.SL.BPConstructed[i] == 1)
+            if ( menu.SL.BPConstructed[i] == 1)
             {
-              
 
-                GameObject BluePrintDone = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/BlueprintDone"), BlueFloorObjects[i].transform);
-                BluePrintDone.name = "BluePrintDone";
-
+                BlueprintsDone[i].SetActive(true);
 
             }
+            else BlueprintsDone[i].SetActive(false);
 
         }
 
@@ -476,9 +497,7 @@ void MoveBlueprints()
             }
 
 
-#if UNITY_SWITCH
-            pw = partWidth / 2 + partWidth/6;
-#endif
+
             
             cursorpos = new Vector2(0,  FadePosition * pw);
 
@@ -704,11 +723,11 @@ void MoveBlueprints()
 
             DisassembleTimer = Time.fixedTime + 0.5f;
         }
-
-   
-
-            AnimationDisAssemble();
-            AnimationBackToNormal();
+       
+        
+        
+           AnimationDisAssemble();
+        AnimationBackToNormal();
         LayersAnimation();
 
 
@@ -729,11 +748,6 @@ void MoveBlueprints()
             
 
         }
-
-
-        
-
-      
 
 
         

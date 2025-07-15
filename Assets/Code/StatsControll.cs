@@ -156,9 +156,14 @@ public class StatsControll : MonoBehaviour
 
     public ColorAndMaterial ColorMaterial;
 
+    public Sprite MiddleReplacement;
+    private Sprite StartSPRT;
+
     private void Awake()
     {
+        SR = GetComponent<SpriteRenderer>();
 
+        StartSPRT = SR.sprite;
         _PubObject = GetComponent<PubObject>();
         AU = GetComponent<AudioSource>();
         CM = GetComponent<CharacterPath>();
@@ -262,11 +267,7 @@ public class StatsControll : MonoBehaviour
         Payed = true;
      
 
-        SR = GetComponent<SpriteRenderer>();
-
-
-      
-
+     
 
 
 
@@ -539,6 +540,9 @@ public class StatsControll : MonoBehaviour
     public void GrowControll()
     {
 
+        SwapSPRTMiddlePart();
+
+
         ColorMaterial.ObjectColorAlpha();
 
             DamageObject();
@@ -563,6 +567,39 @@ public class StatsControll : MonoBehaviour
                   GrowingSprites[CurrentGrowState];
 
     }
+
+    void SwapSPRTMiddlePart()
+    {
+        if (SR == null)
+            return;
+
+   
+
+        if (MiddleReplacement != null && _transform.parent != null)
+        {
+            StatsControll parentStats = _transform.parent.GetComponent<StatsControll>();
+            bool hasNext = _transform.GetSiblingIndex() + 1 < _transform.parent.childCount;
+
+            SR.sprite = (parentStats != null && hasNext) ? MiddleReplacement : StartSPRT;
+        }
+        else
+        {
+            if (_transform.childCount <= 0)
+                SR.sprite = StartSPRT;
+            else
+            if (_transform.GetChild(0).GetComponent<StatsControll>() != null) 
+            {
+                if (MiddleReplacement != null) 
+                    SR.sprite = MiddleReplacement;
+                 else SR.sprite = StartSPRT;
+            }
+            else SR.sprite = StartSPRT;
+        }
+
+     
+    }
+
+
 
     void DamageObject()
     {

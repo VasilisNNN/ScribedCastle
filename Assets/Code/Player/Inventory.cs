@@ -731,23 +731,12 @@ public class Inventory : MonoBehaviour
 
     void DrawInventory(bool tf)
     {
-      
-#if UNITY_SWITCH
 
-        for (int i = 0; i < FolderButtons.Count; i++)
-        {
-        FolderButtons[i].SetActive(tf);
-        FolderButtons[i].GetComponent<RectTransform>().position = new Vector2(FolderButtons[i].GetComponent<RectTransform>().position.x, SlotsRect[i].y + SlotsRect[i].height/1.2f);
-        LeftFolder.GetComponent<RectTransform>().position = new Vector2(LeftFolder.GetComponent<RectTransform>().position.x, SlotsRect[i].y + SlotsRect[i].height/ 1.2f);
-        RightFolder.GetComponent<RectTransform>().position = new Vector2(RightFolder.GetComponent<RectTransform>().position.x, SlotsRect[i].y + SlotsRect[i].height/ 1.2f);
-        }
 
-#endif
 
-#if UNITY_STANDALONE || UNITY_PS4 || UNITY_PS5
         for (int i = 0; i < FolderButtons.Count; i++)
          FolderButtons[i].SetActive(tf);
-#endif
+
 
 
 
@@ -1808,7 +1797,7 @@ public class Inventory : MonoBehaviour
 
                 Constr.DroppedItems.Add(NewItem);
 
-                if (pl.menu.SL.ObjectsToDestroy.Contains(NewItem.name)) pl.menu.SL.ObjectsToDestroy.Remove(NewItem.name);
+                if (pl.menu.SL.SaveLoadCurrent.ObjectsToDestroy.Contains(NewItem.name)) pl.menu.SL.SaveLoadCurrent.ObjectsToDestroy.Remove(NewItem.name);
             }
 
 

@@ -341,7 +341,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0baccbb65091a904fbf5bc22a346f23e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  item: 9e020000c0030000c3030000c6030000891300008b13000033010000350100001b050000
+  item: 9e020000c0030000c3030000c6030000891300008b130000350100001b050000
   itemcount: 
   durability: 
   AddOnColl: 0
@@ -413,6 +413,8 @@ MonoBehaviour:
   IgnoreDestroyList: 0
   BuildedStructure: 0
   SpawnPointName: 
+  ColorMaterial: {fileID: 0}
+  MiddleReplacement: {fileID: 0}
 --- !u!114 &4543319707855793332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -425,11 +427,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 968c0051690728c46b0bb41c47ea1dfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Red: 0
-  Green: 0
-  Gold: 0
-  Cost: 0
-  CornCost: 0
   Table: 0
   Shield: 0
   TransperentWall: 0

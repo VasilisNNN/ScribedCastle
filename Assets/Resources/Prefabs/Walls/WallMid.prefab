@@ -188,6 +188,8 @@ MonoBehaviour:
   IgnoreDestroyList: 0
   BuildedStructure: 0
   SpawnPointName: 
+  ColorMaterial: {fileID: 0}
+  MiddleReplacement: {fileID: 970113196, guid: 18e711a933a2c994baa27186c7eaf2a7, type: 3}
 --- !u!114 &8723616248568076219
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -200,11 +202,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 968c0051690728c46b0bb41c47ea1dfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Red: 0
-  Green: 0
-  Gold: 0
-  Cost: 0
-  CornCost: 0
   Table: 0
   Shield: 0
   TransperentWall: 0

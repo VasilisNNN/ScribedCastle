@@ -1433,11 +1433,11 @@ public class ItemsSlotsUI : MonoBehaviour
         if (pl.inv.CurrentCraftingTable._destroy)
         {
             if(GetComponent<StatsControll>()==null)
-            pl.menu.SL.ObjectsToDestroy.Add(gameObject.name);
+                pl.menu.SL.SaveLoadCurrent.ObjectsToDestroy.Add(gameObject.name);
             else
             {
                 if (!GetComponent<StatsControll>().BuildedStructure)
-                    pl.menu.SL.ObjectsToDestroy.Add(gameObject.name);
+                    pl.menu.SL.SaveLoadCurrent.ObjectsToDestroy.Add(gameObject.name);
             }
 
             Destroy(pl.inv.CurrentCraftingTable.gameObject);

@@ -9,6 +9,7 @@ using System;
 using TMPro;
 using System.Linq;
 using static UnityEngine.EventSystems.StandaloneInputModule;
+using UnityEditor;
 
 
 
@@ -64,6 +65,7 @@ public class MenuCustom : MonoBehaviour
     public float MenuActionDelay { get; set; }
     public bool ShowAchivements { get; set; }
     public bool HideUI { get; private set; }
+    public bool TransparencyBuilding { get; set; }
     public InputMode IM { get; private set; }
     public float ScrollDelay { get; set; }
     private List<GameObject> Slots = new List<GameObject>();
@@ -74,6 +76,9 @@ public class MenuCustom : MonoBehaviour
     public float MasterSliderValue, BGSliderValue, ObjectsSliderValue;
     [HideInInspector]
     public int HideUIValue;
+
+    [HideInInspector]
+    public int TransparencyUIValue;
 
     [HideInInspector]
     public string[] CurrentSlotLocations, CurrentSlotDates, CurrentSlotTimes;
@@ -95,7 +100,7 @@ public class MenuCustom : MonoBehaviour
     public AudioClip MenuCancelClip, ErrorClip;
 
     private bool ChooseMouseObject, Building;
-    private Constructor constrr;
+    private Constructor Constr;
 
     public string StartLocation = "Main location";
 
@@ -114,7 +119,7 @@ public class MenuCustom : MonoBehaviour
     private string ScreenZoomText;
     private string BuildingModeText;
     private string HideUIText;
-
+    private string TransparencyUIText;
     private string[] LanguageNames_EN, LanguageNames_UA, LanguageNames_JP;
     private string SceneToTransition = "";
     public float TransitionTimer { get; private set; }
@@ -127,10 +132,16 @@ public class MenuCustom : MonoBehaviour
     private float StartLanguageDelay;
 
     private Transform CanvasTransform;
-    private Toggle HideUIToggle; 
+    private Toggle HideUIToggle, TransparencyUIToggle;
+
+    private void Awake()
+    {
+        DefaultVariables();
+    }
     void Start()
     {
         CanvasTransform = InitializeObjects.CanvasTransform;
+        Constr = InitializeObjects.Constr;
         StartLanguageDelay = Time.fixedTime + 0.25f;
 
         if (Screen.currentResolution.width<=20)
@@ -145,7 +156,7 @@ public class MenuCustom : MonoBehaviour
         LanguageNames_UA = new string[] { "Англійська", "Українська" };
         LanguageNames_JP = new string[] { "英語", "ウクライナ語" };
 
-        constrr = GameObject.Find("Constructor").GetComponent<Constructor>();
+       
 
         MenuChooseMove = Resources.Load<AudioClip>("Sound/UI/Click_0");
         MenuApplyClip = Resources.Load<AudioClip>("Sound/UI/Confirm0");
@@ -175,21 +186,9 @@ public class MenuCustom : MonoBehaviour
 
         ExitOB = GameObject.Find("Exit");
         OptionsApplyOB = GameObject.Find("OptionsApply");
-        MasterSlider = GameObject.Find("MasterSlider").GetComponent<Slider>();
-        BGSlider = GameObject.Find("BGSlider").GetComponent<Slider>();
-        ObjectsSlider = GameObject.Find("ObjectsSlider").GetComponent<Slider>();
-
-        ContinueNumber = 0;
-        MasterSliderValue = 0;
-        BGSliderValue = 0;
-        ObjectsSliderValue = 0;
-        HideUIValue = 0;
        
 
-        CurrentSlotLocations = new string[10] { "", "", "", "", "", "", "", "", "", "" };
-        CurrentSlotDates = new string[10] { "", "", "", "", "", "", "", "", "", "" };
-        CurrentSlotTimes = new string[10] { "", "", "", "", "", "", "", "", "", "" };
-     
+        
         ChooseUITransfrom = GameObject.Find("MenuChoose").transform;
 
         ChooseSubMenu = GameObject.Find("ChooseUI");
@@ -205,15 +204,9 @@ public class MenuCustom : MonoBehaviour
         }
         MouseObject = GameObject.Find("MouseUI");
 
-        ResDropDown = GameObject.Find("ResDropdown");
-
-        LanguageDropdown = GameObject.Find("LanguageDropdown1");
-
-        HideUIToggle = GameObject.Find("HideUI").GetComponent<Toggle>();
-
+     
         ToolTipsYesNoOB = GameObject.Find("ToolTipsYesNo");
-        WindowDropdown = GameObject.Find("WindowDropdown");
-
+       
 
         if (MenuAllObject.transform.Find("Continue") != null)
         {
@@ -281,7 +274,8 @@ public class MenuCustom : MonoBehaviour
         OptionsButtons.Add(OptionsAllTransform.Find("ObjectsSlider").gameObject);
 
         OptionsButtons.Add(HideUIToggle.gameObject);
-
+        OptionsButtons.Add(TransparencyUIToggle.gameObject);
+        
 
         OptionsButtons.Add(OptionsAllTransform.Find("OptionsApply").gameObject);
 
@@ -313,8 +307,7 @@ public class MenuCustom : MonoBehaviour
             ToolTipsYesNoOB.name = "ToolTipsYesNo";
         }
 
-        mg = Resources.Load<UnityEngine.Audio.AudioMixer>("Sound/NewAudioMixer");
-
+        
 
         MenuNamesEN = new string[12] { "Start Main location", "Load", "Save", "Options", "Back", "Exit", "New game", "To main menu", "Modes" + "\n" + "(Play the main game first)", "Modes", "Start Main field", "Continue" };
         MenuNamesUA = new string[12] { "Нова гра", "Завантажити", "Зберігти", "ОпціЇ", "Назад", "Вийти з гри", "Старт", "Головне меню", "Моди", "Моди", "Старт" , "Продовжити"};
@@ -409,8 +402,6 @@ public class MenuCustom : MonoBehaviour
 #endif
 
 
-        if (IM.joystick)
-            Cursor.visible = false;
 
         if (FirstStart == 0 && MenuAllObject.transform.Find("Continue") != null)
         {
@@ -420,11 +411,11 @@ public class MenuCustom : MonoBehaviour
         }
 
         bool TutorialPause = false;
-        if (constrr != null)
+        if (Constr != null)
         {
-            ChooseMouseObject = constrr.ChooseMouseObject;
-            Building = constrr.Building;
-            TutorialPause = constrr.TutorialPause;
+            ChooseMouseObject = Constr.ChooseMouseObject;
+            Building = Constr.Building;
+            TutorialPause = Constr.TutorialPause;
         }
 
       
@@ -439,6 +430,15 @@ public class MenuCustom : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha1)) Language = 1;
         if (Input.GetKeyDown(KeyCode.Alpha2)) Language = 2;
 
+        if (IM.FadeMode)
+        {
+            TransparencyBuilding = !TransparencyBuilding;
+            TransparencyUIToggle.isOn = TransparencyBuilding;
+
+            if (!TransparencyBuilding) TransparencyUIValue = 0;
+            else TransparencyUIValue = 1;
+
+        }
 
         if (pl != null)
         {
@@ -485,7 +485,7 @@ public class MenuCustom : MonoBehaviour
 
       
 
-        if (SL.Saving || SL.Loading) return;
+        if (SL.SaveLoadCurrent.Saving || SL.SaveLoadCurrent.Loading) return;
 
 
        
@@ -525,8 +525,6 @@ public class MenuCustom : MonoBehaviour
 
         }
 
-
-
         MenuChoiseMove();
         OptionsChoiseMove();
 
@@ -559,23 +557,12 @@ public class MenuCustom : MonoBehaviour
             ApplyOptions();
         }
 
+        if (SaveSlotsOn) SaveSlots();
+        if (LoadSlotsOn) LoadSlots();
 
-
-            if (SaveSlotsOn) SaveSlots();
-            if (LoadSlotsOn) LoadSlots();
-
-
-
-              MenuUpdate();
-
-             if (quit) Quit();
-
-
-             SaveSlotsChoose();
-
-
-
-
+       MenuUpdate();
+       if (quit) Quit();
+       SaveSlotsChoose();
 
     }
 
@@ -1179,17 +1166,27 @@ public class MenuCustom : MonoBehaviour
                 if (HideUIToggle.isOn)
                 HideUIValue = 1;
                 else HideUIValue = 0;
+
+
+                if (TransparencyUIToggle.isOn)
+                    TransparencyUIValue = 1;
+                else TransparencyUIValue = 0;
+
             }
         }
 
         HideUI = HideUIToggle.isOn;
-
+        TransparencyBuilding = TransparencyUIToggle.isOn;
         if (!IM.joystick)
         {
             if (HideUIToggle.isOn)
                 HideUIValue = 1;
             else HideUIValue = 0;
 
+            if (TransparencyUIToggle.isOn)
+                TransparencyUIValue = 1;
+            else TransparencyUIValue = 0;
+            
             MasterSliderValue = MasterSlider.value;
             BGSliderValue = BGSlider.value;
             ObjectsSliderValue = ObjectsSlider.value;
@@ -1272,7 +1269,7 @@ public class MenuCustom : MonoBehaviour
             
                 SaveSlotsOn = false;
 
-                SL.Saving = true;
+                SL.SaveLoadCurrent.Saving = true;
 
                 BackToMainMenu(ref SaveSlotsUI, ref DrawSaveSlots);
 
@@ -1311,7 +1308,7 @@ public class MenuCustom : MonoBehaviour
 
                 if (CurrentSlotLocations[i] != null)
                 {
-                    if (CurrentSlotLocations[i].Length > 0 && !SL.Loading)
+                    if (CurrentSlotLocations[i].Length > 0 && !SL.SaveLoadCurrent.Loading)
                     {
 
                         CurrentSlotNumber = i;
@@ -1321,7 +1318,7 @@ public class MenuCustom : MonoBehaviour
                         FirstLanguage = 1;
 
                   
-                        SL.Loading = true;
+                        SL.SaveLoadCurrent.Loading = true;
                         LoadSlotsOn = false;
 
                         ONOFFUI(ChooseUITransfrom, false);
@@ -1473,6 +1470,7 @@ public class MenuCustom : MonoBehaviour
             BGSliderValue = 0.8f;
             MasterSliderValue = 0.8f;
             HideUIValue = 0;
+            TransparencyUIValue = 1; 
         }
 
 
@@ -1539,9 +1537,6 @@ public class MenuCustom : MonoBehaviour
 
 
 
-
-
-            LanguagesControll();
         }
 
         if (ObjectsSlider != null)
@@ -1549,40 +1544,45 @@ public class MenuCustom : MonoBehaviour
           
             ObjectsSlider.value = ObjectsSliderValue;
 
-
+            float objects = 3 * (ObjectsSlider.value * 10) - 30;
+            if (objects > 5) objects = 5;
+            mg.SetFloat("Objects", objects);
         }
-
-        float objects = 3 * (ObjectsSlider.value * 10) - 30;
-        if (objects > 5) objects = 5;
-        mg.SetFloat("Objects", objects);
+        print("LoadMenu 01");
+    
 
         if (BGSlider != null)
         {
             BGSlider.value = BGSliderValue;
 
-
+            float bg = 2 * (BGSlider.value * 10) - 30;
+            if (bg > 5) bg = 5;
+            mg.SetFloat("BG", bg);
         }
+        print("LoadMenu 1");
 
-        float bg = 2 * (BGSlider.value * 10) - 30;
-        if (bg > 5) bg = 5;
-        mg.SetFloat("BG", bg);
 
         if (MasterSlider != null)
+        {
             MasterSlider.value = MasterSliderValue;
 
-
-
-
-        float master = 3 * (MasterSlider.value * 10) - 30;
-        if (master > 5) master = 5;
-        mg.SetFloat("Master", master);
-
+            float master = 3 * (MasterSlider.value * 10) - 30;
+            if (master > 5) master = 5;
+            mg.SetFloat("Master", master);
+        }
 
         if (HideUIValue == 0) HideUIToggle.isOn = false;
         else HideUIToggle.isOn = true;
 
         HideUI = HideUIToggle.isOn;
+        print("LoadMenu 2");
+        if (TransparencyUIValue == 0) TransparencyUIToggle.isOn = false;
+        else TransparencyUIToggle.isOn = true;
 
+        TransparencyBuilding = TransparencyUIToggle.isOn;
+
+
+        print("LoadMenu 3");
         if (LanguageDropdown != null)
             LanguageDropdown.GetComponent<TMP_Dropdown>().value = Language;
 
@@ -1602,13 +1602,13 @@ public class MenuCustom : MonoBehaviour
 #if UNITY_PS4 || UNITY_PS5
         OnScreenLog.Add("LoadMenu" + " ////////// LANGUAGE IS " + Utility.systemLanguage.ToString());
 #endif
-        LanguagesControll();
-
+   
     }
 
     void SetChoisePosition(GameObject Button)
     {
-        if(ChooseUITransfrom.position != Button.GetComponent<RectTransform>().position) PlayAudio(MenuChooseMove);
+        if(ChooseUITransfrom.position != Button.GetComponent<RectTransform>().position && IM.MouseMode) 
+            PlayAudio(MenuChooseMove);
 
         ChooseSlot.transform.position = Button.GetComponent<RectTransform>().position;
         ChooseUITransfrom.position = Button.GetComponent<RectTransform>().position;
@@ -1986,10 +1986,21 @@ public class MenuCustom : MonoBehaviour
         if (Language == 1) HideUIText = "Сховати кнопки";
         if (Language == 2) HideUIText = "UIボタンを隠す";
 
+        if (Language == 0) TransparencyUIText = "Transparency during scribing";
+        if (Language == 1) TransparencyUIText = "Прозорість при будівництві";
+        if (Language == 2) TransparencyUIText = "スクライビング中の透明性";
+
+        
+
         if (OptionsAllTransform != null)
             OptionsAllTransform.Find("HideUI").Find("Label").GetComponent<TextMeshProUGUI>().text = HideUIText;
 
 
+        if (OptionsAllTransform != null)
+            OptionsAllTransform.Find("TransparencyUI").Find("Label").GetComponent<TextMeshProUGUI>().text = TransparencyUIText;
+
+
+        
 
         if (Language == 0)
         {
@@ -2235,6 +2246,34 @@ public class MenuCustom : MonoBehaviour
             }
         }
     }
+
+    public void DefaultVariables()
+    {
+        mg = Resources.Load<UnityEngine.Audio.AudioMixer>("Sound/NewAudioMixer");
+        MasterSlider = GameObject.Find("MasterSlider").GetComponent<Slider>();
+        BGSlider = GameObject.Find("BGSlider").GetComponent<Slider>();
+        ObjectsSlider = GameObject.Find("ObjectsSlider").GetComponent<Slider>();
+
+        ResDropDown = GameObject.Find("ResDropdown");
+        LanguageDropdown = GameObject.Find("LanguageDropdown1");
+        HideUIToggle = GameObject.Find("HideUI").GetComponent<Toggle>();
+        TransparencyUIToggle = GameObject.Find("TransparencyUI").GetComponent<Toggle>();
+        WindowDropdown = GameObject.Find("WindowDropdown");
+
+
+        ContinueNumber = 0;
+        MasterSliderValue = 0;
+        BGSliderValue = 0;
+        ObjectsSliderValue = 0;
+        HideUIValue = 0;
+        TransparencyUIValue = 1;
+
+        CurrentSlotLocations = new string[10] { "", "", "", "", "", "", "", "", "", "" };
+        CurrentSlotDates = new string[10] { "", "", "", "", "", "", "", "", "", "" };
+        CurrentSlotTimes = new string[10] { "", "", "", "", "", "", "", "", "", "" };
+
+    }
+
 
     private void OnDestroy()
     {

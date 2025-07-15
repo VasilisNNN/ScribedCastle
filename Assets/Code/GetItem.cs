@@ -276,19 +276,32 @@ public class GetItem : MonoBehaviour {
 
 
 
-
-
-        if (pl.IM.R2 && Constr.CurrentMerchantID != _Stats.DatabaseID)
+        if (inv.crafting && Constr.CurrentMerchantID == _Stats.DatabaseID && inv.CurrentCraftingTable != GetComponent<GetItem>())
         {
 
-           //
+      
+            inv.PauseInventory = true;
+            inv.ChooseTopSegmentSlot = true;
+
+            inv.PlaySoundsPitched(inv.UIOpen, 1);
+            inv.CraftingUIOB.GetComponent<ItemsSlotsUI>().CloseUI();
+            inv.CraftingUIOB.GetComponent<ItemsSlotsUI>().CurrentRow = 0;
+            inv.Choose.transform.position = inv.CraftingUIOB.GetComponent<ItemsSlotsUI>().Slots[0].Slot[0].transform.position;
+            inv.UpdateInvFolder();
+
+            inv.CurrentCraftingTable = GetComponent<GetItem>();
+            inv.CraftingUIOB.GetComponent<ItemsSlotsUI>().StartUI();
+            inv.showinvent = true;
+            inv.inventjustopenned = Time.fixedTime + 0.01f;
+
+      
 
         }
 
-        if (pl.IM.R2 && Constr.CurrentMerchantID == _Stats.DatabaseID)
+        if (pl.IM.R2   && !inv.crafting)
         {
 
-
+          
             inv.crafting = true;
             inv.PauseInventory = true;
             inv.ChooseTopSegmentSlot = true;
@@ -303,7 +316,10 @@ public class GetItem : MonoBehaviour {
             inv.CraftingUIOB.GetComponent<ItemsSlotsUI>().StartUI();
             inv.showinvent = true;
             inv.inventjustopenned = Time.fixedTime + 0.01f;
+         
             pl.IM.ActionDelay = Time.fixedTime + 0.15f;
+
+
         }
 
 
@@ -602,11 +618,11 @@ public class GetItem : MonoBehaviour {
 
       
         if (GetComponent<StatsControll>() == null)
-            pl.menu.SL.ObjectsToDestroy.Add(gameObject.name);
+            pl.menu.SL.SaveLoadCurrent.ObjectsToDestroy.Add(gameObject.name);
         else
         {
             if (!GetComponent<StatsControll>().BuildedStructure)
-                pl.menu.SL.ObjectsToDestroy.Add(gameObject.name);
+                pl.menu.SL.SaveLoadCurrent.ObjectsToDestroy.Add(gameObject.name);
         }
 
 
@@ -638,11 +654,11 @@ public class GetItem : MonoBehaviour {
 
 
         if (GetComponent<StatsControll>() == null)
-            pl.menu.SL.ObjectsToDestroy.Add(gameObject.name);
+            pl.menu.SL.SaveLoadCurrent.ObjectsToDestroy.Add(gameObject.name);
         else
         {
             if (!GetComponent<StatsControll>().BuildedStructure)
-                pl.menu.SL.ObjectsToDestroy.Add(gameObject.name);
+                pl.menu.SL.SaveLoadCurrent.ObjectsToDestroy.Add(gameObject.name);
         }
 
           Destroy(gameObject);

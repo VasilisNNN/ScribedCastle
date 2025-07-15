@@ -193,7 +193,7 @@ public class Player : MonoBehaviour {
     {
         LayerSort = GetComponent<LayerSorting>();
 
-        TEST = true;
+        TEST = false;
         rigidbody2D = GetComponent<Rigidbody2D>();
         DayNight = GameObject.Find("DayAndNight").GetComponent<DayAndNight>();
         inv = GetComponent<Inventory>();
@@ -287,6 +287,8 @@ public class Player : MonoBehaviour {
             inv.AddItem(980, 999, 99, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
             inv.AddItem(1000, 999, 99, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
             inv.AddItem(1015, 999, 99, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
+            inv.AddItem(354, 999, 99, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
+            inv.AddItem(354, 999, 99, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
 
             AddTestitems = true;
 
@@ -310,11 +312,11 @@ public class Player : MonoBehaviour {
         else Vision = VisionBase;
 
 
-        if (SeparateHeartsHPUI)
-        DrawHPParts();
+      //  if (SeparateHeartsHPUI)
+      //  DrawHPParts();
 
-        if (SliderHPUI)
-            DrawHPSliders();
+     //   if (SliderHPUI)
+         //   DrawHPSliders();
 
         /*objectsInRange.Clear();
 
