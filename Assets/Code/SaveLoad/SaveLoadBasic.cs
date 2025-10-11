@@ -478,6 +478,13 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
                 n.GetComponent<BoxCollider2D>().enabled = false;
 
             }
+
+            if (n.GetComponent<Character>() != null)
+            {
+                n.GetComponent<Character>().enabled = false;
+
+            }
+
             return;
         }
 
