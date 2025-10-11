@@ -611,7 +611,7 @@ new string[7] { "", "", "", "", "", "", "" },
 355, 355, Item.type.item,
 new string[7] { "Island soil", "Земля", "土地", "", "", "", "" },
 new string[7] { "Expands available land on the island", "Розширює доступну землю острова", "島で利用可能な土地の拡大", "", "", "", "" },
-/*Cost*/ 1
+/*Cost*/ 150
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -1094,17 +1094,17 @@ new string[7] { "", "", "", "", "", "", "" },
         items[items.Count - 1].Structure = true;
         items[items.Count - 1].TargetTileMap = MainTileBase;
         items[items.Count - 1]._StructureType = Item.StructureType.Building;
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/WallChurchBottom");
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchBottom");
 
 
         items[items.Count - 1].ObjectPrefsBottom = new GameObject[] {
-            Resources.Load<GameObject>("Prefabs/Walls/WallChurchBottom")};
+            Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchBottom")};
 
         items[items.Count - 1].ObjectPrefsMid = new GameObject[] {
-            Resources.Load<GameObject>("Prefabs/Walls/WallChurchMid")};
+            Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchMid")};
 
         items[items.Count - 1].ObjectPrefsTop = new GameObject[] {
-            Resources.Load<GameObject>("Prefabs/Walls/WallChurchTop")};
+            Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchTop")};
         
         items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
 
@@ -1124,22 +1124,86 @@ new string[7] { "", "", "", "", "", "", "" },
         items[items.Count - 1]._StructureType = Item.StructureType.Building;
 
 
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/WallChurchBottom1");
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchBottom1");
 
         items[items.Count - 1].ObjectPrefsBottom = new GameObject[] {
-            Resources.Load<GameObject>("Prefabs/Walls/WallChurchBottom1")};
+            Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchBottom1")};
 
         items[items.Count - 1].ObjectPrefsMid = new GameObject[] {
-            Resources.Load<GameObject>("Prefabs/Walls/WallChurchMid1")};
+            Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchMid1")};
 
         items[items.Count - 1].ObjectPrefsTop = new GameObject[] {
-            Resources.Load<GameObject>("Prefabs/Walls/WallChurchTop1")};
+            Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchTop1")};
 
 
         items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
 
         items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
         items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+
+
+        items.Add(new Item(
+682, 682, Item.type.item,
+new string[7] { "Church block 3", "", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 15
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchBottom2");
+
+        items[items.Count - 1].ObjectPrefsBottom = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchBottom2")};
+
+        items[items.Count - 1].ObjectPrefsMid = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchMid2")};
+
+        items[items.Count - 1].ObjectPrefsTop = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchTop2")};
+
+
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+
+        items.Add(new Item(
+683, 683, Item.type.item,
+new string[7] { "Church block 4", "", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 15
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchBottom3");
+
+        items[items.Count - 1].ObjectPrefsBottom = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchBottom3")};
+
+        items[items.Count - 1].ObjectPrefsMid = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchMid3")};
+
+        items[items.Count - 1].ObjectPrefsTop = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchTop3")};
+
+
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+
+
 
         items.Add(new Item(
 690, 680, Item.type.item,
@@ -1153,7 +1217,7 @@ new string[7] { "", "", "", "", "", "", "" },
         items[items.Count - 1]._StructureType = Item.StructureType.Building;
 
 
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/WallChurchMid");
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchMid");
         items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
 
         items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
@@ -1170,11 +1234,50 @@ new string[7] { "", "", "", "", "", "", "" },
         items[items.Count - 1]._StructureType = Item.StructureType.Building;
 
 
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/WallChurchMid1");
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchMid1");
         items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
 
         items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
         items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+       
+        
+        
+        items.Add(new Item(
+   692, 682, Item.type.item,
+new string[7] { "Church mid block mid 3", "", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 15
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchMid2");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+        items.Add(new Item(
+ 684, 683, Item.type.item,
+new string[7] { "Church mid block mid 4", "", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 15
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchMid3");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
 
 
         items.Add(new Item(
@@ -1189,7 +1292,7 @@ new string[7] { "", "", "", "", "", "", "" },
         items[items.Count - 1]._StructureType = Item.StructureType.Building;
 
 
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/WallChurchTop");
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchTop");
         items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
 
 
@@ -1206,8 +1309,47 @@ new string[7] { "", "", "", "", "", "", "" },
         items[items.Count - 1]._StructureType = Item.StructureType.Building;
 
 
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/WallChurchTop1");
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchTop1");
         items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+
+        items.Add(new Item(
+699, 682, Item.type.item,
+new string[7] { "Church top block top 3", "", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 15
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchTop2");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+
+        items.Add(new Item(
+685, 683, Item.type.item,
+new string[7] { "Church top block top 4", "", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 15
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ChurchWall/WallChurchTop3");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+
+
+
+
+
+
 
 
 
@@ -2488,16 +2630,16 @@ new string[7] { "Beautiful structure for developed town", "", "", "", "", "", ""
         items[items.Count - 1]._StructureType = Item.StructureType.Building;
 
 
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/Arch wall");
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall");
 
         items[items.Count - 1].ObjectPrefsBottom = new GameObject[] {
-            Resources.Load<GameObject>("Prefabs/Walls/Arch wall")};
+            Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall")};
 
         items[items.Count - 1].ObjectPrefsMid = new GameObject[] {
-            Resources.Load<GameObject>("Prefabs/Walls/Arch wall mid")};
+            Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall mid")};
 
         items[items.Count - 1].ObjectPrefsTop = new GameObject[] {
-            Resources.Load<GameObject>("Prefabs/Walls/Arch wall top")};
+            Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall top")};
 
 
         items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
@@ -2505,10 +2647,8 @@ new string[7] { "Beautiful structure for developed town", "", "", "", "", "", ""
         items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
         items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
 
-
-
         items.Add(new Item(
-985, 980, Item.type.item,
+981, 980, Item.type.item,
 new string[7] { "Arch wall mid", "Стіна з аркою середина", "", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
 /*Cost*/ 4
@@ -2519,7 +2659,7 @@ new string[7] { "", "", "", "", "", "", "" },
         items[items.Count - 1]._StructureType = Item.StructureType.Building;
 
 
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/Arch wall mid");
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall mid");
         items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
 
         items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
@@ -2527,7 +2667,7 @@ new string[7] { "", "", "", "", "", "", "" },
 
 
         items.Add(new Item(
-990, 980, Item.type.item,
+982, 980, Item.type.item,
 new string[7] { "Arch wall top", "Стіна з аркою вершина", "", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
 /*Cost*/ 4
@@ -2538,7 +2678,76 @@ new string[7] { "", "", "", "", "", "", "" },
         items[items.Count - 1]._StructureType = Item.StructureType.Building;
 
 
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/Arch wall top");
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall top");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+
+
+        items.Add(new Item(
+983, 983, Item.type.item,
+new string[7] { "Arch wall 1", "Стіна з аркою 1", "", "", "", "", "" },
+new string[7] { "Beautiful structure for developed town", "", "", "", "", "", "" },
+/*Cost*/ 5
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall 1");
+
+        items[items.Count - 1].ObjectPrefsBottom = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall 1")};
+
+        items[items.Count - 1].ObjectPrefsMid = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall mid 1")};
+
+        items[items.Count - 1].ObjectPrefsTop = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall top 1")};
+
+
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+
+
+        items.Add(new Item(
+984, 983, Item.type.item,
+new string[7] { "Arch wall mid 1", "Стіна з аркою середина", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 4
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall mid 1");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+        items.Add(new Item(
+985, 983, Item.type.item,
+new string[7] { "Arch wall top 1", "Стіна з аркою вершина", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 4
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall top 1");
         items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
 
         items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
@@ -2546,7 +2755,151 @@ new string[7] { "", "", "", "", "", "", "" },
 
 
         items.Add(new Item(
-991, 991, Item.type.item,
+986, 986, Item.type.item,
+new string[7] { "Arch wall 2", "Стіна з аркою 2", "", "", "", "", "" },
+new string[7] { "Beautiful structure for developed town", "", "", "", "", "", "" },
+/*Cost*/ 5
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall 2");
+
+        items[items.Count - 1].ObjectPrefsBottom = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall 2")};
+
+        items[items.Count - 1].ObjectPrefsMid = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall mid 2")};
+
+        items[items.Count - 1].ObjectPrefsTop = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall top 2")};
+
+
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+
+
+        items.Add(new Item(
+987, 986, Item.type.item,
+new string[7] { "Arch wall mid 2", "Стіна з аркою середина", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 4
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall mid 2");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+        items.Add(new Item(
+988, 986, Item.type.item,
+new string[7] { "Arch wall top 2", "Стіна з аркою вершина", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 4
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall top 2");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+
+        items.Add(new Item(
+989, 989, Item.type.item,
+new string[7] { "Arch wall 3", "Стіна з аркою 3", "", "", "", "", "" },
+new string[7] { "Beautiful structure for developed town", "", "", "", "", "", "" },
+/*Cost*/ 5
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall 3");
+
+        items[items.Count - 1].ObjectPrefsBottom = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall 3")};
+
+        items[items.Count - 1].ObjectPrefsMid = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall mid 3")};
+
+        items[items.Count - 1].ObjectPrefsTop = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall top 3")};
+
+
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+
+
+        items.Add(new Item(
+990, 989, Item.type.item,
+new string[7] { "Arch wall mid 3", "Стіна з аркою середина", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 4
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall mid 3");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+        items.Add(new Item(
+991, 989, Item.type.item,
+new string[7] { "Arch wall top 3", "Стіна з аркою вершина", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 4
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/ArchWall/Arch wall top 3");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+
+
+    
+
+
+
+
+
+
+        items.Add(new Item(
+995, 995, Item.type.item,
 new string[7] { "Fat column", "", "", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
 /*Cost*/ 5
@@ -2562,7 +2915,7 @@ new string[7] { "", "", "", "", "", "", "" },
 
 
         items.Add(new Item(
-992, 992, Item.type.item,
+996, 996, Item.type.item,
 new string[7] { "Thin column", "", "", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
 /*Cost*/ 5
@@ -2578,7 +2931,7 @@ new string[7] { "", "", "", "", "", "", "" },
 
 
         items.Add(new Item(
-993, 993, Item.type.item,
+997, 997, Item.type.item,
 new string[7] { "Sphere column", "", "", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
 /*Cost*/ 5
@@ -2607,16 +2960,46 @@ new string[7] { "", "", "", "", "", "", "" },
         items[items.Count - 1]._StructureType = Item.StructureType.Building;
 
 
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/Basic wall 1");
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall 1");
 
         items[items.Count - 1].ObjectPrefsBottom = new GameObject[] {
-            Resources.Load<GameObject>("Prefabs/Walls/Basic wall 1")};
+            Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall 1")};
 
         items[items.Count - 1].ObjectPrefsMid = new GameObject[] {
-            Resources.Load<GameObject>("Prefabs/Walls/Basic wall 1 mid")};
+            Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall 1 mid")};
 
         items[items.Count - 1].ObjectPrefsTop = new GameObject[] {
-            Resources.Load<GameObject>("Prefabs/Walls/Basic wall 1 top")};
+            Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall 1 top")};
+
+
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+
+        items.Add(new Item(
+1001, 1001, Item.type.item,
+new string[7] { "Basic wall two windows", "Базова стіна два вікна", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 4
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall two windows");
+
+        items[items.Count - 1].ObjectPrefsBottom = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall two windows")};
+
+        items[items.Count - 1].ObjectPrefsMid = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall two windows mid")};
+
+        items[items.Count - 1].ObjectPrefsTop = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall two windows top")};
 
 
         items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
@@ -2626,6 +3009,68 @@ new string[7] { "", "", "", "", "", "", "" },
 
 
 
+        items.Add(new Item(
+1002, 1002, Item.type.item,
+new string[7] { "Basic wall gothic", "Базова готична стіна", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 4
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall gothic");
+
+        items[items.Count - 1].ObjectPrefsBottom = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall gothic")};
+
+        items[items.Count - 1].ObjectPrefsMid = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall gothic mid")};
+
+        items[items.Count - 1].ObjectPrefsTop = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall gothic top")};
+
+
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+
+
+        items.Add(new Item(
+1003, 1003, Item.type.item,
+new string[7] { "Basic wall faces", "Базова стіна з обличчами", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 4
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall faces");
+
+        items[items.Count - 1].ObjectPrefsBottom = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall faces")};
+
+        items[items.Count - 1].ObjectPrefsMid = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall faces mid")};
+
+        items[items.Count - 1].ObjectPrefsTop = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall faces top")};
+
+
+
+
+
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
         items.Add(new Item(
 1005, 1000, Item.type.item,
 new string[7] { "Wall basic 1 mid", "Базова стіна 1 середина", "", "", "", "", "" },
@@ -2638,11 +3083,69 @@ new string[7] { "", "", "", "", "", "", "" },
         items[items.Count - 1]._StructureType = Item.StructureType.Building;
 
 
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/Basic wall 1 mid");
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall 1 mid");
         items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
 
         items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
         items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+
+        items.Add(new Item(
+1006, 1001, Item.type.item,
+new string[7] { "Wall basic two windows mid", "Базова стіна два вікна середина", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 4
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall two windows mid");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+        items.Add(new Item(
+1007, 1002, Item.type.item,
+new string[7] { "Wall basic gothic mid", "Базова готична стіна середина", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 4
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall gothic mid");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+
+
+        items.Add(new Item(
+1008, 1003, Item.type.item,
+new string[7] { "Wall basic faces mid", "Базова стіна з обличчами середина", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 4
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall faces mid");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
 
 
         items.Add(new Item(
@@ -2657,13 +3160,70 @@ new string[7] { "", "", "", "", "", "", "" },
         items[items.Count - 1]._StructureType = Item.StructureType.Building;
 
 
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/Basic wall 1 top");
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall 1 top");
         items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
 
         items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
         items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
 
 
+        items.Add(new Item(
+1011, 1001, Item.type.item,
+new string[7] { "Basic wall two windows top", "Базова стіна два вікна вершина", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 4
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall two windows top");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+
+
+        items.Add(new Item(
+1012, 1002, Item.type.item,
+new string[7] { "Basic wall gothic top", "Базова готична стіна вершина", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 4
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall gothic top");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+
+
+        items.Add(new Item(
+1013, 1003, Item.type.item,
+new string[7] { "Basic wall faces top", "Базова стіна з обличчами вершина", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 4
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/BasicWall/Basic wall faces top");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
 
         items.Add(new Item(
 1015, 1015, Item.type.item,
@@ -2794,6 +3354,77 @@ new string[7] { "", "", "", "", "", "", "" },
 
         items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
         items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+
+
+        items.Add(new Item(
+1030, 1030, Item.type.item,
+new string[7] { "German wall", "Німецька стіна", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 6
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/GermanWall/German wall");
+
+        items[items.Count - 1].ObjectPrefsBottom = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/GermanWall/German wall")};
+
+        items[items.Count - 1].ObjectPrefsMid = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/GermanWall/German wall mid")};
+
+        items[items.Count - 1].ObjectPrefsTop = new GameObject[] {
+            Resources.Load<GameObject>("Prefabs/Walls/GermanWall/German wall top")};
+
+
+
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+        items.Add(new Item(
+1031, 1030, Item.type.item,
+new string[7] { "German wall mid", "Німецька стіна середина", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 6
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/German wall mid");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+
+        items.Add(new Item(
+1032, 1030, Item.type.item,
+new string[7] { "German wall top", "Німецька стіна вершина", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 6
+));
+        items[items.Count - 1].CanStack = true;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Building;
+
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/German wall top");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+
+
 
         //-------------------------- FARMS ----------------------------//
 

@@ -77,7 +77,7 @@ public class Dialog : MonoBehaviour
 
     public void StartDialog(int dialogid)
     {
-        if(textdatabase == null) textdatabase = GetComponent<TextDatabase>();
+        if(textdatabase == null) textdatabase = InitializeObjects.Textdatabase;
 
         LinesEn = 
             textdatabase.textEN;
@@ -179,7 +179,6 @@ public class Dialog : MonoBehaviour
             Dialog_Obj.transform.Find("EButton").gameObject.SetActive(false);
         //  }
 
-        textdatabase = GetComponent<TextDatabase>();
 
         if (Dialog_Obj.transform.Find("Text").GetComponent<TextMeshProUGUI>() != null)
             Dialog_Obj.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = DialogString;

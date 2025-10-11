@@ -1622,7 +1622,7 @@ public class Constructor : MonoBehaviour
         GameObject TopOnGround = null;
         GameObject DecorationOnGround = null;
 
-        //----------Object on Ground can bacome parent object for object objecttobuild
+        //----------Object on Ground can bacome parent object for objecttobuild
       
         CheckObjectOnGround(ref ObjectOnGround, ref TopOnGround, ref DecorationOnGround);
 

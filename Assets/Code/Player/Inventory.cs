@@ -75,6 +75,8 @@ public class Inventory : MonoBehaviour
     
     public GameObject Choose { get; private set; }
     public int CurrentItem { get; private set; }
+    public Item CurrentItemToolTips { get;  set; }
+
 
     public int CurrentItemID { get; private set; }
    
@@ -241,7 +243,7 @@ public class Inventory : MonoBehaviour
    
         LoadSlots();
 
-
+        gameObject.AddComponent<AssembleWallsUI>();
        
     }
 
@@ -1317,30 +1319,41 @@ public class Inventory : MonoBehaviour
         if (!showinvent) ToolTip.SetActive(false);
         else ToolTip.SetActive(true);
 
-        if (IM.ActionDelay > Time.fixedTime || PauseInventory) return;
-        
+        if (IM.ActionDelay > Time.fixedTime ) return;
+
         if (!crafting)
         {
             if (CurrentItem > inventoryFolder.Count)
                 CurrentItem = inventoryFolder.Count - 1;
+
+
         }
 
+        if (!PauseInventory)
+        {
 
+            if (inventoryFolder == null) return;
+            if (inventoryFolder.Count <= 0) return;
+            if (CurrentItem < 0) return;
+            if (CurrentItem < inventoryFolder.Count)
+                CurrentItemToolTips = inventoryFolder[CurrentItem];
+            else CurrentItemToolTips = null;
+        }
 
         if (CurrentItem > -1)
         {
 
 
-            if ( showinvent && inventoryFolder.Count > 0)
+            if (showinvent && inventoryFolder.Count > 0)
             {
                 if (CurrentItem > inventoryFolder.Count - 1) CurrentItem = inventoryFolder.Count - 1;
 
                 CurrentItemID = inventoryFolder[CurrentItem].itemID;
                 if (GetCurrentItem().itemID > -1)
                 {
-                
-                    ToolTip.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = TooltipsString(inventoryFolder[CurrentItem]);
-              
+
+                    ToolTip.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = TooltipsString(CurrentItemToolTips);
+
 
                 }
                 else ToolTip.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "";
@@ -1360,7 +1373,7 @@ public class Inventory : MonoBehaviour
             if (!IM.MouseMode)
             {
                 Choose.transform.position = new Vector3(99999, 99999, 999);
-        
+
             }
             else
 
@@ -1369,7 +1382,7 @@ public class Inventory : MonoBehaviour
 
             }
             ToolTip.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "";
-           // ToolTip.transform.position = new Vector3(99999, 99999, ToolTip.transform.position.z);
+            // ToolTip.transform.position = new Vector3(99999, 99999, ToolTip.transform.position.z);
         }
 
 
@@ -2000,6 +2013,7 @@ public class Inventory : MonoBehaviour
 
         //#FF5D5D - red
         //#9DFF99 - green
+        if (i == null) return "";
 
         string red = "#280d14";
         string green = "#9DFF99";

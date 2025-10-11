@@ -48,7 +48,7 @@ public class StatsControll : MonoBehaviour
 
     public bool Destructible;
     public bool CanBeStunned;
-    public bool CanTurnInEgg;
+
 
 
     public int MAXHP { get; set; }
@@ -176,7 +176,10 @@ public class StatsControll : MonoBehaviour
 
         pl = InitializeObjects.PL;
         Const = InitializeObjects.Constr;
+
+        if(gameObject.GetComponent<ColorAndMaterial>()==null)
         gameObject.AddComponent<ColorAndMaterial>();
+
         ColorMaterial = GetComponent<ColorAndMaterial>();
 
     }
@@ -550,16 +553,7 @@ public class StatsControll : MonoBehaviour
         if (MC != null && ConstructorID>-1 && ConstructorID < Const.OBOnBoard.Count)
             Const.OBOnBoard[ConstructorID].Place = transform.position;
         
-        if (Durability <= 0 && DurabilityMax > -1 && CanTurnInEgg)
-            {
-            Const.AddLogPart("WORKER " + pl.inv.GetItemInDatabase(DatabaseID).itemNames[0] + " DIED! You can pick an egg",
-                              "РОБИЧИЙ ПОМЕР! Можете підібрати яйце", "ロボットが死ぬ！卵を拾う", gameObject);
-
-
-
-                HP = 0;
-        }
-        
+      
         if(SR == null && GetComponent<SpriteRenderer>()!=null) SR = GetComponent<SpriteRenderer>();
 
         if (GrowingSprites.Length > 0 && CurrentGrowState < GrowingSprites.Length)

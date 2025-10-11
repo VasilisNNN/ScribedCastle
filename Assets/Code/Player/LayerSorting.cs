@@ -215,13 +215,15 @@ public class LayerSorting : MonoBehaviour
 
     void ApplyLayerOrder(GameObject ob, string larename, out int outorder, int layerbuffer, float ypos, int num)
     {
-        outorder = (int)(ypos * layerbuffer) + num + RndBuffer[num];
+        outorder = (int)(ypos * layerbuffer) + (int)Mathf.Floor(ob.transform.position.x % 30) % 10;
         ob.GetComponent<SpriteRenderer>().sortingLayerName = larename;
         ob.GetComponent<SpriteRenderer>().sortingOrder = outorder;
 
 
 
     }
+
+
 
 
     public void ResetFlippingObjects()
