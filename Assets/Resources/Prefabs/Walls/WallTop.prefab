@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7993975731792202404}
   - component: {fileID: 1911024782127351716}
   - component: {fileID: 8723616248568076219}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: WallTop
   m_TagString: Flipping
   m_Icon: {fileID: 0}
@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 7169894017281787812}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.375, y: -1.038, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -218,7 +218,6 @@ MonoBehaviour:
   StartGrowWithZero: 0
   Destructible: 1
   CanBeStunned: 0
-  CanTurnInEgg: 0
   CollisionClips: []
   AudioPlayed: 0
   GettingDamageFromWalls: 0
@@ -240,6 +239,8 @@ MonoBehaviour:
   IgnoreDestroyList: 0
   BuildedStructure: 0
   SpawnPointName: 
+  ColorMaterial: {fileID: 0}
+  MiddleReplacement: {fileID: 0}
 --- !u!114 &8723616248568076219
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -252,11 +253,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 968c0051690728c46b0bb41c47ea1dfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Red: 0
-  Green: 0
-  Gold: 0
-  Cost: 0
-  CornCost: 0
   Table: 0
   Shield: 0
   TransperentWall: 0

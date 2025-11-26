@@ -157,7 +157,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -51, y: -444}
+  m_AnchoredPosition: {x: -681, y: -371}
   m_SizeDelta: {x: 80, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1772394832163513404
@@ -603,7 +603,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2477509260100470022}
   - component: {fileID: 2477509260100470020}
-  - component: {fileID: 2477509260100470023}
   - component: {fileID: 2876447944283871237}
   m_Layer: 5
   m_Name: BlueprintMenu
@@ -651,54 +650,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2477509260100470017}
   m_CullTransparentMesh: 1
---- !u!114 &2477509260100470023
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2477509260100470017}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d1f5dc6e90aabd448be5c7faced587fa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  BP:
-  - {fileID: 4407993525900536674, guid: 6ca620e26a389ec4895c6c3a20ecbedd, type: 3}
-  - {fileID: 4407993525900536674, guid: 2de59a2f0da3d474ba871c1f02e28e9e, type: 3}
-  - {fileID: 4407993525900536674, guid: 9aa49430dcbb2e24a917e704f7bc0762, type: 3}
-  - {fileID: 4407993525900536674, guid: d3d6600b17c47024880d2c43f178e36f, type: 3}
-  - {fileID: 4407993525900536674, guid: 3dfbc0493129f9d45872824bb1e43108, type: 3}
-  - {fileID: 2375686667560874381, guid: 407dc881f7b1ae943a8a9b8f831a6c33, type: 3}
-  - {fileID: 2375686667560874381, guid: 094d1db1347c8ce46b42862aaf61a5af, type: 3}
-  - {fileID: 6300392134143569938, guid: f574f553103f62748b86b275e464ff77, type: 3}
-  - {fileID: 4407993525900536674, guid: a3cf0b60371849f4f9421564101c4be1, type: 3}
-  - {fileID: 2375686667560874381, guid: 2df159c52a03d3042a0fd56e29f0dd9c, type: 3}
-  - {fileID: 2375686667560874381, guid: 456422a9ed7eb8e43a2d944772f1b0b9, type: 3}
-  - {fileID: 2375686667560874381, guid: 87c99c820d33ff049afb3f5f2147361a, type: 3}
-  - {fileID: 2375686667560874381, guid: a5091f728f5406146a344c0c479bebc6, type: 3}
-  - {fileID: 4407993525900536674, guid: d913e13c445eae446bd0ba6022a3d4ef, type: 3}
-  - {fileID: 4407993525900536674, guid: 032a52926fc4fcd4ab31ce57ccdcef8d, type: 3}
-  - {fileID: 4407993525900536674, guid: ef7e5b6f5333646478a0ebff499cf407, type: 3}
-  - {fileID: 4407993525900536674, guid: e88c41f9739543d4bb8f476125879def, type: 3}
-  - {fileID: 4407993525900536674, guid: 879763266b9c39a45a71d898862ef555, type: 3}
-  - {fileID: 4407993525900536674, guid: 97e88cec92b3e324894d353097a9d09d, type: 3}
-  - {fileID: 4407993525900536674, guid: 21238fb49cafabe45bcbdc51f2d2ac14, type: 3}
-  - {fileID: 2375686667560874381, guid: 6508dc855e09c904da191ff435cff5f8, type: 3}
-  - {fileID: 4407993525900536674, guid: 0c9c418047a8e914fa01fe8d3de5ab28, type: 3}
-  - {fileID: 4407993525900536674, guid: a822ece84c6f4654c80504738d8693a0, type: 3}
-  - {fileID: 4407993525900536674, guid: 8fc8b0208df74b54e9a6acf9908229d3, type: 3}
-  LeftArrow: {fileID: 5933119539817277601}
-  RightArrow: {fileID: 601695095935221705}
-  PlayButton: {fileID: 1661965419636704302}
-  AC:
-  - {fileID: 8300000, guid: ef935614272a0c746903438b6b363feb, type: 3}
-  Assemble:
-  - {fileID: 8300000, guid: aa0aaf76101104144a90e44a3098e85c, type: 3}
-  - {fileID: 8300000, guid: 1bccd9cfb402fe44095e3701dec63f1c, type: 3}
-  - {fileID: 8300000, guid: 0f506dbb6536ec44da52b3c67fe54eac, type: 3}
-  Constructed:
-  - {fileID: 8300000, guid: 14cfb930af95a8046931977a2a59fa45, type: 3}
 --- !u!82 &2876447944283871237
 AudioSource:
   m_ObjectHideFlags: 0
@@ -998,7 +949,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 58, y: -441}
+  m_AnchoredPosition: {x: -572, y: -368}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2292996105133497520

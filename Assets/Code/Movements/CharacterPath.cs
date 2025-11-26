@@ -525,10 +525,12 @@ public class CharacterPath : MonoBehaviour
 
     void Animations()
     {
-        if (GetComponent<Animator>() != null)
+        if (pl.menu.MenuONOFF)
         {
-            GetComponent<Animator>().SetBool("Attacking", Attacking);
-
+            LegsAnim.speed = 0;
+            if (anim != null)
+                anim.speed = 0;
+            return;
         }
 
         Flip();
@@ -543,17 +545,14 @@ public class CharacterPath : MonoBehaviour
 
         if (SpeedForce == Vector2.zero) Walk = false;
 
-        if (GetComponent<Animator>() != null)
-        {
-            Animator AN = GetComponent<Animator>();
-
-
-            AN.SetBool("Walk", Walk);
-        }
-
-
         if (anim != null)
         {
+            anim.speed = 1;
+            anim.SetBool("Attacking", Attacking);
+
+
+            anim.SetBool("Walk", Walk);
+      
             if (Attacking && AttackDelay < Time.fixedTime)
             {
                 anim.SetBool("Attacking", true);

@@ -78,7 +78,7 @@ SpriteRenderer:
   m_SortingLayerID: 777213259
   m_SortingLayer: 1
   m_SortingOrder: 10
-  m_Sprite: {fileID: -844825994, guid: e33d06ccedfaac94b87c7e425b2bfc5b, type: 3}
+  m_Sprite: {fileID: -3985759516408998331, guid: e33d06ccedfaac94b87c7e425b2bfc5b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -101,11 +101,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 968c0051690728c46b0bb41c47ea1dfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Red: 0
-  Green: 0
-  Gold: 0
-  Cost: 20
-  CornCost: 0
   Table: 0
   Shield: 0
   TransperentWall: 0
@@ -217,7 +212,6 @@ MonoBehaviour:
   StartGrowWithZero: 0
   Destructible: 0
   CanBeStunned: 0
-  CanTurnInEgg: 0
   CollisionClips: []
   AudioPlayed: 0
   GettingDamageFromWalls: 0
@@ -239,6 +233,8 @@ MonoBehaviour:
   IgnoreDestroyList: 0
   BuildedStructure: 0
   SpawnPointName: 
+  ColorMaterial: {fileID: 0}
+  MiddleReplacement: {fileID: 0}
 --- !u!114 &482906735473937010
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -277,3 +273,4 @@ MonoBehaviour:
   WaveCountMAX: 1
   Day_Cycle: 1
   NotInTheMorning: 0
+  RandomPosition: 0

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -55,6 +56,8 @@ public class PCSaveLoad : SaveLoadBasic
 
         PlayerPrefs.SetInt("DrawTutorial", _menu.DrawTutorial);
         PlayerPrefs.SetInt("FirstStart", _menu.FirstStart);
+        PlayerPrefs.SetString("StartLocation", _menu.StartLocation);
+        PlayerPrefs.SetInt("Progression", _menu.Progression);
 
 
 
@@ -228,7 +231,7 @@ public class PCSaveLoad : SaveLoadBasic
     {
         if (BPConstructed.Count == 0)
         {
-            for (int i = 0; i < 15; i++)
+            for (int i = 0; i < 100; i++)
                 BPConstructed.Add(0);
         }
 
@@ -383,36 +386,6 @@ public class PCSaveLoad : SaveLoadBasic
             }
         }
 
-        /*
-        if (_constr.PitsOnBoard != null)
-        {
-            PitsOnBoard_Count = _constr.PitsOnBoard.Count;
-        }
-        else PitsOnBoard_Count = 0;
-
-
-        PlayerPrefs.SetInt("PitsOnBoard_Count" + SlotName, PitsOnBoard_Count);
-
-        for (int i = 0; i < _constr.PitsOnBoard.Count; i++)
-        {
-            if (_constr.PitsOnBoard[i] != null)
-            {
-                if (_constr.PitsOnBoard[i].Name != null)
-                    PlayerPrefs.SetString("PitsOnBoardName" + i + SlotName, _constr.PitsOnBoard[i].Name);
-                else PlayerPrefs.SetString("PitsOnBoardName" + i + SlotName, "");
-
-                PlayerPrefs.SetInt("PitsOnBoardxPOS" + i + SlotName, _constr.PitsOnBoard[i].xPOS);
-                PlayerPrefs.SetInt("PitsOnBoardyPOS" + i + SlotName, _constr.PitsOnBoard[i].yPOS);
-
-            }
-            else
-            {
-
-                PlayerPrefs.SetString("PitsOnBoardName" + i + SlotName, "");
-                PlayerPrefs.SetInt("PitsOnBoardxPOS" + i + SlotName, 0);
-                PlayerPrefs.SetInt("PitsOnBoardyPOS" + i + SlotName, 0);
-            }
-        }*/
 
 
     }
@@ -576,8 +549,8 @@ public class PCSaveLoad : SaveLoadBasic
 
         _menu.DrawTutorial = PlayerPrefs.GetInt("DrawTutorial");
         _menu.FirstStart = PlayerPrefs.GetInt("FirstStart");
-
-
+        _menu.StartLocation = PlayerPrefs.GetString("StartLocation");
+        _menu.Progression = PlayerPrefs.GetInt("Progression");
 
     }
 
@@ -792,6 +765,8 @@ public class PCSaveLoad : SaveLoadBasic
 
         }
 
+        if (_menu.StartLocation.Length <= 1)
+            _menu.StartLocation = "Island";
     }
 
     void UNITY_LOAD_UnlockedItems(string SlotName)
@@ -913,6 +888,10 @@ public class PCSaveLoad : SaveLoadBasic
             _constr.Floors++;
 
         }
+
+
+        
+
     }
 
 

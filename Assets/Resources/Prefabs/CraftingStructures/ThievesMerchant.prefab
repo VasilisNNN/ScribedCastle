@@ -18,7 +18,7 @@ GameObject:
   m_Layer: 0
   m_Name: ThievesMerchant
   m_TagString: Flipping
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 7250588514170254948, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -200,7 +200,6 @@ MonoBehaviour:
   StartGrowWithZero: 0
   Destructible: 1
   CanBeStunned: 0
-  CanTurnInEgg: 0
   CollisionClips: []
   AudioPlayed: 0
   GettingDamageFromWalls: 0
@@ -276,7 +275,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3348135569933921163}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 64b7c7a689c64fc43a04a51c66068ad9, type: 2}
   m_CullingMode: 0

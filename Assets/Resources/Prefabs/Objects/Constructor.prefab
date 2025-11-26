@@ -105,7 +105,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Tile: {fileID: 0}
-  TopScafolds: {fileID: 0}
   StartBlock: {fileID: 0}
   TileBlock: {fileID: 0}
   ComfortMax: 0
@@ -115,19 +114,16 @@ MonoBehaviour:
   ConstructedStructures: []
   DroppedItems: []
   TOnBoard: []
+  PitsOnBoard: []
   Enemies: []
-  SoldiersCountMAX: 30
-  EnemiesCountMAX: 30
   UnlockedText: []
-  TutorialPhaseBigTip: 
   CollNum: 
   pl: {fileID: 0}
   ShowChargeUI: 1
   CanScrollCamera: 0
-  MerchantsIds: 700000007100000072000000
+  MerchantsIds: 700000007100000072000000730000007400000076000000
   objectsInRange: []
   UpdateInRange: 20
-  TileMax: 300
   PlaceWaterOnTileDestroy: 0
   WaterBase: {fileID: 0}
 --- !u!114 &1679495084604316918
@@ -142,8 +138,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f901c3102a1f1d4db3a58a16a709f97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  joystick: 0
-  MousePosition: {x: 0, y: 0}
 --- !u!61 &1679495084604316919
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -350,12 +344,6 @@ MonoBehaviour:
     StartItems: 090000002c0100002d0100001405000015050000d4030000e8030000f7030000
     StartItemsCounts: 900100000500000005000000e7030000e7030000050000000500000005000000
     UpgradeItems: 
-  FloorStates: 
-  RNDSTART_Y: 0
-  RNDSTART_X: 0
-  RNDStablePos: 0
-  ObjectPlacement_seed_Start: 0
-  RNDSHIFT: {x: 0, y: 0}
   Unlocked_IDs: 
   PreplacedObjects_Count: 0
   GenMap_GrowStates_Count: 0
@@ -367,22 +355,13 @@ MonoBehaviour:
   DroppedItems_Count: 0
   Inventory_Count: 0
   UnlockedItems_Count: 0
-  SavingState: 0
-  LoadingState: 0
   ACHNames: []
-  ObjectsToDestroy: []
   LocationsNames: []
   CreateLocationOnStart: 
   BPConstructed: 
   DayNumber: 0
   DayTime: 0
-  FloorBrush: []
-  KitchenBrush: []
-  TopBrush: []
-  GroundBrush: []
-  BaseBrush: []
-  GrassBrush: []
-  PitBrush: []
+  SaveLoadCurrent: {fileID: 0}
 --- !u!114 &1382937054290660535
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -400,6 +379,9 @@ MonoBehaviour:
   MasterSliderValue: 0
   BGSliderValue: 0
   ObjectsSliderValue: 0
+  HideUIValue: 0
+  TransparencyUIValue: 0
+  DistanceFadeValue: 0
   CurrentSlotLocations: []
   CurrentSlotDates: []
   CurrentSlotTimes: []
@@ -412,7 +394,7 @@ MonoBehaviour:
   DrawTutorial: 0
   FirstStart: 0
   FirstLanguage: 0
-  ModesObj: []
+  StartLocation: Main location
   MasterSlider: {fileID: 0}
   BGSlider: {fileID: 0}
   ObjectsSlider: {fileID: 0}
@@ -420,4 +402,3 @@ MonoBehaviour:
   MenuApplyClip: {fileID: 0}
   MenuCancelClip: {fileID: 0}
   ErrorClip: {fileID: 0}
-  StartLocation: Main location

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 using System;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 
 [Serializable]
@@ -90,6 +91,8 @@ public class Constructor : MonoBehaviour
     public List<GameObject> DroppedItems = new List<GameObject>();
     [HideInInspector]
     public List<TilesOnBoard> TOnBoard = new List<TilesOnBoard>();
+    [HideInInspector]
+    public List<TilesOnBoard> PitsOnBoard = new List<TilesOnBoard>();
 
     [HideInInspector]
 
@@ -152,7 +155,9 @@ public class Constructor : MonoBehaviour
 
     public int MinIncome { get; set; }
     public int MaxIncome { get; set; }
-
+    public int AllTrash { get; set; }
+   
+    public int MaxTrash { get; set; }
     public SaveLoad SL { get; set; }
 
     private Image ToolTip_IMG;
@@ -204,12 +209,7 @@ public class Constructor : MonoBehaviour
 
     public int LastBuildingConstructed { get; private set; }
 
-    public int MaxPoop { get; private set; }
-    public int AllPoop { get; set; }
-    public int MaxTrash { get; private set; }
-    public int AllTrash { get; set; }
-
-
+ 
     private List<ObjectOnBoard> batch;
     private ObjectOnBoard batchpart;
 
@@ -222,7 +222,7 @@ public class Constructor : MonoBehaviour
     private Vector2 distance;
 
     public float UpdateInRange = 10;
-    public int TileMax = 300;
+    private int TileMax = 999999;
 
     public bool PlaceWaterOnTileDestroy;
     public TileBase WaterBase;
@@ -236,7 +236,7 @@ public class Constructor : MonoBehaviour
 
 
     public bool AlphaBuildingFade { get; private set; }
-
+    public bool DistanceFade { get; set; }
     void Start()
     {
         CurrentMerchant = 0;
@@ -244,12 +244,18 @@ public class Constructor : MonoBehaviour
 
         MerchantNameText = GameObject.Find("MerchantNameText").GetComponent<TextMeshProUGUI>();
 
-     
-  
+        if(SceneManager.GetActiveScene().name == "Island")
+            WaterBase = Resources.Load<TileBase>("Assets/Resources/Brushes/Water");
+
+        else if (SceneManager.GetActiveScene().name == "Lake")
+            WaterBase = Resources.Load<TileBase>("Assets/Resources/Brushes/WaterDark");
+        else
+            WaterBase = Resources.Load<TileBase>("Assets/Resources/Brushes/WaterDark");
+
+
+
         textdatabase = InitializeObjects.Textdatabase;
         
-        AllPoop = 20;
-        AllTrash = 20;
 
         SalariesOB = GameObject.Find("Salaries").GetComponent<TextMeshProUGUI>();
         ExitBuildingMode = GameObject.Find("ExitBuildingMode");
@@ -347,11 +353,11 @@ public class Constructor : MonoBehaviour
 
             for (int y = -30; y < 30; y++)
             {
-                /*if (PitsTileBase.GetTile(new Vector3Int(x, y, 0)) != null)
+                if (PitsTileBase.GetTile(new Vector3Int(x, y, 0)) != null)
                 {
                     PitsOnBoard.Add(new TilesOnBoard(x, y, Tile.GetTile(new Vector3Int(x, y, 0)).name));
 
-                }*/
+                }
 
                 if (Tile.GetTile(new Vector3Int(x,y,0)) != null)
                 {
@@ -614,7 +620,22 @@ public class Constructor : MonoBehaviour
                 UnsettingTile = Tile;
 
             }
+
+
+            if (PitsTileBase.GetTile(new Vector3Int(XPos, YPos, 0)) != null)
+            {
+                UnsettingTile = PitsTileBase;
+
+            }
             
+            if (pl.inv.GetItemInDatabase(OnButtonID).TargetTileMap == GreyMap)
+            {
+                if (GreyMap.GetTile(new Vector3Int(XPos, YPos, 0)) != null)
+                {
+                    UnsettingTile = GreyMap;
+
+                }
+            }
         }
        
 
@@ -936,28 +957,35 @@ public class Constructor : MonoBehaviour
 
         //CheckNeighbourTiles(ref c, Map);
         c = 1;
+       
+        Vector3Int pos = new(FinalXPos, FinalYPos, 0);
 
-        if (TOnBoard.Count < TileMax && c > 0 &&
-        StartBlock.GetTile(new Vector3Int(FinalXPos, FinalYPos, 0)) == null &&
-        TileBlock.GetTile(new Vector3Int(FinalXPos, FinalYPos, 0)) == null &&
+        if (TOnBoard.Count < TileMax &&
+            c > 0 &&
+            StartBlock.GetTile(pos) == null &&
+            TileBlock.GetTile(pos) == null &&
+            Map.GetTile(pos) == null &&
 
-        ((Map.GetTile(new Vector3Int(FinalXPos, FinalYPos, 0)) == null &&
-        Map != GreyMap &&
-        GreyMap.GetTile(new Vector3Int(FinalXPos, FinalYPos, 0)) != null) ||
+            ((Map != GreyMap && GreyMap.GetTile(pos) != null) || Map == GreyMap)&&
 
-        (Map.GetTile(new Vector3Int(FinalXPos, FinalYPos, 0)) == null && Map == GreyMap)))
+            ((Map != PitsTileBase && PitsTileBase.GetTile(pos) == null) || 
+              Map == PitsTileBase && Tile.GetTile(pos) == null))
+        
 
         {
-        
+            
             SetColorAndAlpha(_transform.GetChild(0).gameObject, new Color(0.1f, 1, 0.1f, 0.7f));
-          
-            canbuild = true;
+                canbuild = true;
+           
+            
         }
         else
         {
         
             SetColorAndAlpha(_transform.GetChild(0).gameObject, new Color(1, 0.1f, 0.1f, 0.7f));
         }
+
+
 
 
         //----------------------------------------------------
@@ -1014,11 +1042,6 @@ public class Constructor : MonoBehaviour
             for (int i = 0; i < ItemNeeded.Length; i++)
             {
 
-                // if (PO.ItemNeededCount[i] <= pl.inv.GetItemInDatabase(PO.ItemNeeded[i]).Count)
-
-                print("reduce item");
-                if (pl.inv == null) print("pl.inv null");
-
                 pl.inv.ReduceItemCount(ItemNeeded[i], ItemNeededCount[i]);
 
             }
@@ -1030,17 +1053,19 @@ public class Constructor : MonoBehaviour
 
         Map.SetTile(new Vector3Int(FinalXPos, FinalYPos, 0), Brush);
         
-        print("Brush.name " + Brush.name);
-
         if (PlaceWaterOnTileDestroy)
             WaterMap.SetTile(new Vector3Int(XPos, YPos, 0), null);
 
-       // if (Map == pl.inv.database.MainTileBase)
-            TOnBoard.Add(new TilesOnBoard(new Vector3Int(FinalXPos, FinalYPos, 0).x, new Vector3Int(FinalXPos, FinalYPos, 0).y, Brush.name));
+        if(Map == GreyMap) WaterMap.SetTile(new Vector3Int(XPos, YPos, 0), null);
+        // if (Map == pl.inv.database.MainTileBase)
+        TilesOnBoard NewTile = new TilesOnBoard(new Vector3Int(FinalXPos, FinalYPos, 0).x, new Vector3Int(FinalXPos, FinalYPos, 0).y, Brush.name);
 
-       /* if (Map == pl.inv.database.MudTileBase)
-            MudOnBoard.Add(new TilesOnBoard(new Vector3Int(FinalXPos, FinalYPos, 0).x, new Vector3Int(FinalXPos, FinalYPos, 0).y, Brush.name));
-       */
+
+
+        if (!TOnBoard.Contains(NewTile))
+             TOnBoard.Add(NewTile);
+        
+
 
         Floors += ChildPubObject.floors;
 
@@ -1053,14 +1078,10 @@ public class Constructor : MonoBehaviour
 
         IM.ActionDelay = Time.fixedTime + 0.1f;
 
-
-     
-
+        pl.RescanInBounds(new Bounds(new Vector3(FinalXPos, FinalYPos, 0), new Vector3(2, 2, 0)));
 
         LastBuildingConstructed = OnButtonID;
         SetObjectDelay = Time.fixedTime + 0.1f;
-
-
 
     }
 
@@ -1121,12 +1142,14 @@ public class Constructor : MonoBehaviour
         if(PlaceWaterOnTileDestroy)
         WaterMap.SetTile(new Vector3Int(XPos, YPos , 0), WaterBase);
 
+        if (Map == GreyMap) WaterMap.SetTile(new Vector3Int(XPos, YPos, 0), WaterBase);
 
         GameObject DestroyedOB = FindConstructedObject(ConstructorObjectPosition.x + "_" + ConstructorObjectPosition.y);
         _DestroyObject = false;
 
 
 
+        pl.RescanInBounds(new Bounds(new Vector3(XPos, YPos, 0), new Vector3(2, 2, 0)));
 
         IM.ActionDelay = Time.fixedTime + 0.1f;
         
@@ -2060,6 +2083,7 @@ public class Constructor : MonoBehaviour
     {
        
         AlphaBuildingFade = _menu.TransparencyBuilding;
+        DistanceFade = _menu.DistanceFade;
 
         if (IM.HorizontalFlip)
         {
@@ -2935,18 +2959,29 @@ public class Constructor : MonoBehaviour
     }
     void RandomiseConstructingObject(GameObject ChildOnMouse, ref GameObject ObjectOnGround, ref StatsControll _StatsControll)
     {
-       
 
 
-        if (BottomCheck( ref _StatsControll))
+
+        if (BottomCheck(ref _StatsControll))
+        {
             ChildOnMouse.GetComponent<SpriteRenderer>().sprite = pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsBottom[RandomisedNumber].GetComponent<SpriteRenderer>().sprite;
+            ChildOnMouse.layer = pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsTop[RandomisedNumber].layer;
 
+        }
+        
         if (MidCheck(ref ObjectOnGround, ref _StatsControll))
-        ChildOnMouse.GetComponent<SpriteRenderer>().sprite = pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsMid[RandomisedNumber].GetComponent<SpriteRenderer>().sprite;
-        
+        {
+            ChildOnMouse.GetComponent<SpriteRenderer>().sprite = pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsMid[RandomisedNumber].GetComponent<SpriteRenderer>().sprite;
+            ChildOnMouse.layer = pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsTop[RandomisedNumber].layer;
+
+        }
+
         if (TopCheck(ref ObjectOnGround, ref _StatsControll))
-         ChildOnMouse.GetComponent<SpriteRenderer>().sprite = pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsTop[RandomisedNumber].GetComponent<SpriteRenderer>().sprite;
-        
+        {
+            ChildOnMouse.GetComponent<SpriteRenderer>().sprite = pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsTop[RandomisedNumber].GetComponent<SpriteRenderer>().sprite;
+            ChildOnMouse.layer = pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsTop[RandomisedNumber].layer;
+
+        }
 
         if (isRandomised || _StatsControll == null) return;
 
@@ -2990,18 +3025,43 @@ public class Constructor : MonoBehaviour
        
 
         if (!IM.R2) return;
-        
-        if (CurrentMerchant < MerchantsIds.Length-1)
-            CurrentMerchant++;
-        else CurrentMerchant = 0;
+
+        int prevCurrentMerchant = CurrentMerchant;
 
 
-        CurrentMerchantID = MerchantsIds[CurrentMerchant];
+        for (int i = 0; i < MerchantsIds.Length; i++)
+        {
+            if (CheckStructuresOnBoard(MerchantsIds[i]))
+            {
+                if (i > CurrentMerchant)
+                {
+                    CurrentMerchant = i;
+                    CurrentMerchantID = MerchantsIds[CurrentMerchant];
+                    print("CurrentMerchantID " + CurrentMerchantID);
+                    return;
+                }
+
+            }
+        }
+
+
+        for (int i = 0; i < MerchantsIds.Length; i++)
+        {
+
+            if (CheckStructuresOnBoard(MerchantsIds[i]))
+            {
+                CurrentMerchant = i;
+                CurrentMerchantID = MerchantsIds[CurrentMerchant];
+                print("CurrentMerchantID " + CurrentMerchantID);
+                return;
+            }
+
+
+        }
 
 
 
     }
-
 
 
     void ScroolCamera()
@@ -3095,6 +3155,69 @@ public class Constructor : MonoBehaviour
         return result;
     }
 
-    
+
+  public  bool CheckTheGround(Vector3 pos)
+    {
+        Vector3Int cellpos = GreyMap.WorldToCell(pos);
+
+        if (GreyMap.GetTile(cellpos) == null)
+            return false;
+
+
+
+        return true;
+
+    }
+
+
+    public bool CheckWallTiles(Vector3 pos)
+    {
+        Vector3Int cellpos = GreyMap.WorldToCell(pos);
+
+        if (PitsTileBase.GetTile(cellpos) != null)
+            return true;
+
+        if (WaterMap.GetTile(cellpos) != null)
+            return true;
+
+        return false;
+
+    }
+
+
+    public bool CheckStructures(Vector3 pos)
+    {
+        
+        for (int i = 0; i < OBOnBoard.Count; i++)
+        {
+            ObjectOnBoard ob = OBOnBoard[i];
+
+
+            GameObject obj = ob.Object;
+            if (obj != null)
+                if (ob.Place == ConstructorObjectPosition && obj.transform.parent != _transform && (obj.transform.parent == null || (obj.transform.parent != null && obj.transform.parent.GetComponent<StatsControll>() == null)))
+                {
+                        
+                    return true;
+                }
+        }
+
+        return false;
+
+    }
+
+
+
+    public bool CheckStructuresOnBoard(int id)
+    {
+
+        for (int i = 0; i < OBOnBoard.Count; i++)
+        {
+            if (OBOnBoard[i].ID == id) return true;
+        }
+
+        return false;
+
+    }
 }
 

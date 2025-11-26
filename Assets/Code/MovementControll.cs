@@ -152,7 +152,15 @@ public class MovementControll : MonoBehaviour
     void Animations()
     {
         if (Anim == null) return;
-        
+
+        if (pl.menu.MenuONOFF)
+        {
+            Anim.speed = 0;
+            return;
+
+        }
+
+        Anim.speed = 1;
         if (AnimFade > Time.fixedTime)
             Anim.CrossFade(CurrentAnimName, 0.2f, 0);
         else

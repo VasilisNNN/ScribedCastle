@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 320679989, guid: 696b5c170afb0f2468c2be6325f42714, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.4811321, g: 0.4811321, b: 0.4811321, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -260,7 +260,7 @@ Transform:
   m_GameObject: {fileID: 3013037859997308010}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.037, y: 0.4, z: 0}
+  m_LocalPosition: {x: 0.052, y: 0.514, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -344,7 +344,7 @@ Transform:
   m_GameObject: {fileID: 3030776782486438969}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.079, y: 0.429, z: 0}
+  m_LocalPosition: {x: -0.06400002, y: 0.54299986, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -592,8 +592,6 @@ MonoBehaviour:
   BringsPickedItemToThePlayer: 0
   MoveBetweenA_B: 0
   PickSpecificItem: 
-  Enemy: 0
-  Soldier: 0
   DropItemsOnTarget: 0
   DestroyTarget: 1
   LeavesTrash: 0
@@ -744,7 +742,6 @@ MonoBehaviour:
   StartGrowWithZero: 0
   Destructible: 1
   CanBeStunned: 0
-  CanTurnInEgg: 0
   CollisionClips: []
   AudioPlayed: 0
   GettingDamageFromWalls: 0
@@ -767,6 +764,7 @@ MonoBehaviour:
   BuildedStructure: 0
   SpawnPointName: 
   ColorMaterial: {fileID: 0}
+  MiddleReplacement: {fileID: 0}
 --- !u!114 &1440657771734962078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -839,7 +837,7 @@ Transform:
   m_GameObject: {fileID: 6189884288875875687}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.155, y: 0.87, z: 0}
+  m_LocalPosition: {x: 0.16999999, y: 0.98399985, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1040,7 +1038,7 @@ Transform:
   m_GameObject: {fileID: 8869531719594429558}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0.06801532, w: 0.9976843}
-  m_LocalPosition: {x: 0.199, y: 0.415, z: 0}
+  m_LocalPosition: {x: 0.21399999, y: 0.5289998, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

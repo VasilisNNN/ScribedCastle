@@ -5,6 +5,7 @@ using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 using System.Linq;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 
 public class BlueprintMenu : MonoBehaviour
@@ -14,11 +15,11 @@ public class BlueprintMenu : MonoBehaviour
 
     private List<GameObject> BluePrintObjects = new List<GameObject>();
     private List<GameObject> BlueFloorObjects = new List<GameObject>();
-    private List<GameObject> Rewards = new List<GameObject>();
+
     private List<GameObject> BlueprintsDone = new List<GameObject>();
-    public GameObject LeftArrow;
-    public GameObject RightArrow;
-    public GameObject PlayButton;
+    private GameObject LeftArrow;
+    private GameObject RightArrow;
+    private GameObject PlayButton;
 
     private MenuCustom menu;
 
@@ -62,12 +63,21 @@ public class BlueprintMenu : MonoBehaviour
 
     private RectTransform CanvasTransform;
     private int blueprintnum;
+    private Transform BlueprintMenu_Transfrom , ButtonsUI;
+    private GameObject Reward;
+
     void Start()
     {
         CanvasTransform = InitializeObjects.CanvasTransform.GetComponent<RectTransform>();
+        BlueprintMenu_Transfrom = GameObject.Find("BlueprintMenu").transform;
 
+        LeftArrow = BlueprintMenu_Transfrom.Find("LeftArrow").gameObject;
+        RightArrow = BlueprintMenu_Transfrom.Find("RightArrow").gameObject;
+        PlayButton = BlueprintMenu_Transfrom.Find("PlayButton").gameObject;
 
-        BData = gameObject.AddComponent<BlueprintDatabase>();
+        ButtonsUI = GameObject.Find("ButtonsUI").transform;
+
+        BData = InitializeObjects.Blueprintdatabase;
         BlueprintNameText = GameObject.Find("BlueprintNameText").GetComponent<TextMeshProUGUI>();
         BlueprintDescText = GameObject.Find("BlueprintDescText").GetComponent<TextMeshProUGUI>();
 
@@ -77,10 +87,10 @@ public class BlueprintMenu : MonoBehaviour
 
         EscapeBlueprint = GameObject.Find("EscapeBlueprint");
 
-        BlueprintText = transform.Find("BlueprintText").GetComponent<TextMeshProUGUI>();
+        BlueprintText = BlueprintMenu_Transfrom.Find("BlueprintText").GetComponent<TextMeshProUGUI>();
         LastBlueprint = -1;
 
-        FadeCursor = transform.Find("FadeCursor").gameObject;
+        FadeCursor = BlueprintMenu_Transfrom.Find("FadeCursor").gameObject;
 
         StatsOBJ = GameObject.Find("Stats");
         AS = GetComponent<AudioSource>();
@@ -115,7 +125,7 @@ public class BlueprintMenu : MonoBehaviour
         Assembled = true;
 
         
-        menu.ONOFFUI(transform, false);
+        menu.ONOFFUI(BlueprintMenu_Transfrom, false);
 
     }
 
@@ -137,10 +147,26 @@ public class BlueprintMenu : MonoBehaviour
                 GameObject BluePrintBrick = BluePr.transform.GetChild(ii).gameObject;
                 BluePrintBrick.GetComponent<RectTransform>().anchoredPosition = new Vector2(BP[i].ObjectList[ii].Place.x * partWidth, BP[i].ObjectList[ii].Place.y * partWidth);
                 BluePrintBrick.GetComponent<Image>().sprite = BP[i].ObjectList[ii].Object.GetComponent<SpriteRenderer>().sprite;
+               
+                
+                BluePrintBrick.GetComponent<RectTransform>().sizeDelta = new Vector2( 
+                    BP[i].ObjectList[ii].Object.GetComponent<SpriteRenderer>().sprite.rect.width / 3.2f,
+                    BP[i].ObjectList[ii].Object.GetComponent<SpriteRenderer>().sprite.rect.height / 3.2f);
+
+
+
+                float pivoty = 0.000753f * BluePrintBrick.GetComponent<RectTransform>().sizeDelta.y + 0.11446f;
+
+                if (pivoty < 0.3 && pivoty > 0.2) pivoty = 0.25f;
+                if (pivoty < 0.58f && pivoty > 0.48f) pivoty = 0.5f;
+
+                BluePrintBrick.GetComponent<RectTransform>().pivot = new Vector2(
+              0.5f,
+              pivoty);
+
 
                 if (BP[i].ObjectList[ii].hasParrent) BluePrintBrick.name += "Child";
 
-                BluePrintBrick.GetComponent<Image>().enabled = false;
                // BluePrintBrick.transform.SetSiblingIndex(Mathf.Abs(BP[i].ObjectOrder[ii]));
 
             }
@@ -155,19 +181,18 @@ public class BlueprintMenu : MonoBehaviour
         {
 
 
-            GameObject BluePr = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/BlueprintBase"), transform);
+            GameObject BluePr = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/BlueprintBase"), BlueprintMenu_Transfrom);
        
 
             Vector2 BluePrPOS = new Vector2(i * 500, 1);
             BluePr.GetComponent<RectTransform>().anchoredPosition = BluePrPOS;
             BluePrintObjects.Add(BluePr);
 
-            GameObject BlueFloor = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/BlueprintFloor"), transform);
+            GameObject BlueFloor = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/BlueprintFloor"), BlueprintMenu_Transfrom);
       
             BlueFloor.GetComponent<RectTransform>().anchoredPosition = BluePrPOS;
             BlueFloorObjects.Add(BlueFloor);
-            BlueFloor.GetComponent<Image>().enabled = false;
-
+      
           
             for (int ii = 0; ii < BP[i].ObjectList.Count; ii++)
             {
@@ -176,9 +201,23 @@ public class BlueprintMenu : MonoBehaviour
                 BluePrintBrick.GetComponent<RectTransform>().anchoredPosition = new Vector2(BP[i].ObjectList[ii].Place.x * partWidth, BP[i].ObjectList[ii].Place.y * partWidth);
                 BluePrintBrick.GetComponent<Image>().sprite = BP[i].ObjectList[ii].Object.GetComponent<SpriteRenderer>().sprite;
 
+                BluePrintBrick.GetComponent<RectTransform>().sizeDelta = new Vector2(
+                 BP[i].ObjectList[ii].Object.GetComponent<SpriteRenderer>().sprite.rect.width/3.2f,
+                 BP[i].ObjectList[ii].Object.GetComponent<SpriteRenderer>().sprite.rect.height / 3.2f);
+
+                float pivoty = 0.000753f * BluePrintBrick.GetComponent<RectTransform>().sizeDelta.y + 0.11446f;
+
+                if (pivoty < 0.3 && pivoty > 0.2) pivoty = 0.25f;
+                if (pivoty < 0.58f && pivoty > 0.48f) pivoty = 0.5f;
+
+                BluePrintBrick.GetComponent<RectTransform>().pivot = new Vector2(
+              0.5f,
+              pivoty);
+
+
+
                 if (BP[i].ObjectList[ii].hasParrent) BluePrintBrick.name += "Child";
 
-                BluePrintBrick.GetComponent<Image>().enabled = false;
                 BluePrintBrick.transform.SetSiblingIndex(Mathf.Abs(BP[i].ObjectOrder[ii]));
 
             }
@@ -187,8 +226,8 @@ public class BlueprintMenu : MonoBehaviour
 
             BlueFloor.transform.SetAsFirstSibling();
 
-            GameObject BluePrBG = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/BlueprintBaseBG"), transform);
-            BluePrBG.GetComponent<Image>().enabled = false;
+            GameObject BluePrBG = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/BlueprintBaseBG"), BlueprintMenu_Transfrom);
+
             BluePrBG.transform.SetAsFirstSibling();
             BlueprintsBG.Add(BluePrBG);
 
@@ -196,25 +235,23 @@ public class BlueprintMenu : MonoBehaviour
             CreateFloors(BluePr, BlueFloor, i);
             if (BlueprintsDone.Count < BP.Count)
             {
-                GameObject BluePrintDone = Instantiate(BPDoneOB, transform);
+                GameObject BluePrintDone = Instantiate(BPDoneOB, BlueprintMenu_Transfrom);
                 BluePrintDone.name = "BluePrintDone";
                 BlueprintsDone.Add(BluePrintDone);
             }
 
         }
 
-        for (int i = 0; i < BlueFloorObjects.Count; i++)
-        {
-            GameObject Reward = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/Reward"), BlueFloorObjects[i].transform);
-            Vector2 RewardPOS = new Vector2(0, -300);
+        
+            Reward = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/Reward"), BlueprintMenu_Transfrom);
+            Vector2 RewardPOS = new Vector2(-685, -250);
             Reward.GetComponent<RectTransform>().anchoredPosition = RewardPOS;
-            Reward.GetComponent<Image>().enabled = false;
-            Reward.transform.Find("Text").GetComponent<TextMeshProUGUI>().enabled = false;
-            Rewards.Add(Reward);
+
+          
 
 
         
-        }
+        
 
 
 
@@ -223,12 +260,11 @@ public class BlueprintMenu : MonoBehaviour
      
         RightArrow.transform.SetAsLastSibling();
 
-       
-        LeftArrow.GetComponent<Image>().enabled = false;
-        RightArrow.GetComponent<Image>().enabled = false;
 
-        transform.Find("BG").SetAsFirstSibling();
-        transform.Find("BG").GetComponent<Image>().enabled = false;
+
+
+        BlueprintMenu_Transfrom.Find("BG").SetAsFirstSibling();
+        EscapeBlueprint.transform.SetAsLastSibling();
         menu.ONOFFUI(LeftArrow.transform, false);
 
     
@@ -268,7 +304,7 @@ public class BlueprintMenu : MonoBehaviour
                     }
                 }
 
-                BlueFloorPart.GetComponent<Image>().enabled = false;
+               
                 BlueFloorPart.GetComponent<Image>().color = new Color(color, color, color, 1);
                 color -= 0.005f;
             }
@@ -297,12 +333,12 @@ public class BlueprintMenu : MonoBehaviour
     }
 
 
-    void RewardsControl(int i)
+    void RewardsControl()
     {
 
      
         
-            TextMeshProUGUI TMesh = Rewards[i].transform.Find("Text").GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI TMesh = Reward.transform.Find("Text").GetComponent<TextMeshProUGUI>();
 
 
             TMesh.text = "";
@@ -315,9 +351,11 @@ public class BlueprintMenu : MonoBehaviour
             if (menu.Language == 2)
                 TMesh.text += "報酬: ";
 
-            for (int j = 0; j < BP[i].Rewards.Length; j++)
-                TMesh.text += inv.GetItemInDatabase(BP[i].Rewards[j].itemID).itemNames[menu.Language] + " x" + BP[i].Rewards[j].Count + "\n";
-        
+            for (int j = 0; j < BP[CurrentBP].Rewards.Length; j++)
+                TMesh.text += inv.GetItemInDatabase(BP[CurrentBP].Rewards[j].itemID).itemNames[menu.Language] + " x" + BP[CurrentBP].Rewards[j].Count + "\n";
+
+
+        Reward.transform.SetAsLastSibling();
     }
 
 
@@ -342,14 +380,14 @@ void MoveBlueprints()
                 BluePrintObjects[i].SetActive(false);
                 BlueprintsBG[i].SetActive(false);
                 BlueFloorObjects[i].SetActive(false);
-                Rewards[i].SetActive(false);
+                
             }
             else
             {
                 BluePrintObjects[i].SetActive(true);
                 BlueprintsBG[i].SetActive(true);
                 BlueFloorObjects[i].SetActive(true);
-                Rewards[i].SetActive(true);
+             
             }
         }
 
@@ -358,13 +396,14 @@ void MoveBlueprints()
     void GetRewards()
     {
         if (blueprintnum >= BP.Count) blueprintnum = 0;
+   
 
+        int b = blueprintnum + startBlueprint();
+        int i = blueprintnum ;
 
-        int i = blueprintnum;
-
-        RewardsControl(i);
-
-        if (!BP[i].Unlocked && menu.SL.BPConstructed[i] >0)
+        RewardsControl();
+        print("BPConstructed.count " + menu.SL.BPConstructed.Count);
+        if (!BP[i].Unlocked && menu.SL.BPConstructed[b] > 0)
         {
               
             BP[i].Unlocked = true;
@@ -375,7 +414,7 @@ void MoveBlueprints()
         }
 
            
-        if (ReadObject(BP[i].ObjectList)  && BP[i].Rewards.Length>0 && menu.SL.BPConstructed[i] != 1)
+        if (ReadObject(BP[i].ObjectList)  && BP[i].Rewards.Length>0 && menu.SL.BPConstructed[b] != 1)
         {
           
             for (int r = 0; r < BP[i].Rewards.Length; r++)
@@ -383,7 +422,7 @@ void MoveBlueprints()
 
                
             LastBlueprint = i;
-            menu.SL.BPConstructed[i] = 1;
+            menu.SL.BPConstructed[b] = 1;
 
                 
 
@@ -398,12 +437,15 @@ void MoveBlueprints()
 
     public void BluePrintsDoneManager()
     {
-      
 
-        for (int i = 0; i < BP.Count; i++)
+   
+
+
+
+        for (int i = 0; i < BlueprintsDone.Count; i++)
         {
 
-            if ( menu.SL.BPConstructed[i] == 1)
+            if ( menu.SL.BPConstructed[i + startBlueprint()] == 1)
             {
 
                 BlueprintsDone[i].SetActive(true);
@@ -415,6 +457,20 @@ void MoveBlueprints()
 
     }
 
+    private int startBlueprint()
+    {
+
+        int startbp = 0;
+        if (SceneManager.GetActiveScene().name == "Lake")
+            startbp = 39;
+        if (SceneManager.GetActiveScene().name == "Mountain")
+            startbp = 59;
+        if (SceneManager.GetActiveScene().name == "Hell")
+            startbp = 79;
+
+
+        return startbp;
+    }
 
     float DisAssembleXPos(RectTransform BrickRT, GameObject BP, int currentchild)
     {
@@ -646,7 +702,7 @@ void MoveBlueprints()
      
 
         if (!showbp) return;
-
+    
         menu.MenuActionDelay = Time.fixedTime + 0.1f;
 
         if (pl.menu.Language==0)
@@ -737,11 +793,11 @@ void MoveBlueprints()
             FadePosition = 6;
             inv.ONOFF(StatsOBJ, true);
             ResetAllPositions();
-                menu.ONOFFUI(transform, false);
+                menu.ONOFFUI(BlueprintMenu_Transfrom, false);
 
             inv.PlaySoundsPitched(inv.UIOpen, 0.8f);
 
-            menu.ONOFFUI(GameObject.Find("ButtonsUI").transform, true);
+            menu.ONOFFUI(ButtonsUI, true);
             menu.IM.ActionDelay = Time.fixedTime + 0.1f;
        
             showbp = false;
@@ -765,14 +821,15 @@ void MoveBlueprints()
                 showbp = false;
                 pl.menu.PlayAudio(pl.menu.MenuChooseMove);
 
-                menu.ONOFFUI(transform, false);
-                menu.ONOFFUI(GameObject.Find("ButtonsUI").transform, true);
+                menu.ONOFFUI(BlueprintMenu_Transfrom, false);
+                menu.ONOFFUI(ButtonsUI, true);
                 inv.ONOFF(StatsOBJ, true);
 
                 menu.IM.ActionDelay = Time.fixedTime + 0.2f;
             }
         }
 
+        print("BlueprintsButton 0");
 
         if ((menu.IM.BKey || (menu.UIColl(BlueprintsButton) && menu.IM.LeftMouseButtonDown && menu.IM.MouseMode)) && !menu.MenuONOFF && !inv.showjournal && menu.IM.ActionDelay < Time.fixedTime)
         {
@@ -786,8 +843,8 @@ void MoveBlueprints()
 
                 inv.PlaySoundsPitched(inv.UIOpen, 1);
 
-                menu.ONOFFUI(transform, true);
-                menu.ONOFFUI(GameObject.Find("ButtonsUI").transform, false);
+                menu.ONOFFUI(BlueprintMenu_Transfrom, true);
+                menu.ONOFFUI(ButtonsUI, false);
                 inv.ONOFF(StatsOBJ, false);
                 inv.showinvent = false;
                 
@@ -796,13 +853,15 @@ void MoveBlueprints()
             {
                 inv.PlaySoundsPitched(inv.UIOpen, 0.8f);
 
-                menu.ONOFFUI(transform, false);
-                menu.ONOFFUI(GameObject.Find("ButtonsUI").transform, true);
+                menu.ONOFFUI(BlueprintMenu_Transfrom, false);
+                menu.ONOFFUI(ButtonsUI, true);
                 inv.ONOFF(StatsOBJ, true);
             }
 
             menu.IM.ActionDelay = Time.fixedTime + 0.1f;
         }
+
+
     }
 
 

@@ -14,7 +14,7 @@ public class InitializeObjects : MonoBehaviour
 
     public static ItemDatabase Itemdatabase;
     public static TextDatabase Textdatabase;
-
+    public static BlueprintDatabase Blueprintdatabase;
     public bool TextOnly;
 
  
@@ -25,6 +25,11 @@ public class InitializeObjects : MonoBehaviour
 
         Textdatabase = new TextDatabase();
         Textdatabase.SetData();
+
+
+        Blueprintdatabase = new BlueprintDatabase();
+        Blueprintdatabase.SetData();
+
 
         CanvasTransform = GameObject.Find("Canvas").transform;
 

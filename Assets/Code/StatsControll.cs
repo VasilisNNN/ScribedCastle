@@ -885,8 +885,7 @@ public class StatsControll : MonoBehaviour
             if (Const.AllTrash>= _PubObject.Trash)
             Const.AllTrash -= _PubObject.Trash;
 
-            if (Const.AllPoop >= _PubObject.Poop)
-                Const.AllPoop -= _PubObject.Poop;
+
         }
 
 

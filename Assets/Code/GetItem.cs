@@ -57,6 +57,7 @@ public class GetItem : MonoBehaviour {
     public bool CanBePickedByMouse = true;
 
     private StatsControll _Stats;
+    private bool isCraftingTable;
     private void Awake()
     {
         _Stats = GetComponent<StatsControll>();
@@ -273,10 +274,10 @@ public class GetItem : MonoBehaviour {
     }
     void Update()
     {
+        if(!inv.showinvent || Constr.CurrentMerchantID != _Stats.DatabaseID) isCraftingTable = false;
 
 
-
-        if (inv.crafting && Constr.CurrentMerchantID == _Stats.DatabaseID && inv.CurrentCraftingTable != GetComponent<GetItem>())
+        if (inv.crafting && !isCraftingTable && Constr.CurrentMerchantID == _Stats.DatabaseID && inv.CurrentCraftingTable != GetComponent<GetItem>())
         {
 
       
@@ -294,7 +295,7 @@ public class GetItem : MonoBehaviour {
             inv.showinvent = true;
             inv.inventjustopenned = Time.fixedTime + 0.01f;
 
-      
+            isCraftingTable = true;
 
         }
 
@@ -303,8 +304,8 @@ public class GetItem : MonoBehaviour {
 
           
             inv.crafting = true;
-            inv.PauseInventory = true;
-            inv.ChooseTopSegmentSlot = true;
+           // inv.PauseInventory = true;
+            //inv.ChooseTopSegmentSlot = true;
 
             inv.PlaySoundsPitched(inv.UIOpen, 1);
             inv.CraftingUIOB.GetComponent<ItemsSlotsUI>().CloseUI();
@@ -318,7 +319,7 @@ public class GetItem : MonoBehaviour {
             inv.inventjustopenned = Time.fixedTime + 0.01f;
          
             pl.IM.ActionDelay = Time.fixedTime + 0.15f;
-
+            isCraftingTable = true;
 
         }
 
@@ -366,7 +367,7 @@ public class GetItem : MonoBehaviour {
         {
             inv.crafting = false;
             inv.CurrentCraftingTable = null;
-
+            isCraftingTable = false;
             inv.showinvent = false;
             pl.IM.ActionDelay = Time.fixedTime + 0.15f;
         }
@@ -426,8 +427,8 @@ public class GetItem : MonoBehaviour {
                 if (Crafting)
                 {
                     inv.crafting = true;
-                    inv.PauseInventory = true;
-                    inv.ChooseTopSegmentSlot = true;
+                   // inv.PauseInventory = true;
+                  //  inv.ChooseTopSegmentSlot = true;
 
                     inv.PlaySoundsPitched(inv.UIOpen, 1);
 
@@ -445,6 +446,7 @@ public class GetItem : MonoBehaviour {
                         */
 
                     inv.CurrentCraftingTable = GetComponent<GetItem>();
+                    isCraftingTable = true;
                     inv.showinvent = true;
                     inv.inventjustopenned  = Time.fixedTime + 0.01f;
                     pl.IM.ActionDelay = Time.fixedTime + 0.15f;

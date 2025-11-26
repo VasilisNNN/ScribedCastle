@@ -32,7 +32,8 @@ public class GenerateMoney : MonoBehaviour
 
     void Update()
     {
-        
+        if (pl.Pause()) return;
+
         if (Anim != null)
         {
             Anim.SetInteger("Day", pl.DayNight.Day_Cycle.GetHashCode());

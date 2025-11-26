@@ -57,7 +57,27 @@ public class AssembleWallsUI : MonoBehaviour
 
         if (CurrentItem.ObjectPrefs.GetComponent<PubObject>().wall <= 0)
         {
-            TurnOFFUI();
+            if (SPRT != null)
+            {
+                AssembleUI.SetActive(true);
+                Bottom.enabled = true;
+
+                Bottom.sprite = SPRT;
+            }
+            else
+            {
+                AssembleUI.SetActive(false);
+                Bottom.enabled = false;
+                Bottom.sprite = null;
+
+            }
+            Mid.enabled = false;
+            Top.enabled = false;
+            Mid.sprite = null;
+            Top.sprite = null;
+
+            AssembleUI.SetActive(false);
+
             return;
         }
 

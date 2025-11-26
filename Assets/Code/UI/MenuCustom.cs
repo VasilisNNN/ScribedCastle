@@ -45,6 +45,10 @@ public class MenuCustom : MonoBehaviour
     public UnityEngine.Audio.AudioMixer mg;
 
     private string[] MenuNamesEN, MenuNamesUA, MenuNamesJP, ModesNamesEN, ModesNamesUA, ModesNamesJP;
+    private string[] ModesDescNamesEN, ModesDescNamesUA, ModesDescNamesJP;
+
+
+
     public bool FullScreen;
 
     private bool YesNo, ToolTipsYesNo;
@@ -55,7 +59,7 @@ public class MenuCustom : MonoBehaviour
     private List<GameObject> MenuButtons = new List<GameObject>();
     private List<GameObject> OptionsButtons = new List<GameObject>();
     private List<GameObject> YesNoButtons = new List<GameObject>();
-
+    private List<GameObject> ModeMenuButtons = new List<GameObject>();
 
 
     private Player pl;
@@ -66,11 +70,13 @@ public class MenuCustom : MonoBehaviour
     public bool ShowAchivements { get; set; }
     public bool HideUI { get; private set; }
     public bool TransparencyBuilding { get; set; }
+    public bool DistanceFade { get; set; }
+
     public InputMode IM { get; private set; }
     public float ScrollDelay { get; set; }
     private List<GameObject> Slots = new List<GameObject>();
     private int SlotXPOS, SlotYPOS;
-    private GameObject BackFromSaveSlots, ChooseSlot, MenuAllObject, MouseObject, ResDropDown, LanguageDropdown, ToolTipsYesNoOB, WindowDropdown;
+    private GameObject  BackFromSaveSlots, ChooseSlot, MenuAllObject, MouseObject, ResDropDown, LanguageDropdown, ToolTipsYesNoOB, WindowDropdown;
     private Transform MenuAllTransform, OptionsAllTransform, SaveSlotsUI, ModeMenu, YesNoOB_Transform;
     [HideInInspector]
     public float MasterSliderValue, BGSliderValue, ObjectsSliderValue;
@@ -78,16 +84,16 @@ public class MenuCustom : MonoBehaviour
     public int HideUIValue;
 
     [HideInInspector]
-    public int TransparencyUIValue;
+    public int TransparencyUIValue, DistanceFadeValue;
 
     [HideInInspector]
     public string[] CurrentSlotLocations, CurrentSlotDates, CurrentSlotTimes;
     [HideInInspector]
-    public int CurrentSlotNumber, ContinueNumber, CurrentYesNoNumber, ResolutionNumber, Language, LastSystemLanguage, DrawTutorial, FirstStart, FirstLanguage;
+    public int CurrentSlotNumber, ContinueNumber, CurrentYesNoNumber, ResolutionNumber, Language, LastSystemLanguage, DrawTutorial, FirstStart, FirstLanguage , Progression;
+    public string StartLocation;
 
+    private GameObject ExitBuildingMode, ContinueOB, QuitGameOB, ToMenuOB, ToolTipsYesButtonOB, ToolTipsNoButtonOB, StartOB, SaveOB, LoadOB, OptionsOB, AchOB, ExitOB, OptionsApplyOB;
 
-    private GameObject ExitBuildingMode, ContinueOB, ToMenuOB, ToolTipsYesButtonOB, ToolTipsNoButtonOB, StartOB, SaveOB, LoadOB, OptionsOB, ModesOB, AchOB, ExitOB, OptionsApplyOB;
-    public GameObject[] ModesObj;
 
     [HideInInspector]
     public Slider MasterSlider, BGSlider, ObjectsSlider;
@@ -102,7 +108,6 @@ public class MenuCustom : MonoBehaviour
     private bool ChooseMouseObject, Building;
     private Constructor Constr;
 
-    public string StartLocation = "Main location";
 
     private string toolTipsText = "Start from the tutorial scene?";
     private string toolTipsTextYES = "Yes";
@@ -132,7 +137,12 @@ public class MenuCustom : MonoBehaviour
     private float StartLanguageDelay;
 
     private Transform CanvasTransform;
-    private Toggle HideUIToggle, TransparencyUIToggle;
+    private Toggle HideUIToggle, TransparencyUIToggle , DistanceFadeUIToggle;
+    private float LanguageTimer;
+
+    private RectTransform CanvasRectTransform ;
+    private BlueprintDatabase bluedatabase;
+
 
     private void Awake()
     {
@@ -141,11 +151,21 @@ public class MenuCustom : MonoBehaviour
     void Start()
     {
         CanvasTransform = InitializeObjects.CanvasTransform;
+        CanvasRectTransform = GameObject.Find("Canvas").GetComponent<RectTransform>();
+
         Constr = InitializeObjects.Constr;
         StartLanguageDelay = Time.fixedTime + 0.25f;
 
         if (Screen.currentResolution.width<=20)
             Screen.SetResolution(1920, 1080, FullScreen);
+
+        bluedatabase = InitializeObjects.Blueprintdatabase;
+
+        if (bluedatabase == null)
+        {
+            bluedatabase = new BlueprintDatabase();
+            bluedatabase.SetData();
+        }
 
 
 
@@ -164,6 +184,8 @@ public class MenuCustom : MonoBehaviour
         ErrorClip = Resources.Load<AudioClip>("Sound/UI/Error");
         SaveSlotsUI = GameObject.Find("SaveSlotsUI").transform;
         ModeMenu = GameObject.Find("ModeMenu").transform;
+  
+
         YesNoOB_Transform = GameObject.Find("ToolTipsYesNo").transform;
 
         AS = GetComponent<AudioSource>();
@@ -181,7 +203,7 @@ public class MenuCustom : MonoBehaviour
         SaveOB = GameObject.Find("Save");
         LoadOB = GameObject.Find("Load");
         OptionsOB = GameObject.Find("Options");
-        ModesOB = GameObject.Find("Modes");
+
         AchOB = GameObject.Find("AchivementsButton");
 
         ExitOB = GameObject.Find("Exit");
@@ -193,6 +215,7 @@ public class MenuCustom : MonoBehaviour
 
         ChooseSubMenu = GameObject.Find("ChooseUI");
         MenuAllObject = GameObject.Find("MenuAll");
+        QuitGameOB = GameObject.Find("MenuAll").transform.Find("QuitGame").gameObject;
 
         MenuAllTransform = GameObject.Find("MenuAll").transform;
         OptionsAllTransform = GameObject.Find("OptionsAll").transform;
@@ -275,7 +298,7 @@ public class MenuCustom : MonoBehaviour
 
         OptionsButtons.Add(HideUIToggle.gameObject);
         OptionsButtons.Add(TransparencyUIToggle.gameObject);
-        
+        OptionsButtons.Add(DistanceFadeUIToggle.gameObject);
 
         OptionsButtons.Add(OptionsAllTransform.Find("OptionsApply").gameObject);
 
@@ -284,6 +307,15 @@ public class MenuCustom : MonoBehaviour
         ONOFFUI(OptionsAllTransform, false);
         YesNoButtons.Add(ToolTipsYesNoOB.transform.Find("YesButton").gameObject);
         YesNoButtons.Add(ToolTipsYesNoOB.transform.Find("NoButton").gameObject);
+
+
+        ModeMenuButtons.Add(ModeMenu.transform.Find("Option 0").gameObject);
+        ModeMenuButtons.Add(ModeMenu.transform.Find("Option 1").gameObject);
+        ModeMenuButtons.Add(ModeMenu.transform.Find("Option 2").gameObject);
+        ModeMenuButtons.Add(ModeMenu.transform.Find("Option 3").gameObject);
+
+
+
 
         if (GameObject.Find("Player")!=null)
             pl = InitializeObjects.PL;
@@ -316,9 +348,31 @@ public class MenuCustom : MonoBehaviour
         for(int i=0;i< MenuNamesJP.Length;i++)
             CheckJPCharacters(MenuNamesJP[i]);
 
-        ModesNamesEN = new string[5] { "Winter", "Spring", "Summer", "Autumn", "Go back"};
-        ModesNamesUA = new string[5] { "Зима", "Кров", "Зброя і стіни", "Босраш", "Назад", };
+        ModesNamesEN = new string[5] { "Island", "Lake", "Mountain", "Hell", "Go back"};
+        ModesNamesUA = new string[5] { "Острів", "Озеро", "Гора", "Пекло", "Назад", };
         ModesNamesJP = new string[5] { "冬", "血液", "武器と壁", "ボスラッシュ", "戻る" };
+
+
+        ModesDescNamesEN = new string[4] { 
+            "Your can start here", 
+            "Build "+ bluedatabase.FindItem(14).itemNames[0] + "on the Island",
+            "Build "+ bluedatabase.FindItem(32).itemNames[0] + " near the Lake",
+            "Build "+ bluedatabase.FindItem(50).itemNames[0] + " near the Mountain" };
+
+
+        ModesDescNamesUA = new string[4] {
+            "Починай тут",
+            "Побудуй "+ bluedatabase.FindItem(14).itemNames[1] + " на Острові",
+            "Побудуй "+ bluedatabase.FindItem(32).itemNames[1] + " на Озері",
+            "Побудуй "+ bluedatabase.FindItem(50).itemNames[1] + " на Горі" };
+
+
+        ModesDescNamesJP = new string[4] {
+            "ここから始められます",
+            "構築してください "+ bluedatabase.FindItem(14).itemNames[2] + " 島で",
+            "構築してください "+ bluedatabase.FindItem(32).itemNames[2] + " 湖で",
+            "構築してください "+ bluedatabase.FindItem(50).itemNames[2] + " 山の上で"};
+
 
         for (int i = 0; i < ModesNamesJP.Length; i++)
             CheckJPCharacters(ModesNamesJP[i]);
@@ -339,10 +393,10 @@ public class MenuCustom : MonoBehaviour
         ChooseSlot = GameObject.Find("SaveSlotsUI").transform.Find("Choose").gameObject;
         
       
-        ONOFFUI(GameObject.Find("ModeMenu").transform, false);
-        ONOFFUI(GameObject.Find("SaveSlotsUI").transform, false);
+        ONOFFUI(ModeMenu, false);
+        ONOFFUI(SaveSlotsUI, false);
         ONOFFUI(ToolTipsYesNoOB.transform, false);
-        ONOFFUI(GameObject.Find("ToolTipsYesNo").transform, false);
+
 
         
         ONOFFUI(OptionsAllTransform, false);
@@ -372,7 +426,14 @@ public class MenuCustom : MonoBehaviour
 
     void Update()
     {
-    
+
+        if (LanguageTimer < Time.fixedTime && SceneManager.GetActiveScene().name == "StartMenu")
+        {
+            LanguagesControll();
+            LanguageTimer = Time.fixedTime + 3;
+        }
+
+
 
         if (SceneToTransition.Length > 1)
         {
@@ -413,6 +474,7 @@ public class MenuCustom : MonoBehaviour
         bool TutorialPause = false;
         if (Constr != null)
         {
+          
             ChooseMouseObject = Constr.ChooseMouseObject;
             Building = Constr.Building;
             TutorialPause = Constr.TutorialPause;
@@ -439,6 +501,8 @@ public class MenuCustom : MonoBehaviour
             else TransparencyUIValue = 1;
 
         }
+        
+        ProgressionManager();
 
         if (pl != null)
         {
@@ -460,7 +524,7 @@ public class MenuCustom : MonoBehaviour
 
             ONOFFUI(OptionsAllTransform, false);
 
-            ONOFFUI(GameObject.Find("ModeMenu").transform, false);
+            ONOFFUI(ModeMenu, false);
 
 
             if (!MenuONOFF)
@@ -474,7 +538,7 @@ public class MenuCustom : MonoBehaviour
 
                 MenuButtonNum = 0;
                 _options = false;
-                _modes = false;
+               _modes = false;
             }
             else
             ONOFFUI(ChooseUITransfrom, true);
@@ -508,13 +572,13 @@ public class MenuCustom : MonoBehaviour
             if (_options)
             {
                    
-                if (!_modes) ONOFFUI(GameObject.Find("ModeMenu").transform, false);
+                if (!_modes) ONOFFUI(ModeMenu, false);
              
               
                  BackToMainMenu(ref OptionsAllTransform, ref _options);
 
                 
-                ONOFFUI(GameObject.Find("ModeMenu").transform, false);
+                ONOFFUI(ModeMenu, false);
 
                 _modes = false;
              
@@ -551,7 +615,7 @@ public class MenuCustom : MonoBehaviour
               
         }
 
-        if (UIColl(OptionsApplyOB) && (IM.enter_b || IM.LeftMouseButtonDown))
+        if (PressButton(OptionsApplyOB) )
         {
             SetChoisePosition(OptionsApplyOB);
             ApplyOptions();
@@ -603,8 +667,9 @@ public class MenuCustom : MonoBehaviour
         
         SetChoisePosition(YesNoButtons[MenuButtonNum]);
 
-        if (IM.exit_b) BackToMainMenu(ref YesNoOB_Transform, ref YesNo);
-
+        if (IM.exit_b || IM.menu_b || PressButton(GameObject.Find("BackFromYesNo"))) 
+          BackToMainMenu(ref YesNoOB_Transform, ref YesNo);
+       
     }
     void OptionsChoiseMove()
     {
@@ -776,9 +841,9 @@ public class MenuCustom : MonoBehaviour
 
 
 
-        ONOFFUI(GameObject.Find("ModeMenu").transform, false);
+        ONOFFUI(ModeMenu, false);
 
-            _modes = false;
+          _modes = false;
         BackToMainMenu(ref OptionsAllTransform, ref _options);
      
         SL.Save(false);
@@ -790,48 +855,18 @@ public class MenuCustom : MonoBehaviour
     void MenuUpdate()
     {
         if (!MenuONOFF) return;
-        
-        if (ModesOB != null)
+
+
+        if (_modes)
         {
-            if (!_modes)
-            {
-                if (UIColl(ModesOB) && (IM.enter_b || IM.LeftMouseButtonDown))
-                {
-
-                    if (IM.ActionDelay < Time.fixedTime)
-                    {
-                        ONOFFUI(GameObject.Find("ModeMenu").transform, true);
-                        PlayAudio(MenuApplyClip);
-                        ONOFFUI(MenuAllTransform, false);
-                        _modes = true;
-                        MenuButtonNum = 0;
-                        IM.ActionDelay = Time.fixedTime + 0.3f;
-                    }
-
-                }
-            }
+            ModesManager();
+            return;
         }
-
-       /* if (_modes)
-        {
-            Modes();
-            ChooseUITransfrom.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
-        }
-        else
-        {
-            ChooseUITransfrom.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
-            ChooseUITransfrom.GetComponent<RectTransform>().sizeDelta = new Vector3(320, 100, 0);
-
-
-        }*/
-
-        if (_modes) return;
-            
-        
+  
         if (DrawSaveSlots) return;
         
 
-        if (UIColl(ToMenuOB) && (IM.enter_b || IM.LeftMouseButtonDown) && IM.ActionDelay < Time.fixedTime)
+        if (PressButton(ToMenuOB))
         {
 
 
@@ -905,7 +940,7 @@ public class MenuCustom : MonoBehaviour
         }
 
 
-        if (UIColl(ToolTipsYesButtonOB) && (IM.enter_b || IM.LeftMouseButtonDown) && IM.ActionDelay < Time.fixedTime)
+        if (PressButton(ToolTipsYesButtonOB))
         {
             if (IM.ActionDelay < Time.fixedTime)
             {
@@ -917,7 +952,7 @@ public class MenuCustom : MonoBehaviour
             }
         }
 
-        if (UIColl(ToolTipsNoButtonOB) && (IM.enter_b || IM.LeftMouseButtonDown) && IM.ActionDelay < Time.fixedTime)
+        if (PressButton(ToolTipsNoButtonOB))
         {
             if (IM.ActionDelay < Time.fixedTime)
             {
@@ -929,7 +964,7 @@ public class MenuCustom : MonoBehaviour
 
 
 
-        if (UIColl(AchOB) && (IM.enter_b || IM.LeftMouseButtonDown) && IM.ActionDelay < Time.fixedTime)
+        if (PressButton(AchOB))
         {
             PlayAudio(MenuApplyClip);
             ONOFFUI(MenuAllTransform, false);
@@ -940,24 +975,25 @@ public class MenuCustom : MonoBehaviour
             IM.ActionDelay = Time.fixedTime + 0.3f;
         }
 
-        if (UIColl(StartOB) && (IM.enter_b || IM.LeftMouseButtonDown) && IM.ActionDelay < Time.fixedTime)
+        if (PressButton(StartOB) && !_modes)
         {
-            
-           // CurrentYesNoNumber = 0;
-            YesNo = true;
-            SetChoisePosition(YesNoButtons[0]);
 
-            ONOFFUI(ToolTipsYesNoOB.transform, true);
+            _modes = true;
+            SetChoisePosition(ModeMenuButtons[0]);
+            ONOFFUI(ModeMenu, true);
 
             ONOFFUI(OptionsAllTransform, false);
             ONOFFUI(MenuAllTransform, false);
-
             MenuButtonNum = 0;
             IM.ActionDelay = Time.fixedTime + 0.3f;
+
         }
 
 
-        if (UIColl(SaveOB) && (IM.enter_b || IM.LeftMouseButtonDown) && IM.ActionDelay < Time.fixedTime && !gameover)
+    
+
+     
+        if (PressButton(SaveOB) && !gameover)
         {
             PlayAudio(MenuApplyClip);
             SaveSlotsOn = true;
@@ -966,14 +1002,14 @@ public class MenuCustom : MonoBehaviour
 
             MenuButtonNum = 0;
             ONOFFUI(MenuAllTransform, false);
-            ONOFFUI(GameObject.Find("SaveSlotsUI").transform, true);
+            ONOFFUI(SaveSlotsUI, true);
 
             LanguagesControll();
             IM.ActionDelay = Time.fixedTime + 0.3f;
 
         }
 
-        if (UIColl(LoadOB) && (IM.enter_b || IM.LeftMouseButtonDown) && IM.ActionDelay < Time.fixedTime)
+        if (PressButton(LoadOB) )
         {
             PlayAudio(MenuApplyClip);
             LoadSlotsOn = true;
@@ -981,7 +1017,7 @@ public class MenuCustom : MonoBehaviour
             SetChoisePosition(Slots[0]);
             LanguagesControll();
             ONOFFUI(MenuAllTransform, false);
-            ONOFFUI(GameObject.Find("SaveSlotsUI").transform, true);
+            ONOFFUI(SaveSlotsUI, true);
             MenuButtonNum = 0;
 
         
@@ -995,7 +1031,7 @@ public class MenuCustom : MonoBehaviour
         }
 
 
-        if (UIColl(OptionsOB) && (IM.enter_b || IM.LeftMouseButtonDown) && IM.ActionDelay < Time.fixedTime)
+        if (PressButton(OptionsOB) )
         {
             PlayAudio(MenuApplyClip);
             MenuButtonNum = 0;
@@ -1009,7 +1045,7 @@ public class MenuCustom : MonoBehaviour
         if (ExitOB != null && SceneManager.GetActiveScene().name != "StartMenu")
         {
 
-            if ((UIColl(ExitOB) && (IM.enter_b || IM.LeftMouseButtonDown) ) || (IM.exit_b && !_options && !YesNo && !_modes && !DrawSaveSlots && IM.ActionDelay < Time.fixedTime ))
+            if (PressButton(ExitOB) || (IM.exit_b && !_options && !YesNo && !_modes && !DrawSaveSlots && IM.ActionDelay < Time.fixedTime ))
             {
                 PlayAudio(MenuApplyClip);
                 ONOFFUI(MenuAllTransform, false);
@@ -1020,7 +1056,7 @@ public class MenuCustom : MonoBehaviour
             }
         }
 
-        if (UIColl(GameObject.Find("QuitGame")) && (IM.enter_b || IM.LeftMouseButtonDown))
+        if (PressButton(GameObject.Find("QuitGame")))
         {
 
             quit = true;
@@ -1063,9 +1099,8 @@ public class MenuCustom : MonoBehaviour
         // SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene());
 
 
-        if (SceneManager.GetActiveScene().name != "StartMenu")
-            TransitionToTheScene(StartLocation, false);
-        else TransitionToTheScene("Main location", false);
+          TransitionToTheScene(StartLocation, false);
+   
 
         Invoke("StartActivityNow", 1f);
 
@@ -1172,11 +1207,18 @@ public class MenuCustom : MonoBehaviour
                     TransparencyUIValue = 1;
                 else TransparencyUIValue = 0;
 
+
+                if (DistanceFadeUIToggle.isOn)
+                    DistanceFadeValue = 1;
+                else DistanceFadeValue = 0;
+
             }
         }
 
         HideUI = HideUIToggle.isOn;
         TransparencyBuilding = TransparencyUIToggle.isOn;
+        DistanceFade = DistanceFadeUIToggle.isOn;
+
         if (!IM.joystick)
         {
             if (HideUIToggle.isOn)
@@ -1186,7 +1228,11 @@ public class MenuCustom : MonoBehaviour
             if (TransparencyUIToggle.isOn)
                 TransparencyUIValue = 1;
             else TransparencyUIValue = 0;
-            
+
+            if (DistanceFadeUIToggle.isOn)
+                DistanceFadeValue = 1;
+            else DistanceFadeValue = 0;
+
             MasterSliderValue = MasterSlider.value;
             BGSliderValue = BGSlider.value;
             ObjectsSliderValue = ObjectsSlider.value;
@@ -1254,7 +1300,7 @@ public class MenuCustom : MonoBehaviour
 
             }
 
-            if (UIColl(Slots[i]) && (IM.enter_b || IM.LeftMouseButtonDown) && IM.ActionDelay < Time.fixedTime)
+            if (PressButton(Slots[i]))
             {
          
 
@@ -1302,7 +1348,7 @@ public class MenuCustom : MonoBehaviour
                 
             }
 
-            if (UIColl(Slots[i]) && (IM.enter_b || IM.LeftMouseButtonDown) && IM.ActionDelay < Time.fixedTime)
+            if (PressButton(Slots[i]) )
             {
 
 
@@ -1366,17 +1412,10 @@ public class MenuCustom : MonoBehaviour
 
     public bool UIColl(GameObject Button)
     {
-        /*
-        Vector2 Mouth = Input.mousePosition;
-        Vector2 Min = (Vector2)Button.GetComponent<BoxCollider2D>().bounds.min - 
-            Button.GetComponent<RectTransform>().sizeDelta / 2;
-        Vector2 Max = (Vector2)Button.GetComponent<BoxCollider2D>().bounds.max + Button.GetComponent<RectTransform>().sizeDelta / 2;
+     
 
-        if (Mouth.x > Min.x && Mouth.y > Min.y && Mouth.x < Max.x && Mouth.y < Max.y)
-        {
-            return true;
-
-        }else return false;*/
+        CollList MouseCollList = MouseObject.GetComponent<CollList>();
+        CollList ChooseCollList = ChooseUITransfrom.GetComponent<CollList>();
 
         if (IM.joystick)
 
@@ -1384,7 +1423,8 @@ public class MenuCustom : MonoBehaviour
 
             if (ChooseUITransfrom.GetComponent<CollList>().GetCollList().Contains(Button))
             {
-                Button.transform.localScale = new Vector3(Mathf.Lerp(Button.transform.localScale.x, 1.2f, Time.deltaTime * 3), Mathf.Lerp(Button.transform.localScale.y, 1.2f, Time.deltaTime * 3), 1);
+             
+                Button.transform.localScale = new Vector3(Mathf.Lerp(Button.transform.localScale.x, 1.2f, Time.deltaTime * 5), Mathf.Lerp(Button.transform.localScale.y, 1.2f, Time.deltaTime * 5), 1);
               
                 return true;
             }
@@ -1398,12 +1438,13 @@ public class MenuCustom : MonoBehaviour
         }
 
 
-        if ((MouseObject.GetComponent<CollList>().GetCollList().Contains(Button) && IM.MouseMode) || (ChooseUITransfrom.GetComponent<CollList>().GetCollList().Contains(Button) && !IM.MouseMode && ScrollDelay-0.1f < Time.fixedTime))
+        if ((MouseCollList.GetCollList().Contains(Button) && IM.MouseMode) || (ChooseCollList.GetCollList().Contains(Button) && !IM.MouseMode && ScrollDelay-0.1f < Time.fixedTime))
         {
-            Button.transform.localScale = new Vector3(Mathf.Lerp(Button.transform.localScale.x, 1.2f, Time.deltaTime * 3), Mathf.Lerp(Button.transform.localScale.y, 1.2f, Time.deltaTime * 3), 1);
+       
+                Button.transform.localScale = new Vector3(Mathf.Lerp(Button.transform.localScale.x, 1.2f, Time.deltaTime * 5), Mathf.Lerp(Button.transform.localScale.y, 1.2f, Time.deltaTime * 5), 1);
 
 
-            if (IM.MouseMode)
+          /*  if (IM.MouseMode)
             {
                 for (int i = 0; i < MenuButtons.Count; i++)
                 {
@@ -1436,7 +1477,18 @@ public class MenuCustom : MonoBehaviour
                     }
                 }
 
-            }
+                for (int i = 0; i < ModeMenuButtons.Count; i++)
+                {
+                    if (Button == ModeMenuButtons[i] && MenuButtonNum != i)
+                    {
+                        MenuButtonNum = i;
+                        //  PlayAudio(MenuChooseMove);
+
+                    }
+                }
+
+
+            }*/
 
 
             for (int i = 0; i < Slots.Count; i++)
@@ -1448,7 +1500,17 @@ public class MenuCustom : MonoBehaviour
         
             return true;
         }
-        else if (!MouseObject.GetComponent<CollList>().GetCollList().Contains(Button) && !ChooseUITransfrom.GetComponent<CollList>().GetCollList().Contains(Button) )
+        else if ((!MouseCollList.GetCollList().Contains(Button) && IM.MouseMode) || 
+                 (!ChooseCollList.GetCollList().Contains(Button) && !IM.MouseMode))
+        
+        {
+            if (Button != null)
+                Button.transform.localScale = new Vector3(1f, 1f, 1);
+            return false;
+
+        }
+        else if (!MouseCollList.GetCollList().Contains(Button) && 
+                 !ChooseCollList.GetCollList().Contains(Button) )
         {
             {
                 if (Button != null)
@@ -1459,6 +1521,71 @@ public class MenuCustom : MonoBehaviour
 
 
         
+
+    }
+
+
+    public bool UIColl_NoScale(GameObject Button)
+    {
+
+
+        CollList MouseCollList = MouseObject.GetComponent<CollList>();
+        CollList ChooseCollList = ChooseUITransfrom.GetComponent<CollList>();
+
+        if (IM.joystick)
+
+        {
+
+            if (ChooseUITransfrom.GetComponent<CollList>().GetCollList().Contains(Button))
+            {
+               
+                return true;
+            }
+            else
+            {
+                if (Button != null)
+                    Button.transform.localScale = new Vector3(1f, 1f, 1);
+                return false;
+            }
+
+        }
+
+
+        if ((MouseCollList.GetCollList().Contains(Button) && IM.MouseMode) || (ChooseCollList.GetCollList().Contains(Button) && !IM.MouseMode && ScrollDelay - 0.1f < Time.fixedTime))
+        {
+          
+
+            for (int i = 0; i < Slots.Count; i++)
+            {
+                if (Button == Slots[i])
+                    SaveSlotNum = i;
+            }
+
+
+            return true;
+        }
+        else if ((!MouseCollList.GetCollList().Contains(Button) && IM.MouseMode) ||
+                 (!ChooseCollList.GetCollList().Contains(Button) && !IM.MouseMode))
+
+        {
+            if (Button != null)
+                Button.transform.localScale = new Vector3(1f, 1f, 1);
+            return false;
+
+        }
+        else if (!MouseCollList.GetCollList().Contains(Button) &&
+                 !ChooseCollList.GetCollList().Contains(Button))
+        {
+            {
+                if (Button != null)
+                    Button.transform.localScale = new Vector3(1f, 1f, 1);
+                return false;
+            }
+        }
+        else return false;
+
+
+
 
     }
 
@@ -1548,9 +1675,7 @@ public class MenuCustom : MonoBehaviour
             if (objects > 5) objects = 5;
             mg.SetFloat("Objects", objects);
         }
-        print("LoadMenu 01");
-    
-
+      
         if (BGSlider != null)
         {
             BGSlider.value = BGSliderValue;
@@ -1559,8 +1684,7 @@ public class MenuCustom : MonoBehaviour
             if (bg > 5) bg = 5;
             mg.SetFloat("BG", bg);
         }
-        print("LoadMenu 1");
-
+    
 
         if (MasterSlider != null)
         {
@@ -1575,14 +1699,17 @@ public class MenuCustom : MonoBehaviour
         else HideUIToggle.isOn = true;
 
         HideUI = HideUIToggle.isOn;
-        print("LoadMenu 2");
+   
         if (TransparencyUIValue == 0) TransparencyUIToggle.isOn = false;
         else TransparencyUIToggle.isOn = true;
 
         TransparencyBuilding = TransparencyUIToggle.isOn;
 
+        if (DistanceFadeValue == 0) DistanceFadeUIToggle.isOn = false;
+        else DistanceFadeUIToggle.isOn = true;
 
-        print("LoadMenu 3");
+        DistanceFade = DistanceFadeUIToggle.isOn;
+        
         if (LanguageDropdown != null)
             LanguageDropdown.GetComponent<TMP_Dropdown>().value = Language;
 
@@ -1607,95 +1734,108 @@ public class MenuCustom : MonoBehaviour
 
     void SetChoisePosition(GameObject Button)
     {
-        if(ChooseUITransfrom.position != Button.GetComponent<RectTransform>().position && IM.MouseMode) 
+        if( Vector3.Distance( ChooseUITransfrom.position , Button.GetComponent<RectTransform>().position)>0.1f && IM.MouseMode) 
             PlayAudio(MenuChooseMove);
-
-        ChooseSlot.transform.position = Button.GetComponent<RectTransform>().position;
+     
+    ChooseSlot.transform.position = Button.GetComponent<RectTransform>().position;
         ChooseUITransfrom.position = Button.GetComponent<RectTransform>().position;
 
         ChooseSlot.GetComponent<RectTransform>().sizeDelta = Button.GetComponent<RectTransform>().sizeDelta * 1.2f;
-        if(_options)
-        ChooseUITransfrom.GetComponent<RectTransform>().sizeDelta = Button.GetComponent<RectTransform>().sizeDelta * 2.4f;
-        else
-            ChooseUITransfrom.GetComponent<RectTransform>().sizeDelta = Button.GetComponent<RectTransform>().sizeDelta * 1.4f;
 
-   
+    
+
+        ChooseUITransfrom.GetComponent<RectTransform>().sizeDelta = Button.GetComponent<RectTransform>().sizeDelta  + new Vector2(CanvasRectTransform.rect.width / 120, CanvasRectTransform.rect.width/ 120);
+      
+        ChooseUITransfrom.transform.parent = Button.transform.parent;
+     
+        
+        if(Button.transform.GetSiblingIndex() - 1>=0)
+        ChooseUITransfrom.transform.SetSiblingIndex(Button.transform.GetSiblingIndex()-1);
+        else ChooseUITransfrom.transform.SetSiblingIndex(0);
+
+
         ChooseUITransfrom.localScale = Button.transform.localScale;
         ChooseSlot.transform.localScale = Button.transform.localScale;
-        ChooseUITransfrom.SetAsLastSibling();
+        //ChooseUITransfrom.SetAsLastSibling();
 
     }
 
 
-    void Modes()
+    void ModesManager()
     {
-        
-        for (int i = 0; i < ModesObj.Length; i++)
-        {
-            if (!IM.MouseMode)
-            {
-                MoveChouse_LEFT_RIGHT(ref MenuButtonNum, ModesObj.Length - 1);
-                SetChoisePosition(ModesObj[MenuButtonNum]);
-            }
-            else
-            {
-
-                if (UIColl(ModesObj[i]) && IM.MouseMode) SetChoisePosition(ModesObj[i]);
-            }
-           
-            if (IM.joystick)
-            {
-                if ((IM.enter_b || IM.LeftMouseButtonDown) && IM.ActionDelay < Time.fixedTime)
-                {
-                  
-                    PlayAudio(MenuApplyClip);
-                    DrawTutorial = 1;
-
-                    FirstStart = 0;
-
-                    SL.ResetLocations();
-              
-                    TransitionToTheScene(ModesObj[MenuButtonNum].name, false);
-
-                    IM.ActionDelay = Time.fixedTime + 0.2f;
-                    
-
-                }
-
-               
-            }
-            else if (IM.ActionDelay < Time.fixedTime)
-            {
-
-
-                if (UIColl(ModesObj[i]) && (IM.enter_b || IM.LeftMouseButtonDown))
-                {
-                    PlayAudio(MenuApplyClip);
-                    DrawTutorial = 1;
-
-                    FirstStart = 0;
-                    
-                    SL.ResetLocations();
-                  
-                    IM.ActionDelay = Time.fixedTime + 0.3f;
-                   
-                    TransitionToTheScene(ModesObj[i].name, false);
-                    
-                }
-                
-
-
-            }
-        }
-
-
-        if ((UIColl(GameObject.Find("BackFromModes")) && (IM.enter_b || IM.LeftMouseButtonDown)) || IM.exit_b|| IM.menu_b)
+        if (PressButton(GameObject.Find("BackFromModes")) || IM.exit_b || IM.menu_b)
         {
 
+            ONOFFUI(ModeMenu.transform, false);
             BackToMainMenu(ref ModeMenu, ref _modes);
+
             IM.ActionDelay = Time.fixedTime + 0.3f;
+            return;
+        }
+   
+      
+
+        for (int i = 0; i < ModeMenuButtons.Count; i++)
+        {
+            if (Progression >= i)
+            {
+
+                if (UIColl(ModeMenuButtons[i]) && IM.MouseMode)
+                {
+             
+                    MenuButtonNum = i;
+                
+                }
+
+                if (PressButton(ModeMenuButtons[i]))
+                {
+                
+                    ONOFFUI(ModeMenu, false);
+                    ONOFFUI(OptionsAllTransform, false);
+                    ONOFFUI(MenuAllTransform, false);
+                    StartLocation = ModesNamesEN[i];
+
+                    if (i <= 0)
+                    {
+                    ONOFFUI(ToolTipsYesNoOB.transform, true);
+                    SetChoisePosition(YesNoButtons[0]);
+                        print("ModesManager 0");
+                        YesNo = true;
+                        _modes = false;
+
+
+
+                        IM.ActionDelay = Time.fixedTime + 0.3f;
+
+
+                    }
+                    else
+                    {
+
+                        StartGame();
+
+                    }
+               
+                }
+            }
+            else if (PressButton_NoScalse(ModeMenuButtons[i]))
+            {
+                PlayAudio(ErrorClip);
+
+            }
+
 
         }
+
+
+        if (!IM.MouseMode)
+        {
+            MoveChouse_LEFT_RIGHT(ref MenuButtonNum, ModeMenuButtons.Count - 1);
+        }
+
+
+        SetChoisePosition(ModeMenuButtons[MenuButtonNum]);
+
 
     }
 
@@ -1767,11 +1907,12 @@ public class MenuCustom : MonoBehaviour
     public void PlayAudio(AudioClip AC)
     {
         if (AS.isPlaying) return;
+        print("PlayAudio");
         AS.clip = AC;
         AS.Play();
     }
 
-    void LanguagesControll()
+  public  void LanguagesControll()
     {
 
         if (Language == 0) ExitBuildingMode_text = "Exit Building mode";
@@ -1838,21 +1979,21 @@ public class MenuCustom : MonoBehaviour
             if (Language == 1)
             {
                 if (CurrentSlotLocations[i] == "Tutorial") locationname = "Туторіал";
-                if (CurrentSlotLocations[i] == "Main location") locationname = "Основна локація";
-                if (CurrentSlotLocations[i] == "Blood") locationname = "Кров";
-                if (CurrentSlotLocations[i] == "Boss rush") locationname = "Бос раш";
-                if (CurrentSlotLocations[i] == "Guns and Walls") locationname = "Зброя і стіни";
-                if (CurrentSlotLocations[i] == "Winter") locationname = "Зима";
+                if (CurrentSlotLocations[i] == "Island") locationname = "Острів";
+                if (CurrentSlotLocations[i] == "Lake") locationname = "Озеро";
+                if (CurrentSlotLocations[i] == "Mountain") locationname = "Гора";
+                if (CurrentSlotLocations[i] == "Hell") locationname = "Пекло";
+
             }
 
             if (Language == 2)
             {
                 if (CurrentSlotLocations[i] == "Tutorial") locationname = "チュートリアル";
-                if (CurrentSlotLocations[i] == "Main location") locationname = "主な所在地";
-                if (CurrentSlotLocations[i] == "Blood") locationname = "血";
-                if (CurrentSlotLocations[i] == "Boss rush") locationname = "ボスラッシュ";
-                if (CurrentSlotLocations[i] == "Guns and Walls") locationname = "銃と壁";
-                if (CurrentSlotLocations[i] == "Winter") locationname = "冬";
+                if (CurrentSlotLocations[i] == "Island") locationname = "島";
+                if (CurrentSlotLocations[i] == "Lake") locationname = "湖";
+                if (CurrentSlotLocations[i] == "Mountain") locationname = "山";
+                if (CurrentSlotLocations[i] == "Hell") locationname = "地獄";
+
 
 
 
@@ -1954,29 +2095,17 @@ public class MenuCustom : MonoBehaviour
         {
             if (Language == 0)
             {
-                ModeMenu.Find("Winter").Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = ModesNamesEN[0];
-                ModeMenu.Find("Spring").Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = ModesNamesEN[1];
-                ModeMenu.Find("Summer").Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = ModesNamesEN[2];
-                ModeMenu.Find("Autumn").Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = ModesNamesEN[3];
-                ModeMenu.Find("BackFromModes").Find("Text").GetComponent<TextMeshProUGUI>().text = ModesNamesEN[4];
+                SetModeMenuLables(ModesNamesEN, ModesDescNamesEN);
             }
 
             if (Language == 1)
             {
-                ModeMenu.Find("Winter").Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = ModesNamesUA[0];
-                ModeMenu.Find("Spring").Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = ModesNamesUA[1];
-                ModeMenu.Find("Summer").Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = ModesNamesUA[2];
-                ModeMenu.Find("Autumn").Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = ModesNamesUA[3];
-                ModeMenu.Find("BackFromModes").Find("Text").GetComponent<TextMeshProUGUI>().text = ModesNamesUA[4];
+                SetModeMenuLables(ModesNamesUA, ModesDescNamesUA);
             }
 
             if (Language == 2)
             {
-                ModeMenu.Find("Winter").Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = ModesNamesJP[0];
-                ModeMenu.Find("Spring").Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = ModesNamesJP[1];
-                ModeMenu.Find("Summer").Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = ModesNamesJP[2];
-                ModeMenu.Find("Autumn").Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = ModesNamesJP[3];
-                ModeMenu.Find("BackFromModes").Find("Text").GetComponent<TextMeshProUGUI>().text = ModesNamesJP[4];
+                SetModeMenuLables(ModesNamesJP, ModesDescNamesJP);
             }
 
 
@@ -2004,176 +2133,115 @@ public class MenuCustom : MonoBehaviour
 
         if (Language == 0)
         {
-            if (ContinueOB != null)
-                ContinueOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesEN[11];
-
-            if (FirstStart == 0)
-            {
-                if (StartOB != null)
-                    StartOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesEN[6];
-            }
-            else
-            {
-                if (StartOB != null)
-                    StartOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesEN[0];
-            }
-
-            if (SceneManager.GetActiveScene().name == "StartMenu")
-            {
-                if (StartOB != null)
-                    StartOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesEN[0];
-            }
-
-
-            if (FirstStart == 0)
-            {
-                if (ModesOB != null)
-                    ModesOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesEN[8];
-            }
-            else
-            {
-                if (ModesOB != null)
-                    ModesOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesEN[9];
-            }
-
-
-
-            if (ToMenuOB != null)
-                ToMenuOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesEN[7];
-
-
-            if (LoadOB != null)
-            {
-                LoadOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesEN[1];
-
-            }
-            if (SaveOB != null)
-            {
-                SaveOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesEN[2];
-
-            }
-
-            if (OptionsOB != null)
-                OptionsOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesEN[3];
-
-            if (ExitOB != null)
-                ExitOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesEN[4];
-
-            if (MenuAllObject.transform.Find("QuitGame") != null)
-                GameObject.Find("QuitGame").transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesEN[5];
-
+            SetMenuLabels(MenuNamesEN);
         }
 
         if (Language == 1)
         {
-            if (ContinueOB != null)
-                ContinueOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesUA[11];
-
-
-            if (FirstStart == 0)
-            {
-                if (StartOB != null)
-                    StartOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesUA[6];
-            }
-            else
-            {
-                if (StartOB != null)
-                    StartOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesUA[0];
-            }
-
-
-            if (FirstStart == 0)
-            {
-                if (ModesOB != null)
-                    ModesOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesUA[8];
-            }
-            else
-            {
-                if (ModesOB != null)
-                    ModesOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesUA[9];
-            }
-
-            if (ToMenuOB != null)
-                ToMenuOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesUA[7];
-
-            if (LoadOB != null)
-                LoadOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesUA[1];
-
-            if (SaveOB != null)
-                SaveOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesUA[2];
-
-            if (OptionsOB != null)
-                OptionsOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesUA[3];
-
-            if (ExitOB != null)
-                ExitOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesUA[4];
-
-
-            if (MenuAllObject.transform.Find("QuitGame") != null)
-                GameObject.Find("QuitGame").transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesUA[5];
+            SetMenuLabels(MenuNamesUA);
 
         }
 
         if (Language == 2)
         {
 
-
-            if (ContinueOB != null)
-                ContinueOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesJP[11];
-
-
-            if (FirstStart == 0)
-            {
-                if (StartOB != null)
-                    StartOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesJP[6];
-            }
-            else
-            {
-                if (StartOB != null)
-                    StartOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesJP[0];
-            }
-
-
-            if (FirstStart == 0)
-            {
-                if (ModesOB != null)
-                    ModesOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesJP[8];
-            }
-            else
-            {
-                if (ModesOB != null)
-                    ModesOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesJP[9];
-            }
-
-            if (ToMenuOB != null)
-                ToMenuOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesJP[7];
-
-            if (LoadOB != null)
-                LoadOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesJP[1];
-
-            if (SaveOB != null)
-                SaveOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesJP[2];
-
-            if (OptionsOB != null)
-                OptionsOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesJP[3];
-
-            if (ExitOB != null)
-                ExitOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesJP[4];
-
-
-            if (MenuAllObject.transform.Find("QuitGame") != null)
-                GameObject.Find("QuitGame").transform.Find("Text").GetComponent<TextMeshProUGUI>().text = MenuNamesJP[5];
-
+            SetMenuLabels(MenuNamesJP);
         }
     }
 
 
-    public void ONOFFUI(Transform tr, bool TF)
+    void SetModeMenuLables(string[] modelabels, string[] descs)
     {
-        SetComponentEnabled(tr, TF);
-        SetChildComponentEnabled(tr, TF);
+
+        ModeMenu.Find("Option 0").Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = modelabels[0];
+        ModeMenu.Find("Option 1").Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = modelabels[1];
+        ModeMenu.Find("Option 2").Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = modelabels[2];
+        ModeMenu.Find("Option 3").Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = modelabels[3];
+
+        ModeMenu.Find("Description 0").Find("Text").GetComponent<TextMeshProUGUI>().text = descs[0];
+        ModeMenu.Find("Description 1").Find("Text").GetComponent<TextMeshProUGUI>().text = descs[1];
+        ModeMenu.Find("Description 2").Find("Text").GetComponent<TextMeshProUGUI>().text = descs[2];
+        ModeMenu.Find("Description 3").Find("Text").GetComponent<TextMeshProUGUI>().text = descs[3];
+
+
+
+#if UINITY_SWITCH || UNITY_PS4 || UNITY_PS5 || UNITY_XBOX
+        ModeMenu.Find("BackFromModesConsole").Find("Text").GetComponent<TextMeshProUGUI>().text = modelabels[4];
+#else
+        ModeMenu.Find("BackFromModesConsole").Find("Text").GetComponent<TextMeshProUGUI>().text ="";
+#endif
+
+
     }
 
+
+
+    void SetMenuLabels(string[] menulabels)
+    {
+
+        if (ContinueOB != null)
+            ContinueOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = menulabels[11];
+
+
+        if (FirstStart == 0)
+        {
+            if (StartOB != null)
+                StartOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = menulabels[6];
+        }
+        else
+        {
+            if (StartOB != null)
+                StartOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = menulabels[0];
+        }
+
+
+        if (ToMenuOB != null)
+            ToMenuOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = menulabels[7];
+
+        if (LoadOB != null)
+            LoadOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = menulabels[1];
+
+        if (SaveOB != null)
+            SaveOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = menulabels[2];
+
+        if (OptionsOB != null)
+            OptionsOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = menulabels[3];
+
+        if (ExitOB != null)
+            ExitOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = menulabels[4];
+
+
+        if (QuitGameOB != null)
+            QuitGameOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = menulabels[5];
+
+
+
+    }
+    public void ONOFFUI(Transform tr, bool TF)
+    {
+        if (tr == null) return;
+        tr.gameObject.SetActive(TF);
+
+
+       /* SetComponentEnabled(tr, TF);
+        SetChildComponentEnabled(tr, TF);*/
+    }
+
+    bool PressButton(GameObject button)
+    {
+        if (UIColl(button) && (IM.enter_b || IM.LeftMouseButtonDown) && IM.ActionDelay < Time.fixedTime)
+            return true;
+        return false;
+
+    }
+
+    bool PressButton_NoScalse(GameObject button)
+    {
+        if (UIColl_NoScale(button) && (IM.enter_b || IM.LeftMouseButtonDown) && IM.ActionDelay < Time.fixedTime)
+            return true;
+        return false;
+
+    }
     void SetComponentEnabled(Transform tr, bool enabled)
     {
         if (tr.GetComponent<GamepadUI>() != null && HideUI)
@@ -2247,6 +2315,40 @@ public class MenuCustom : MonoBehaviour
         }
     }
 
+    void ProgressionManager()
+    {
+        int[] blueprIDs = new int[] { 21, 7, 1 };
+
+        int startbp = blueprIDs[0];
+        if (SceneManager.GetActiveScene().name == "Island")
+        {
+            startbp =  blueprIDs[0];
+            if (SL.BPConstructed[startbp] > 1)
+                if (Progression < 1) Progression = 1;
+        }
+
+        if (SceneManager.GetActiveScene().name == "Lake")
+        {
+            startbp = 39 + blueprIDs[1];
+            if (SL.BPConstructed[startbp] > 1)
+                if (Progression < 2) Progression = 2;
+        }
+        if (SceneManager.GetActiveScene().name == "Mountain")
+        {    startbp = 59 + blueprIDs[2];
+            if (SL.BPConstructed[startbp] > 1)
+            if (Progression < 3) Progression = 3;
+         }
+     
+        
+        if (SceneManager.GetActiveScene().name == "Hell")
+            startbp = 79;
+
+
+
+    }
+
+
+
     public void DefaultVariables()
     {
         mg = Resources.Load<UnityEngine.Audio.AudioMixer>("Sound/NewAudioMixer");
@@ -2258,6 +2360,7 @@ public class MenuCustom : MonoBehaviour
         LanguageDropdown = GameObject.Find("LanguageDropdown1");
         HideUIToggle = GameObject.Find("HideUI").GetComponent<Toggle>();
         TransparencyUIToggle = GameObject.Find("TransparencyUI").GetComponent<Toggle>();
+        DistanceFadeUIToggle = GameObject.Find("DistanceFadeUIToggle").GetComponent<Toggle>();
         WindowDropdown = GameObject.Find("WindowDropdown");
 
 

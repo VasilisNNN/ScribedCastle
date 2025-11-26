@@ -27,13 +27,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7316042708682378090}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -2.375, y: -1.038, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7316042708682378091
 SpriteRenderer:
@@ -76,7 +76,7 @@ SpriteRenderer:
   m_SortingLayerID: 777213259
   m_SortingLayer: 1
   m_SortingOrder: 10
-  m_Sprite: {fileID: -2011208699, guid: dc27085ce7df38d4c8da47743d840fe4, type: 3}
+  m_Sprite: {fileID: -809717179, guid: dc27085ce7df38d4c8da47743d840fe4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -99,11 +99,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 968c0051690728c46b0bb41c47ea1dfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Red: 0
-  Green: 0
-  Gold: 0
-  Cost: 10
-  CornCost: 0
   Table: 0
   Shield: 0
   TransperentWall: 0
@@ -144,11 +139,32 @@ BoxCollider2D:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7316042708682378090}
   m_Enabled: 1
+  serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
   m_IsTrigger: 1
   m_UsedByEffector: 0
-  m_UsedByComposite: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0.01999998}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
@@ -159,7 +175,6 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
 --- !u!114 &5936958197105100698
@@ -195,7 +210,6 @@ MonoBehaviour:
   StartGrowWithZero: 0
   Destructible: 0
   CanBeStunned: 0
-  CanTurnInEgg: 0
   CollisionClips: []
   AudioPlayed: 0
   GettingDamageFromWalls: 0
@@ -217,3 +231,5 @@ MonoBehaviour:
   IgnoreDestroyList: 0
   BuildedStructure: 0
   SpawnPointName: 
+  ColorMaterial: {fileID: 0}
+  MiddleReplacement: {fileID: 0}

@@ -98,14 +98,14 @@ public class TutorialPhase
         {
             if (!IM.joystick)
             {
-                if ((pl.GetMouseCollList().Contains(GameObject.Find("CloseBigTips")) && IM.LeftMouseButtonDown) || IM.exit_b || IM.menu_b || IM.enter_b)
+                if (((pl.GetMouseCollList().Contains(GameObject.Find("CloseBigTips")) && IM.LeftMouseButtonDown) || IM.exit_b || IM.menu_b || IM.enter_b || pl.IM.OKey) && IM.ActionDelay < Time.fixedTime)
                 {
                     UnsetBigTips();
                 }
 
             }
             else
-            if ((IM.menu_b || IM.exit_b || IM.enter_b) && Constr.TutorialPause && TipsPause.activeInHierarchy && IM.ActionDelay < Time.fixedTime)
+            if ((IM.menu_b || IM.exit_b || IM.enter_b || pl.IM.OKey ) && Constr.TutorialPause && TipsPause.activeInHierarchy && IM.ActionDelay < Time.fixedTime)
             {
 
                 UnsetBigTips();
@@ -120,13 +120,16 @@ public class TutorialPhase
 
         if ((pl.menu.UIColl(TutorialButton) && pl.IM.LeftMouseButtonDown) || pl.IM.OKey)
         {
-
-            TipsReminder(Phase);
+            if (!Constr.TutorialPause && IM.ActionDelay < Time.fixedTime)
+            {
+                TipsReminder(Phase);
+                IM.ActionDelay = Time.fixedTime + 0.2f;
+            }
         }
 
+       
 
-
-        if (pl.IM.enter_b  || (pl.menu.UIColl(GameObject.Find("CloseBigTips")) && pl.IM.LeftMouseButtonDown) || 
+        if (pl.IM.enter_b || (pl.menu.UIColl(GameObject.Find("CloseBigTips")) && pl.IM.LeftMouseButtonDown) || 
             Constr.TutorialPause == false)
         {
             if (Phase == 0)
@@ -276,7 +279,7 @@ public class TutorialPhase
             {
                 Constr._menu.FirstStart = 0;
 
-                Constr._menu.TransitionToTheScene("Main location", false);
+                Constr._menu.TransitionToTheScene("Island", false);
                 
             }
         }

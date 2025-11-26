@@ -192,8 +192,15 @@ public class Player : MonoBehaviour {
     private void Awake()
     {
         LayerSort = GetComponent<LayerSorting>();
-
         TEST = false;
+
+#if UNITY_EDITOR
+        TEST = true;
+#endif
+
+
+        TEST = true;
+
         rigidbody2D = GetComponent<Rigidbody2D>();
         DayNight = GameObject.Find("DayAndNight").GetComponent<DayAndNight>();
         inv = GetComponent<Inventory>();
@@ -289,7 +296,7 @@ public class Player : MonoBehaviour {
             inv.AddItem(1015, 999, 99, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
             inv.AddItem(354, 999, 99, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
             inv.AddItem(354, 999, 99, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
-
+            inv.AddItem(355, 999, 99, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
             AddTestitems = true;
 
         }
@@ -348,16 +355,22 @@ public class Player : MonoBehaviour {
         if (TEST)
         {
 
+#if !UNITY_STANDALONE
             Cursor.visible = false;
+#endif
+
             if (Input.GetKeyDown(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.A))
             {
 
                 for (int i = 0; i < inv.database.items.Count; i++)
                 {
-                    if (inv.database.items[i].CanStack)
-                        inv.AddItem(inv.database.items[i].itemID, 999, inv.database.items[i].Durability, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
-                    else
-                        inv.AddItem(inv.database.items[i].itemID, 1, inv.database.items[i].Durability, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
+                    if (Resources.Load<Sprite>("Sprites/Items/" + inv.database.items[i].itemNames[0]) != null)
+                    {
+                        if (inv.database.items[i].CanStack)
+                            inv.AddItem(inv.database.items[i].itemID, 999, inv.database.items[i].Durability, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
+                        else
+                            inv.AddItem(inv.database.items[i].itemID, 1, inv.database.items[i].Durability, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
+                    }
                 }
 
             }
@@ -1462,11 +1475,22 @@ public class Player : MonoBehaviour {
         AstarPath.active.UpdateGraphs(bound);
 
         RescanBound = bound;
-        PathRescanBoundTimer = 0.06f;
+        PathRescanBoundTimer = 0.26f;
 
     }
 
+    public bool Pause()
+    {
+        if(menu!=null)
+        if (menu.MenuONOFF )
+            return true;
 
+        if(inv!=null)
+            if(inv.showinvent || inv.showjournal || inv.blueprintshow)
+                return true;
+
+        return false;
+    }
     public void ReduceStamina(int stam)
     {
         Stamina+= stam;

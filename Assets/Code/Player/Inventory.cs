@@ -70,7 +70,8 @@ public class Inventory : MonoBehaviour
     private Rect[] SlotsRect;
     private float  WidthSlot;
     private InputMode IM;
-    private GameObject InventoryUIOB, StatsUI, LogUI, BlueprintMenu, LeftFolder, RightFolder;
+    private GameObject InventoryUIOB, StatsUI, LogUI, LeftFolder, RightFolder;
+    private BlueprintMenu BlueprintManager;
     public GameObject CraftingUIOB { get; private set; }
     
     public GameObject Choose { get; private set; }
@@ -170,7 +171,7 @@ public class Inventory : MonoBehaviour
 
         EscapeInventory = GameObject.Find("EscapeInventory");
         InventoryButton = GameObject.Find("InventoryButton");
-        BlueprintMenu = GameObject.Find("BlueprintMenu");
+        BlueprintManager = GameObject.Find("BlueprintManager").GetComponent<BlueprintMenu>();
         CraftingCross = GameObject.Find("CraftingCross");
         StatsUI = CanvasTransform.transform.Find("Stats").gameObject;
 
@@ -301,7 +302,7 @@ public class Inventory : MonoBehaviour
     {
         slotX = database.items.Count + 20;
 
-        if (BlueprintMenu != null) blueprintshow = BlueprintMenu.GetComponent<BlueprintMenu>().showbp;
+        if (BlueprintManager != null) blueprintshow = BlueprintManager.showbp;
 
 
         ShowControlls();
@@ -538,6 +539,8 @@ public class Inventory : MonoBehaviour
         {
             if (pl.GetMouseCollList().Contains(FolderButtons[i]) && (pl.IM.LeftMouseButtonDown || pl.IM.enter_b))
             {
+                Choose.transform.position = new Vector3(99999, 99999, 999);
+
                 pl.PlaySoundsPitched(ClickClip, 1);
                 FolderButtons[i].transform.Find("NewItemTag").gameObject.SetActive(false);
                 CurrentFolder = i;
@@ -545,6 +548,11 @@ public class Inventory : MonoBehaviour
                 PauseInventory = false;
                 ChooseTopSegmentSlot = false;
                 inventoryFolder = new List<Item>();
+
+                CurrentItem = 0;
+                SlotSlide = 0;
+                SetSlots();
+
                 UpdateInvFolder();
             }
         }
@@ -554,26 +562,36 @@ public class Inventory : MonoBehaviour
 
         if ((pl.IM.LeftTrigger || ((pl.IM.enter_b || pl.IM.LeftMouseButtonDown) && pl.GetMouseCollList().Contains(LeftFolder))) && IM.ActionDelay < Time.fixedTime && CurrentFolder > 0)
         {
+            Choose.transform.position = new Vector3(99999, 99999, 999);
+
             pl.PlaySoundsPitched(ClickClip, 0.8f + CurrentFolder * 0.05f);
             CurrentFolder--;
             FolderButtons[CurrentFolder].transform.Find("NewItemTag").gameObject.SetActive(false);
-            CurrentItem = 0;
-            SlotSlide = 0;
+            
             inventoryFolder = new List<Item>();
             UpdateInvFolder();
 
+            CurrentItem = 0;
+            SlotSlide = 0;
+            SetSlots();
             IM.ActionDelay = 0.1f;
         }
 
         if ((pl.IM.RightTrigger || ((pl.IM.enter_b || pl.IM.LeftMouseButtonDown) && pl.GetMouseCollList().Contains(RightFolder))) && IM.ActionDelay < Time.fixedTime && CurrentFolder < FolderButtons.Count - 1)
         {
+            Choose.transform.position = new Vector3(99999, 99999, 999);
+
             pl.PlaySoundsPitched(ClickClip, 0.8f + CurrentFolder * 0.05f);
             CurrentFolder++;
             FolderButtons[CurrentFolder].transform.Find("NewItemTag").gameObject.SetActive(false);
-            CurrentItem = 0;
-            SlotSlide = 0;
+         
             inventoryFolder = new List<Item>();
             UpdateInvFolder();
+
+            CurrentItem = 0;
+            SlotSlide = 0;
+            SetSlots();
+
             IM.ActionDelay = 0.1f;
         }
 
@@ -725,8 +743,6 @@ public class Inventory : MonoBehaviour
         DrawINV = false;
         IM.ActionDelay = Time.fixedTime + 0.1f;
         _menu.MenuActionDelay = Time.fixedTime + 0.1f;
-        
-
         
     }
 
@@ -1272,11 +1288,14 @@ public class Inventory : MonoBehaviour
 
 
 
-        if (crafting || !pl.IM.LeftMouseButtonDown) return;
-        
+        if (!pl.IM.LeftMouseButton) return;
+        if(IM.ActionDelay>Time.fixedTime) return;
 
         if (pl.GetMouseCollList().Contains(LeftArrow) )
         {
+
+            Choose.transform.position = new Vector3(99999, 99999, 999);
+
             PauseInventory = false;
             ChooseTopSegmentSlot = false;
 
@@ -1290,12 +1309,16 @@ public class Inventory : MonoBehaviour
             SetSlots();
 
             pl.PlaySoundsPitched(ClickClip, 0.8f);
-
+            IM.ActionDelay = Time.fixedTime + 0.1f;
         }
 
         if (pl.GetMouseCollList().Contains(RightArrow) )
         {
-            if(SlotSlide < inventoryFolder.Count - 5)
+
+            Choose.transform.position = new Vector3(99999, 99999, 999);
+
+
+            if (SlotSlide < inventoryFolder.Count - 5)
             SlotSlide++;
 
             if (CurrentItem <= craftingslotX * craftingslotY - 1)
@@ -1303,7 +1326,7 @@ public class Inventory : MonoBehaviour
 
             pl.PlaySoundsPitched(ClickClip, 1f);
             SetSlots();
-
+            IM.ActionDelay = Time.fixedTime + 0.1f;
         }
         
 
@@ -1466,35 +1489,52 @@ public class Inventory : MonoBehaviour
                     CurrentItem = CraftingSlots.Slots[r].items[i].itemID;
 
                     PauseInventory = true;
-           
+                    ChooseTopSegmentSlot = true;
 
                     break;
                 }
 
-           
-
-                if (pl.GetMouseCollList().Contains(CraftingCross))
-                {
-                    CurrentItem = 0;
-
-                }
-
-
             }
         }
 
+        if (pl.GetMouseCollList().Contains(CraftingCross))
+        {
+            CurrentItem = 0;
 
-        
+        }
+
     }
 
     void CollidingOneOfTheSlots(int i)
     {
-      
-        if (!pl.GetMouseCollList().Contains(slots[i]) && IM.MouseMode)
-            return;
 
-        if (!IM.MouseMode &&  !Choose.GetComponent<CollList>().GetCollList().Contains(slots[i]) )
+        if (!pl.GetMouseCollList().Contains(slots[i]) && IM.MouseMode )
+        {
+            if (i == slots.Count - 1)
+            {
+                if (!PauseInventory)
+                {
+                    Choose.transform.position = new Vector3(99999, 99999, 999);
+                    CurrentItemToolTips = null;
+                }
+            }
+
             return;
+        }
+
+        if (pl.GetMouseCollList().Contains(slots[i]))
+        {
+            print("CollidingOneOfTheSlots 1");
+            PauseInventory = false;
+            ChooseTopSegmentSlot = false;
+
+        }
+
+        if (!IM.MouseMode && !Choose.GetComponent<CollList>().GetCollList().Contains(slots[i]))
+        {
+            return;
+        }
+
 
         if( i < inventoryFolder.Count &&  inventoryFolder[i].itemID == -1) return;
         if (i >= inventoryFolder.Count) return;
@@ -1509,8 +1549,7 @@ public class Inventory : MonoBehaviour
             {
                 CurrentItem = i;
             }
-            PauseInventory = false;
-            ChooseTopSegmentSlot = false;
+   
         }
 
 
@@ -1758,14 +1797,16 @@ public class Inventory : MonoBehaviour
             AddItem(BufferItem.itemID, BufferItem.Count, BufferItem.Durability, pl._transform.position);
             PlaySoundsPitched(TakeItemClip, 1);
             BufferItem = new Item();
+            PauseInventory = false;
+            ChooseTopSegmentSlot = false;
+
             //if (showinvent)
             //  pl.menu.ActionDelay = Time.fixedTime + 0.2f;
         }
 
         
 
-        PauseInventory = false;
-        ChooseTopSegmentSlot = false;
+      
 
 
     }
@@ -1829,15 +1870,15 @@ public class Inventory : MonoBehaviour
 
         for (int i = 0; i < slots.Count; i++)
         {
-/*#if UNITY_SWITCH
-                   
-        slotspace = 5;
-            Vector3 c = new Vector3(i * WidthSlot/1.2f - SlotSlide * WidthSlot/1.2f, ScreenBorder.y, 0);
-            SlotsRect[i] = new Rect( c.x , c.y , WidthSlot - slotspace, WidthSlot  - slotspace);
-#endif*/
-        
-          
-            Vector2 pos = new Vector2(i * (WidthSlot + slotspace) - SlotSlide * WidthSlot, -CanvasTransform.rect.height/2+ ScreenBorder.y);
+            /*#if UNITY_SWITCH
+
+                    slotspace = 5;
+                        Vector3 c = new Vector3(i * WidthSlot/1.2f - SlotSlide * WidthSlot/1.2f, ScreenBorder.y, 0);
+                        SlotsRect[i] = new Rect( c.x , c.y , WidthSlot - slotspace, WidthSlot  - slotspace);
+            #endif*/
+
+            print("SetSlots SlotSlide " + SlotSlide);
+            Vector2 pos = new Vector2(i * (WidthSlot + slotspace) - SlotSlide * WidthSlot, -465);
 
             RectTransform rt = slots[i].GetComponent<RectTransform>();
             rt.anchoredPosition = new Vector2(ScreenBorder.x + pos.x, pos.y);

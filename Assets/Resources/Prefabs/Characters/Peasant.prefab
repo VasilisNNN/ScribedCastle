@@ -538,8 +538,6 @@ MonoBehaviour:
   BringsPickedItemToThePlayer: 0
   MoveBetweenA_B: 0
   PickSpecificItem: 
-  Enemy: 0
-  Soldier: 0
   DropItemsOnTarget: 0
   DestroyTarget: 0
   LeavesTrash: 0
@@ -667,7 +665,6 @@ MonoBehaviour:
   StartGrowWithZero: 0
   Destructible: 1
   CanBeStunned: 0
-  CanTurnInEgg: 0
   CollisionClips: []
   AudioPlayed: 0
   GettingDamageFromWalls: 0
@@ -690,6 +687,7 @@ MonoBehaviour:
   BuildedStructure: 0
   SpawnPointName: 
   ColorMaterial: {fileID: 0}
+  MiddleReplacement: {fileID: 0}
 --- !u!114 &1440657771734962078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1040,7 +1038,7 @@ SpriteRenderer:
   m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 320679989, guid: 696b5c170afb0f2468c2be6325f42714, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.3207547, g: 0.3207547, b: 0.3207547, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0

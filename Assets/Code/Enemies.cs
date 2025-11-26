@@ -40,6 +40,8 @@ public class Enemies : MonoBehaviour
     private SpriteRenderer SPRT;
     private AnimationFrame AnimFrame;
 
+    public bool RandomPosition;
+    private List<Vector3> RandomPositions = new List<Vector3>();
     void Start()
     {
         pl = InitializeObjects.PL;
@@ -60,19 +62,17 @@ public class Enemies : MonoBehaviour
             timer = DelayStart - _constr.SL.DayTime;
         else timer = DelayStart;
 
-
     }
 
     
 
     void Update()
     {
-        if (pl.StartLoading) return;
+        if (pl.StartLoading || pl.menu.MenuONOFF) return;
 
         timer -= Time.deltaTime * _constr.Game_SPEED;
 
  
-
         if (NotInTheMorning && pl.DayNight.Day_Cycle == DayAndNight.DayCycle.Morning) return;
 
         if (_constr.Game_SPEED > 0 && (pl.DayNight.Day_Cycle == Day_Cycle || Day_Cycle == DayAndNight.DayCycle.AllTime))
@@ -189,8 +189,8 @@ public class Enemies : MonoBehaviour
         Enemy.name = EnemyObjects[num].name + BuildedPers.Count;
 
       
-        if (GameObject.Find(Enemy.name) != null)
-        Enemy.name += "N" + UnityEngine.Random.Range(0.1f, 100.1f) + UnityEngine.Random.Range(0.1f, 100.1f) + UnityEngine.Random.Range(0.1f, 100.1f) + UnityEngine.Random.Range(0.1f, 100.1f);
+        while (GameObject.Find(Enemy.name) != null && GameObject.Find(Enemy.name)!= Enemy)
+        Enemy.name += "N";
 
         
 
@@ -202,43 +202,13 @@ public class Enemies : MonoBehaviour
 
         _constr.ConstructedStructures.Add(new ObjectOnBoard(Enemy_Stats.DatabaseID, Enemy.transform.position, Enemy.name, Enemy, Enemy.GetComponent<StatsControll>(), Enemy.GetComponent<PubObject>()));
 
-        Vector3 EnemyPos = transform.position;
+        Vector3 EnemyPos = CalculateRandomPosition();
 
 
         if (SpawnPositions.Length == 0)
         {
 
-             
-            for (int x = Random.Range(-1,2); x <2; x++)
-            {
-                int y = 0;
-
-                float XPOS = 0.5f * x - 0.5f*y;
-                float YPOS = 0.25f * y + 0.25f * x;
-
-                if (x == 0 && y == 0) x++;
-
-                if (transform.position + new Vector3(XPOS, YPOS, 0) == transform.position) x++;
-
-                XPOS = 0.5f * x - 0.5f * y;
-                YPOS = 0.25f * y + 0.25f * x-1f;
-
-
-                if (TileBase.GetTile(TileBase.WorldToCell(transform.position + new Vector3(XPOS, YPOS, 0))) != null)
-                {
-
-                    if (!_constr.CheckObjectsPositionOnBoard(transform.position + new Vector3(XPOS, YPOS, 0)))
-                    {
-                        EnemyPos = transform.position + new Vector3(XPOS, YPOS, 0) ;
-
-                        break;
-                    }
-                }
-
-
-                    
-            }
-
+            EnemyPos = CalculateRandomPosition();
 
 
         }
@@ -297,4 +267,40 @@ public class Enemies : MonoBehaviour
         timer = DelayBetweenEnemies;
         
     }
+
+
+    Vector3 CalculateRandomPosition()
+    {
+        Vector3 pos = transform.position;
+        int maxsearchattempts = 10;
+
+        float StartPos = 10f;
+
+        if (RandomPosition)
+        {
+            StartPos = 30f;
+          
+        }
+        else
+            StartPos = 1f;
+    
+        
+   
+        for (int i = 0; i < maxsearchattempts; i++)
+        {
+            if (_constr.CheckStructures(pos) ||
+               !_constr.CheckTheGround(pos) ||
+               _constr.CheckWallTiles(pos))
+                pos =
+                    transform.position +
+                    new Vector3(Random.Range(-StartPos, StartPos), Random.Range(-StartPos, StartPos), 0);
+            else return pos;
+
+        }
+
+        
+        return transform.position;
+    }
+
+
 }

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1911024782127351716}
   - component: {fileID: 8723616248568076219}
   - component: {fileID: 1013769721807426604}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Arch wall
   m_TagString: Flipping
   m_Icon: {fileID: 0}
@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 7169894017281787812}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.375, y: -1.038, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -167,7 +167,6 @@ MonoBehaviour:
   StartGrowWithZero: 0
   Destructible: 1
   CanBeStunned: 0
-  CanTurnInEgg: 0
   CollisionClips: []
   AudioPlayed: 0
   GettingDamageFromWalls: 0

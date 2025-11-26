@@ -29,13 +29,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3217757228830457422}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.82017136, y: 0.92175245, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &524935879207087311
 SpriteRenderer:
@@ -97,11 +97,32 @@ BoxCollider2D:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3217757228830457422}
   m_Enabled: 1
+  serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
   m_IsTrigger: 1
   m_UsedByEffector: 0
-  m_UsedByComposite: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
   m_Offset: {x: 0, y: -0.18}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
@@ -112,7 +133,6 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  serializedVersion: 2
   m_Size: {x: 0.81, y: 0.65}
   m_EdgeRadius: 0
 --- !u!60 &608008965866785211
@@ -123,11 +143,32 @@ PolygonCollider2D:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3217757228830457422}
   m_Enabled: 1
+  serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
   m_IsTrigger: 0
   m_UsedByEffector: 0
-  m_UsedByComposite: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
@@ -144,6 +185,7 @@ PolygonCollider2D:
       - {x: -0.37042522, y: -0.49473655}
       - {x: 0.35199964, y: -0.4987501}
       - {x: 0.3521864, y: 0.10622424}
+  m_UseDelaunayMesh: 0
 --- !u!114 &1190789239124492138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -177,7 +219,6 @@ MonoBehaviour:
   StartGrowWithZero: 0
   Destructible: 1
   CanBeStunned: 0
-  CanTurnInEgg: 0
   CollisionClips: []
   AudioPlayed: 0
   GettingDamageFromWalls: 0
@@ -199,6 +240,8 @@ MonoBehaviour:
   IgnoreDestroyList: 0
   BuildedStructure: 0
   SpawnPointName: 
+  ColorMaterial: {fileID: 0}
+  MiddleReplacement: {fileID: 0}
 --- !u!114 &612714859655458705
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -211,11 +254,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 968c0051690728c46b0bb41c47ea1dfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Red: 0
-  Green: 0
-  Gold: 0
-  Cost: 0
-  CornCost: 0
   Table: 0
   Shield: 0
   TransperentWall: 0
@@ -267,7 +305,7 @@ MonoBehaviour:
   DelayStart: 0
   SpawnPositions: []
   BuildedPers: []
-  EnemiesInWaveCountMAX: 6
+  EnemiesInWaveCountMAX: 3
   WaveCountMAX: 1
   Day_Cycle: 4
   NotInTheMorning: 1

@@ -26,9 +26,11 @@ public class Move_Right_Left : MonoBehaviour {
     public bool GoRound;
     private Vector2 RoundMultiplier;
     private Vector2 StartScale;
-    
+
+    private Player pl;
     void Start()
 	{
+        pl = InitializeObjects.PL;
         RoundMultiplier = new Vector2(1, 1);
         if (!NoBox)
         {
@@ -56,6 +58,9 @@ public class Move_Right_Left : MonoBehaviour {
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (pl != null)
+            if (pl.Pause()) return;
+
         if (!NoBox&& Bounds!=null)
         {
             _min = Bounds.bounds.min;

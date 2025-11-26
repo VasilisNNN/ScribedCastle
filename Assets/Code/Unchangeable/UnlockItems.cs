@@ -46,10 +46,10 @@ public class UnlockItems : MonoBehaviour
 
         _ItemToUnlock.Add(new ItemToUnlock(422, 0, "Boss rush"));
 
-        _ItemToUnlock.Add(new ItemToUnlock(2050, 10, "Main location"));
-        _ItemToUnlock.Add(new ItemToUnlock(2051, 12, "Main location"));
-        _ItemToUnlock.Add(new ItemToUnlock(2052, 15, "Main location"));
-        _ItemToUnlock.Add(new ItemToUnlock(2053, 20, "Main location"));
+        _ItemToUnlock.Add(new ItemToUnlock(2050, 10, "Lake"));
+        _ItemToUnlock.Add(new ItemToUnlock(2051, 12, "Lake"));
+        _ItemToUnlock.Add(new ItemToUnlock(2052, 15, "Lake"));
+        _ItemToUnlock.Add(new ItemToUnlock(2053, 20, "Lake"));
 
 
         SL = GameObject.Find("Constructor").GetComponent<SaveLoad>();

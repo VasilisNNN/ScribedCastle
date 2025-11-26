@@ -1,8 +1,4 @@
-using NUnit;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 public class ColorAndMaterial : MonoBehaviour
@@ -67,16 +63,17 @@ public class ColorAndMaterial : MonoBehaviour
 
             if (_transform.position.y > TargetPos.y-2)
             {
-                float Camdepth = ((_transform.position.y - 2) - (pl.MainCamera.transform.position.y - 2)) / 6;
+                float Camdepth = ((_transform.position.y - 2) - (pl.MainCamera.transform.position.y - 2)) / 4;
                 float Mousedepth = (_transform.position.y - pl.MainCamera.ScreenToWorldPoint(pl.IM.MousePosition).y) / 20;
-
+       
                 float colordepth = Camdepth + Mousedepth;
 
-
-               // colordepth = Mathf.Clamp(colordepth, 0f, 0.25f);
+                if(Constr.DistanceFade)
+                colordepth = Mathf.Clamp(colordepth, 0f, 0.25f);
+                else 
                 colordepth = 0;
 
-                SR.color = new Color(StartColor.r - colordepth / 1.5f, StartColor.g - colordepth / 1.1f, StartColor.b - colordepth , Mathf.Lerp(SR.color.a, Alpha, Time.deltaTime * 10));
+                SR.color = new Color(StartColor.r - colordepth / 1.5f, StartColor.g - colordepth / 1.1f, StartColor.b - colordepth, Mathf.Lerp(SR.color.a, Alpha, Time.deltaTime * 10));
                 for (int i = 0; i < _transform.childCount; i++)
                     SetChildColor(material, i, new Color(StartColor.r - colordepth / 1.5f, StartColor.g - colordepth / 1.1f, StartColor.b - colordepth ));
 
@@ -154,7 +151,7 @@ public class ColorAndMaterial : MonoBehaviour
             _transform.localScale = new Vector3(-1, _transform.localScale.y, 1);
         }
 
-            if (_transform.localScale.y > 1 || _transform.localScale.x > 1)
+        if (_transform.localScale.y > 1 || _transform.localScale.x > 1)
         {
             _transform.localScale = new Vector3(1, 1, 1);
             for (int i = 0; i < _transform.childCount; i++)
@@ -171,8 +168,6 @@ public class ColorAndMaterial : MonoBehaviour
                 }
             }
            
-
-
         }
 
 

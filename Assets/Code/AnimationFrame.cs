@@ -30,9 +30,11 @@ public class AnimationFrame : MonoBehaviour
 
 
     private Sprite StartSPRT;
+    private Player pl;
 
     private void Awake()
     {
+        pl = InitializeObjects.PL;
         Play = true;
         if(GameObject.Find("Constructor")!=null)
         constr = GameObject.Find("Constructor").GetComponent<Constructor>();
@@ -71,7 +73,8 @@ public class AnimationFrame : MonoBehaviour
      void Update()
     {
 
-
+        if (pl != null)
+            if (pl.Pause()) return;
 
         PlayAnimation();
     }
@@ -79,6 +82,7 @@ public class AnimationFrame : MonoBehaviour
 
     void PlayAnimation()
     {
+        
         if (!Play)
         {
             if (Renderer != null)

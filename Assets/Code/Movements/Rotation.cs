@@ -7,15 +7,22 @@ public class Rotation : MonoBehaviour
     public Vector3 RotationDirection;
     public float RotationSpeed = 1;
     private Transform _transform;
-    // Start is called before the first frame update
+    private Player pl;
+
+
     void Start()
     {
+        pl = InitializeObjects.PL;
         _transform = transform;
     }
 
-    // Update is called once per frame
     void Update()
     {
+        if (pl != null)
+            if (pl.Pause()) return;
+
         _transform.Rotate(RotationDirection*RotationSpeed);
-     }
+    }
+
+
 }

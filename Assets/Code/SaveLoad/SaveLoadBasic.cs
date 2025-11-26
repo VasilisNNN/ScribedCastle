@@ -119,7 +119,7 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
 
         if (GameObject.Find("TUTORIAL") != null) _Tutorial = GameObject.Find("TUTORIAL").GetComponent<Tutorial>();
 
-        LocationsNames = new string[6] { "Tutorial", "Main location", "Winter", "Spring", "Summer", "Autumn" };
+        LocationsNames = new string[6] { "Tutorial", "Island", "Lake", "Mountain", "Hell", "Autumn" };
         LocationsMenu.Add("StartMenu");
         LocationsMenu.Add("ChoosePlayer_Main");
         LocationsMenu.Add("ChoosePlayer_Tutorial");
@@ -148,9 +148,10 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
             Resources.Load<TileBase>("Brushes/GrassRegular")
             };
 
-        PitBrush = new TileBase[2] {
+        PitBrush = new TileBase[] {
             Resources.Load<TileBase>("Brushes/Pit"),
-            Resources.Load<TileBase>("Brushes/WaterDitch")
+            Resources.Load<TileBase>("Brushes/WaterDitch"),
+            Resources.Load<TileBase>( "Brushes/River")
             };
 
 
@@ -261,12 +262,23 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
                     }
                 }
             }
+            print("SetTiles 6");
+            for (int f = 0; f < PitBrush.Length; f++)
+            {
+                if (PitBrush[f] != null)
+                {
+                    if (_constr.TOnBoard[i].Name == PitBrush[f].name)
+                    {
+                        _constr.PitsTileBase.SetTile(new Vector3Int(_constr.TOnBoard[i].xPOS, _constr.TOnBoard[i].yPOS, 0), PitBrush[f]);
 
+                    }
+                }
+            }
 
 
         }
 
-
+        pl.PathRescan = 0.2f;
         print("SetTiles 6");
 
         if (TOnBoard_Count == 0)
@@ -367,7 +379,7 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
             // else print("OOPSY...WE HAVE MORE TO LOAD THAT IT IS ON THE FIELD. PROBLEM!!!");
         }
 
-
+        pl.PathRescan = 1;
 
     }
 
@@ -475,13 +487,13 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
 
             if (n.GetComponent<BoxCollider2D>() != null)
             {
-                n.GetComponent<BoxCollider2D>().enabled = false;
+                n.GetComponent<BoxCollider2D>().enabled = true;
 
             }
 
             if (n.GetComponent<Character>() != null)
             {
-                n.GetComponent<Character>().enabled = false;
+                n.GetComponent<Character>().enabled = true;
 
             }
 
@@ -564,11 +576,18 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
 
         if (n.GetComponent<BoxCollider2D>() != null)
         {
-            n.GetComponent<BoxCollider2D>().enabled = false;
+            n.GetComponent<BoxCollider2D>().enabled = true;
+
+           
+        }
+
+        if (n.GetComponent<Character>() != null)
+        {
+            n.GetComponent<Character>().enabled = true;
 
         }
 
-
+    
 
     }
     void CheckParent(ref GameObject ParentOB, int i)

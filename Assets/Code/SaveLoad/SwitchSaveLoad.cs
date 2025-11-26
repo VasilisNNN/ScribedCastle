@@ -91,7 +91,8 @@ public class SwitchSaveLoad : SaveLoadBasic, ISaveLoad
             
             writer.Write(_menu.DrawTutorial);
             writer.Write(_menu.FirstStart);
-
+            writer.Write(_menu.StartLocation);
+            writer.Write(_menu.Progression);
 
 
 
@@ -770,8 +771,8 @@ public class SwitchSaveLoad : SaveLoadBasic, ISaveLoad
 
             _menu.DrawTutorial = reader.ReadInt32();
             _menu.FirstStart = reader.ReadInt32();
-
-
+            _menu.StartLocation = reader.ReadString();
+            _menu.Progression = reader.ReadInt32();
         }
 #endif
     }

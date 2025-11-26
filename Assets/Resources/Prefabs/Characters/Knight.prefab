@@ -266,7 +266,7 @@ GameObject:
   - component: {fileID: 3156490941734495981}
   - component: {fileID: 250309690319045037}
   m_Layer: 0
-  m_Name: Left hand
+  m_Name: Right hand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -542,11 +542,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 968c0051690728c46b0bb41c47ea1dfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Red: 0
-  Green: 0
-  Gold: 0
-  Cost: 0
-  CornCost: 0
   Table: 0
   Shield: 0
   TransperentWall: 0
@@ -598,8 +593,6 @@ MonoBehaviour:
   BringsPickedItemToThePlayer: 0
   MoveBetweenA_B: 0
   PickSpecificItem: 
-  Enemy: 0
-  Soldier: 0
   DropItemsOnTarget: 0
   DestroyTarget: 1
   LeavesTrash: 0
@@ -750,7 +743,6 @@ MonoBehaviour:
   StartGrowWithZero: 0
   Destructible: 1
   CanBeStunned: 0
-  CanTurnInEgg: 0
   CollisionClips: []
   AudioPlayed: 0
   GettingDamageFromWalls: 0
@@ -772,6 +764,8 @@ MonoBehaviour:
   IgnoreDestroyList: 0
   BuildedStructure: 0
   SpawnPointName: 
+  ColorMaterial: {fileID: 0}
+  MiddleReplacement: {fileID: 0}
 --- !u!114 &1440657771734962078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1028,7 +1022,7 @@ GameObject:
   - component: {fileID: 4056895239781992082}
   - component: {fileID: 4671369149271871910}
   m_Layer: 0
-  m_Name: Right hand
+  m_Name: Left hand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

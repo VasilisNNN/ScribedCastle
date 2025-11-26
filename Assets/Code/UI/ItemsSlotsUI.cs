@@ -154,7 +154,7 @@ public class ItemsSlotsUI : MonoBehaviour
 
         ShowTopSlots();
 
-        Action();
+        ActionManager();
 
       
 
@@ -352,10 +352,8 @@ public class ItemsSlotsUI : MonoBehaviour
 
         if (!MouseCollideWithSlots() && pl.IM.MouseMode && pl.inv.PauseInventory)
         {
-         
-            
-            // pl.inv.ToolTip.transform.position = new Vector3(99999, 99999, 0);
-            pl.inv.Choose.transform.position = pl.MouseUI.transform.position;
+            //pl.inv.Choose.transform.position = pl.MouseUI.transform.position;
+            pl.inv.Choose.transform.position = new Vector3(99999, 99999, 0);
         }
         
         Add_Item_ToUpperSegment();
@@ -376,11 +374,12 @@ public class ItemsSlotsUI : MonoBehaviour
 
     }
 
-    void Action()
+    void ActionManager()
     {
      
         if (!pl.inv.showinvent || !showthis )
             return;
+
 
         ON_ChooseTopSegmentSlots();
 

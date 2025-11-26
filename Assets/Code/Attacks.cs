@@ -157,7 +157,13 @@ public class Attacks : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (pl.menu.MenuONOFF) return;
+        if (pl.menu.MenuONOFF)
+        {
+            Anim.speed = 0;
+            return;
+        }
+
+        Anim.speed = 1;
 
         if (Attacking)
         {

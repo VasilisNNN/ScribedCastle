@@ -44,11 +44,12 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMasterTextureLimit: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -87,6 +88,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 1
+  swizzle: 50462976
   cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
@@ -204,10 +206,10 @@ TextureImporter:
       name: Mill_0
       rect:
         serializedVersion: 2
-        x: 72
-        y: 70
-        width: 329
-        height: 363
+        x: 101
+        y: 71
+        width: 280
+        height: 560
       alignment: 9
       pivot: {x: 0.5000001, y: 0.11608429}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -277,9 +279,8 @@ TextureImporter:
       Mill_0: -370714601
       Mill_1: 760692780
       Mill_2: 1107701461
-  spritePackingTag: 
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
