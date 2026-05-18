@@ -28,9 +28,9 @@ public class PS5SaveLoad : SaveLoadBasic, ISaveLoad
     public const int saveDataSize = 131072;
     private const int MenusaveDataSize = 512;
 
-
+#if UNITY_PS5 || UNiTY_PS4
     public SonySaveDataMain PS_SaveMain;
-
+#endif
 
 
     public override void SetOnStart(StartStart[] stats)
