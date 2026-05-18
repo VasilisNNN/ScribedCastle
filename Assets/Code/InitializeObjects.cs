@@ -17,12 +17,15 @@ public class InitializeObjects : MonoBehaviour
     public static BlueprintDatabase Blueprintdatabase;
     public bool TextOnly;
 
- 
-
+    public static Dialog ChattingUIObject;
+    public static MenuCustom _Menu;
+    public static SaveLoad SL;
+    public static VolumeCamera Volume_Camera;
     void Awake()
     {
-      
 
+         ChattingUIObject = GameObject.Find("Chatting").GetComponent<Dialog>();
+      //  ChattingUIObject.gameObject.SetActive(false);
         Textdatabase = new TextDatabase();
         Textdatabase.SetData();
 
@@ -30,7 +33,7 @@ public class InitializeObjects : MonoBehaviour
         Blueprintdatabase = new BlueprintDatabase();
         Blueprintdatabase.SetData();
 
-
+        
         CanvasTransform = GameObject.Find("Canvas").transform;
 
         if (TextOnly)
@@ -71,6 +74,11 @@ public class InitializeObjects : MonoBehaviour
         PLOB.name = "Player";
         PL = PLOB.GetComponent<Player>();
         PL.transform.position = transform.position;
+
+        _Menu = ConstrOB.GetComponent<MenuCustom>();
+
+        SL = ConstrOB.GetComponent<SaveLoad>();
+        Volume_Camera = GameObject.Find("Main Camera").GetComponent<VolumeCamera>();
 
     }
 

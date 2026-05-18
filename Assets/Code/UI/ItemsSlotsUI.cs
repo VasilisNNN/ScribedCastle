@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.Tilemaps;
 using System;
 using TMPro;
-using NUnit;
+
 
 public class ItemsSlotsUI : MonoBehaviour
 {
@@ -44,9 +44,10 @@ public class ItemsSlotsUI : MonoBehaviour
     private List<Item> CraftingFolder = new List<Item>();
     private GameObject LeftFolder, RightFolder;
     private Tilemap FloorTilemap;
+    private ItemDatabase itemDatabase;
     void Start()
     {
-
+        itemDatabase = InitializeObjects.Itemdatabase;
         FloorTilemap = InitializeObjects.FloorTilemap;
         LeftFolder = transform.Find("LeftFolder").gameObject;
         RightFolder = transform.Find("RightFolder").gameObject;
@@ -217,7 +218,7 @@ public class ItemsSlotsUI : MonoBehaviour
        
 
             pl.inv.ONOFF(ItemUpgrade, true);
-            ItemUpgrade.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/Items/" + pl.inv.GetItemInDatabase(Slots[r].items[i].itemID).itemNames[0]);
+            ItemUpgrade.GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/Items/" + itemDatabase.FindItem(Slots[r].items[i].itemID).itemNames[0]);
 
             ItemUpgrade.name = "ItemUpgrade" + r + i;
             ItemUpgrade.GetComponent<Image>().color = new Color(1, 1, 1, 1);
@@ -239,7 +240,7 @@ public class ItemsSlotsUI : MonoBehaviour
             EnterDelay >= Time.fixedTime ||
             Slots[CurrentRow].items[CurrentSlot].itemID <= -1 ||
             pl.GetMouseCollList().Contains(pl.inv.EscapeInventory) ||
-          pl.inv.GetItemInDatabase(Slots[CurrentRow].items[CurrentSlot].itemID).CanNOTBeRemovedFromTheBody)
+          itemDatabase.FindItem(Slots[CurrentRow].items[CurrentSlot].itemID).CanNOTBeRemovedFromTheBody)
             return;
 
         if (UP == null)
@@ -415,10 +416,10 @@ public class ItemsSlotsUI : MonoBehaviour
             print("STARTING TO CHOOSE BODY SLOTS");
             pl.inv.ONOFF(gameObject, true);
             pl.inv.BufferItem = new Item();
-            
-            pl.inv.PauseInventory = true;
-            pl.inv.ChooseTopSegmentSlot = true;
-            CurrentRow = Slots.Length - 1;
+               CurrentRow = Slots.Length - 1;
+            pl.inv.StartChooseTopSegment();
+
+         
 
             VertDelay = Time.fixedTime + 0.1f;
         }
@@ -684,15 +685,15 @@ public class ItemsSlotsUI : MonoBehaviour
             return;
         }
 
-        if (pl.inv == null || pl == null || pl.inv.GetItemInDatabase(id) == null)
+        if (pl.inv == null || pl == null || itemDatabase.FindItem(id) == null)
             return;
 
         if (UP != null)
         {
-            if (pl.inv.GetItemInDatabase(id).itemID > -1)
+            if (itemDatabase.FindItem(id).itemID > -1)
             {
 
-                if (pl.inv.GetItemInDatabase(id)._type == Item.type.weapon)
+                if (itemDatabase.FindItem(id)._type == Item.type.weapon)
                 {
                     UP.PlayerGun.SetGunID(id, pl.inv.BufferItem.Durability);
 
@@ -762,14 +763,15 @@ public class ItemsSlotsUI : MonoBehaviour
             pl.inv.ONOFF(gameObject, true);
             ItemOnChooseIMG.sprite = Resources.Load<Sprite>("Sprites/Items/" + pl.inv.GetCurrentItem().itemNames[0]);
             ItemOnChooseIMG.enabled = true;
-            pl.inv.PauseInventory = true;
+    
 
             if (pl.inv.BufferItem.itemID > -1) pl.inv.AddItem(pl.inv.BufferItem.itemID, 1, pl.inv.BufferItem.Durability, pl._transform.position);
 
             pl.inv.BufferItem = pl.inv.DeepCopyItem(pl.inv.GetCurrentItem().itemID, count, pl.inv.GetCurrentItem().Durability);
             pl.inv.BufferItem.itemID = pl.inv.GetCurrentItem().itemID;
             pl.inv.BufferItem.Count = count;
-            pl.inv.ChooseTopSegmentSlot = true;
+
+            pl.inv.StartChooseTopSegment();
 
             pl.inv.RemoveCurrentSlot(count);
         }
@@ -782,28 +784,40 @@ public class ItemsSlotsUI : MonoBehaviour
     void MoveChoiseUI()
     {
         if (!showthis) return;
-        if ((pl.IM._vertical < -0.5f || pl.IM.DPADY < 0) && CurrentRow < Slots.Length - 1 && VertDelay < Time.fixedTime)
+        if ((pl.IM._vertical < -0.5f || pl.IM.DPADY < 0) && VertDelay < Time.fixedTime)
         {
-            if (UP != null)
+            if (CurrentRow >= Slots.Length - 1)
             {
-                if (CurrentRow == 0 && CurrentSlot < Slots[CurrentRow].Slot.Length - 1)
-                {
-                    CurrentSlot++;
-                }
-
-                if (CurrentRow == 1 && CurrentSlot > 0)
-                {
-                    CurrentSlot--;
-                }
+                pl.inv.StartChooseInventory();
+                
             }
 
-            pl.inv.StopShake();
+            if (CurrentRow < Slots.Length - 1)
+            {
 
-            CurrentRow++;
+                if (UP != null)
+                {
+                    if (CurrentRow == 0 && CurrentSlot < Slots[CurrentRow].Slot.Length - 1)
+                    {
+                        CurrentSlot++;
+                    }
 
-            pl.inv.PlaySoundsPitched(ClickClip, 1);
-            if (CurrentSlot > Slots[CurrentRow].items.Count - 1) CurrentSlot = Slots[CurrentRow].items.Count - 1;
-            VertDelay = Time.fixedTime + 0.1f;
+                    if (CurrentRow == 1 && CurrentSlot > 0)
+                    {
+                        CurrentSlot--;
+                    }
+                }
+
+                pl.inv.StopShake();
+
+                CurrentRow++;
+
+
+
+                pl.inv.PlaySoundsPitched(ClickClip, 1);
+                if (CurrentSlot > Slots[CurrentRow].items.Count - 1) CurrentSlot = Slots[CurrentRow].items.Count - 1;
+                VertDelay = Time.fixedTime + 0.1f;
+            }
         }
 
         if ((pl.IM._vertical > 0.5f || pl.IM.DPADY > 0) && CurrentRow > 0 && VertDelay < Time.fixedTime)
@@ -870,7 +884,7 @@ public class ItemsSlotsUI : MonoBehaviour
         if (!CanPickTopItems) return;
 
         ItemOnChooseIMG.sprite =
-        Resources.Load<Sprite>("Sprites/Items/" + pl.inv.GetItemInDatabase(Slots[CurrentRow].items[CurrentSlot].itemID).itemNames[0]);
+        Resources.Load<Sprite>("Sprites/Items/" + itemDatabase.FindItem(Slots[CurrentRow].items[CurrentSlot].itemID).itemNames[0]);
         ItemOnChooseIMG.enabled = true;
 
         if (UP != null)
@@ -899,7 +913,7 @@ public class ItemsSlotsUI : MonoBehaviour
         }
 
         ItemOnChooseIMG.sprite =
-        Resources.Load<Sprite>("Sprites/Items/" + pl.inv.GetItemInDatabase(Slots[CurrentRow].items[CurrentSlot].itemID).itemNames[0]);
+        Resources.Load<Sprite>("Sprites/Items/" + itemDatabase.FindItem(Slots[CurrentRow].items[CurrentSlot].itemID).itemNames[0]);
         ItemOnChooseIMG.enabled = true;
 
         if (UP != null)
@@ -1048,8 +1062,7 @@ public class ItemsSlotsUI : MonoBehaviour
 
                     CurrentRow = x;
                     CurrentSlot = y;
-                    pl.inv.ChooseTopSegmentSlot = true;
-                    pl.inv.PauseInventory = true;
+                    pl.inv.StartChooseTopSegment();
                 }
             }
         }
@@ -1324,22 +1337,28 @@ public class ItemsSlotsUI : MonoBehaviour
         if (!pl.inv.showinvent) return;
         if (!pl.inv.crafting) return;
 
-        Item currentitem = pl.inv.DeepCopyItem(itemid, 1, pl.inv.GetItemInDatabase(itemid).Durability);
+        Item currentitem = pl.inv.DeepCopyItem(itemid, 1, itemDatabase.FindItem(itemid).Durability);
 
-        if (pl.inv.GetItemInDatabase(itemid).Locked)
+        if (itemDatabase.FindItem(itemid).Locked)
         {
             pl.menu.PlayAudio(pl.menu.ErrorClip);
             return;
         }
 
-       int r = 0;
+
+
+        int amount = 1;
+
+        if (pl.IM.shift) amount = 5;
+
+        int r = 0;
        if (!pl.inv.CurrentCraftingTable.Seller)
         {
-            for (int j = 0; j < pl.inv.GetItemInDatabase(itemid).NeedItemsIDs.Length; j++)
+            for (int j = 0; j < itemDatabase.FindItem(itemid).NeedItemsIDs.Length; j++)
             {
-                if (pl.inv.CheckItem(pl.inv.GetItemInDatabase(itemid).NeedItemsIDs[j]) &&
+                if (pl.inv.CheckItem(itemDatabase.FindItem(itemid).NeedItemsIDs[j]) &&
 
-                    pl.inv.GetItem(pl.inv.GetItemInDatabase(itemid).NeedItemsIDs[j]).Count >= pl.inv.GetItemInDatabase(itemid).NeedItemsCounts[j])
+                    pl.inv.GetItem(itemDatabase.FindItem(itemid).NeedItemsIDs[j]).Count >= itemDatabase.FindItem(itemid).NeedItemsCounts[j])
                 {
                     r++;
                 }
@@ -1351,7 +1370,7 @@ public class ItemsSlotsUI : MonoBehaviour
         else
         {
 
-            if (pl.inv.CheckItem(9) && pl.inv.GetItem(9).Count >= pl.inv.GetItemInDatabase(itemid).Cost)
+            if (pl.inv.CheckItem(9) && pl.inv.GetItem(9).Count >= itemDatabase.FindItem(itemid).Cost * amount)
             {
                 r++;
             }
@@ -1363,7 +1382,7 @@ public class ItemsSlotsUI : MonoBehaviour
         
         if (!pl.inv.CurrentCraftingTable.Seller)
         {
-            if (r < pl.inv.GetItemInDatabase(itemid).NeedItemsIDs.Length || pl.IM.ActionDelay >= Time.fixedTime)
+            if (r < itemDatabase.FindItem(itemid).NeedItemsIDs.Length || pl.IM.ActionDelay >= Time.fixedTime)
             {
                 pl.menu.PlayAudio(pl.menu.MenuCancelClip);
                 return;
@@ -1384,11 +1403,13 @@ public class ItemsSlotsUI : MonoBehaviour
             return;
         }
 
+       
 
- 
         if (!pl.inv.CurrentCraftingTable.NotAddingItems)
-            pl.inv.AddItem(currentitem.itemID, 1, currentitem.Durability, transform.position);
-
+        {
+            pl.inv.AddItem(currentitem.itemID, amount, currentitem.Durability, transform.position);
+           
+        }
 
 
 
@@ -1396,7 +1417,7 @@ public class ItemsSlotsUI : MonoBehaviour
         {
             for (int j = 0; j < currentitem.NeedItemsIDs.Length; j++)
             {
-                pl.inv.ReduceItemCount(currentitem.NeedItemsIDs[j], currentitem.NeedItemsCounts[j]);
+                pl.inv.ReduceItemCount(currentitem.NeedItemsIDs[j], currentitem.NeedItemsCounts[j] * amount);
 
                 print("ReduceItemCount " + currentitem.NeedItemsIDs[j]  + " / "+ currentitem.NeedItemsCounts[j]);
             }
@@ -1404,12 +1425,15 @@ public class ItemsSlotsUI : MonoBehaviour
         else
         {
 
-            pl.inv.ReduceItemCount(9, currentitem.Cost);
+            pl.inv.ReduceItemCount(9, currentitem.Cost * amount);
 
 
         }
+
+
+
         Const.IM.ActionDelay = Time.fixedTime + 0.1f;
-        pl.IM.ActionDelay = Time.fixedTime + 0.5f;
+        pl.IM.ActionDelay = Time.fixedTime + 0.3f;
 
         if (pl.inv.CurrentCraftingTable._destroy)
         {
@@ -1495,13 +1519,13 @@ public class ItemsSlotsUI : MonoBehaviour
     {
 
         if (pl.IM.CraftedItems > 4)
-            pl.IM.ActionDelay = Time.fixedTime + 0.2f;
+            pl.IM.ActionDelay = Time.fixedTime + 0.15f;
         else if (pl.IM.CraftedItems > 3)
-            pl.IM.ActionDelay = Time.fixedTime + 0.35f;
+            pl.IM.ActionDelay = Time.fixedTime + 0.2f;
         else if (pl.IM.CraftedItems >= 2)
-            pl.IM.ActionDelay = Time.fixedTime + 0.5f;
+            pl.IM.ActionDelay = Time.fixedTime + 0.3f;
         else
-            pl.IM.ActionDelay = Time.fixedTime + 0.7f;
+            pl.IM.ActionDelay = Time.fixedTime + 0.4f;
 
         pl.IM.CraftedItems++;
     }
@@ -1520,6 +1544,8 @@ public class ItemsSlotsUI : MonoBehaviour
 
         return res;
     }
+
+
 
     void NeededItemsControll()
     {
@@ -1590,11 +1616,11 @@ public class ItemsSlotsUI : MonoBehaviour
                 {
 
                   
-                    NeedOB.transform.Find("NeedItemSineImage").GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/Items/" + pl.inv.GetItemInDatabase(pl.inv.CurrentCraftingTable.NeededItems[currentNum][i]).itemNames[0]);
+                    NeedOB.transform.Find("NeedItemSineImage").GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/Items/" + itemDatabase.FindItem(pl.inv.CurrentCraftingTable.NeededItems[currentNum][i]).itemNames[0]);
 
                     if (NeedOB.transform.Find("Text") != null)
                     {
-                        NeedOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = pl.inv.GetItemInDatabase(pl.inv.CurrentCraftingTable.NeededItems[currentNum][i]).itemNames[pl.menu.Language] + " x " + pl.inv.CurrentCraftingTable.NeededItemsCounts[currentNum][i];
+                        NeedOB.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = itemDatabase.FindItem(pl.inv.CurrentCraftingTable.NeededItems[currentNum][i]).itemNames[pl.menu.Language] + " x " + pl.inv.CurrentCraftingTable.NeededItemsCounts[currentNum][i];
                     }
                 }
             }

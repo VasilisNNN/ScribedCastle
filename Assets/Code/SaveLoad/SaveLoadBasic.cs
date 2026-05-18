@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 
-public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
+public abstract class SaveLoadBasic : ISaveLoad
 {
 
     public List<int> VaultIDs = new List<int>();
@@ -61,7 +61,9 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
 
 
     public static Player pl;
+
     public static Inventory inv;
+    public static ItemDatabase itemDatabase;
     public static GenerateMap GenMap;
     public static MenuCustom _menu;
     public static Constructor _constr;
@@ -89,6 +91,7 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
     {
         TileNames = new string[3721];
 
+        itemDatabase = InitializeObjects.Itemdatabase;
         if (GameObject.Find("Player") != null)
         {
 
@@ -154,6 +157,11 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
             Resources.Load<TileBase>( "Brushes/River")
             };
 
+        if (BPConstructed.Count == 0)
+        {
+            for (int i = 0; i < 100; i++)
+                BPConstructed.Add(0);
+        }
 
     }
 
@@ -211,16 +219,16 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
     public void SetTiles()
     {
         _constr.TOnBoard = new List<TilesOnBoard>();
-        print("SetTiles 0");
+        
         for (int i = 0; i < Tile_names.Count; i++)
         {
             _constr.TOnBoard.Add(new TilesOnBoard(Tile_xpos[i], Tile_ypos[i], Tile_names[i]));
         }
-        print("SetTiles 1");
+     
         for (int i = 0; i < TOnBoard_Count; i++)
         {
 
-            print("SetTiles 2");
+           
 
             //_constr.SetBigTip(-1, 1);
 
@@ -231,13 +239,12 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
                     if (_constr.TOnBoard[i].Name == FloorBrush[f].name)
                     {
                         _constr.Tile.SetTile(new Vector3Int(_constr.TOnBoard[i].xPOS, _constr.TOnBoard[i].yPOS, 0), FloorBrush[f]);
-                        _constr.Floors++;
+                        _constr.TilesSurface++;
                     }
                 }
             }
 
 
-            print("SetTiles 4");
             for (int f = 0; f < BaseBrush.Length; f++)
             {
                 if (BaseBrush[f] != null)
@@ -250,7 +257,7 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
                     }
                 }
             }
-            print("SetTiles 5");
+
             for (int f = 0; f < GrassBrush.Length; f++)
             {
                 if (GrassBrush[f] != null)
@@ -262,7 +269,7 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
                     }
                 }
             }
-            print("SetTiles 6");
+        
             for (int f = 0; f < PitBrush.Length; f++)
             {
                 if (PitBrush[f] != null)
@@ -279,12 +286,12 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
         }
 
         pl.PathRescan = 0.2f;
-        print("SetTiles 6");
+      
 
         if (TOnBoard_Count == 0)
         {
             _constr.Tile.SetTile(new Vector3Int(0, 0, 0), FloorBrush[0]);
-            _constr.Floors++;
+            _constr.TilesSurface++;
 
 
         }
@@ -295,22 +302,20 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
 
    public void SetDroppedItems()
     {
-        print("DroppedItems_Count " + DroppedItems_Count);
-
+       
 
         for (int i = 0; i < DroppedItems_Count; i++)
         {
 
-            if (inv.GetItemInDatabase(Dropped_IDs[i]) != null)
+            if (itemDatabase.FindItem(Dropped_IDs[i]) != null)
             {
 
 
-                GameObject n = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Objects/Item"));
+                GameObject n = Instantiate(Resources.Load<GameObject>("Prefabs/Objects/Item"));
                 n.name = Dropped_names[i];
 
-                print("DroppedItems CREATED " + Dropped_IDs[i]);
-
-                n.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/" + inv.GetItemInDatabase(Dropped_IDs[i]).itemNames[0]);
+             
+                n.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/" + itemDatabase.FindItem(Dropped_IDs[i]).itemNames[0]);
                 n.GetComponent<SpriteRenderer>().sortingOrder = -900;
 
                 n.GetComponent<GetItem>().item = new int[1] { Dropped_IDs[i] };
@@ -334,9 +339,8 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
         if (_menu.FirstStart == 0) return;
 
 
-        print("ConstructedStructures_Count "+ ConstructedStructures_Count +" / " + OB_names.Count);
-        for (int i = 0; i < ConstructedStructures_Count; i++)
-        {
+       for (int i = 0; i < ConstructedStructures_Count; i++)
+       {
             GameObject n = null;
 
             if (OB_names[i] != "")
@@ -353,18 +357,25 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
 
                 if (n != null)
                 {
+                   
+
                     SetupGroundObject(ref n, i);
-                    _constr.OBOnBoard.Add(new ObjectOnBoard(OB_IDs[i], new Vector2(OB_xpos[i], OB_ypos[i]), OB_names[i], n, n.GetComponent<StatsControll>(), n.GetComponent<PubObject>()));
-                    _constr.ConstructedStructures.Add(new ObjectOnBoard(OB_IDs[i], new Vector2(OB_xpos[i], OB_ypos[i]), OB_names[i], n, n.GetComponent<StatsControll>(), n.GetComponent<PubObject>()));
+                   
+                    _constr.AddObOnBoard(new ObjectOnBoard(OB_IDs[i], new Vector2(OB_xpos[i], OB_ypos[i]), OB_names[i], n, n.GetComponent<StatsControll>(), n.GetComponent<PubObject>()));
+                   
+                    _constr.ConstructedStructures.Add(
+                        new ObjectOnBoard(OB_IDs[i], new Vector2(OB_xpos[i], OB_ypos[i]), OB_names[i], n, n.GetComponent<StatsControll>(), n.GetComponent<PubObject>()));
 
 
                 }
 
 
-            }
+            } 
 
 
-        }
+       }
+
+
 
         for (int i = 0; i < ConstructedStructures_Count; i++)
         {
@@ -372,10 +383,15 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
             {
                 if (_constr.ConstructedStructures[i].Object != null)
                 {
+                    SetupGroundObject(ref _constr.ConstructedStructures[i].Object, i);
+
                     if (_constr.ConstructedStructures[i].Stats != null)
                         _constr.ConstructedStructures[i].Stats.CurrentGrowState = GrowStateList[i];
                 }
             }
+
+     
+
             // else print("OOPSY...WE HAVE MORE TO LOAD THAT IT IS ON THE FIELD. PROBLEM!!!");
         }
 
@@ -410,8 +426,7 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
 
             PubObject PO = n.GetComponent<PubObject>();
 
-            _constr.Floors += PO.kitchenfloors;
-            _constr.Floors += PO.floors;
+            _constr.TilesSurface += PO.floors;
             _constr.Grounds += PO.ground;
             _constr.Walls += PO.wall;
 
@@ -432,13 +447,20 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
 
         }
 
+        GameObject ParentOB = null;
+        CheckParent(ref ParentOB, i);
 
+        if(ParentOB!=null)
+        n.transform.parent = ParentOB.transform;
 
     }
+
+
+
     void CreateGroundObject(GameObject ParentOB, ref GameObject n, int i)
     {
 
-        if (inv.GetItemInDatabase(OB_IDs[i]).ObjectPrefs == null)
+        if (itemDatabase.FindItem(OB_IDs[i]).ObjectPrefs == null)
         {
             return;
         }
@@ -446,7 +468,7 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
         if (ParentOB == null)
         {
 
-            n = Instantiate<GameObject>(inv.GetItemInDatabase(OB_IDs[i]).ObjectPrefs);
+            n = Instantiate(itemDatabase.FindItem(OB_IDs[i]).ObjectPrefs);
             n.name = OB_names[i];
             PubObject _pubObject = n.GetComponent<PubObject>();
             PolygonCollider2D _polygonCollider2D = n.GetComponent<PolygonCollider2D>();
@@ -501,7 +523,7 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
         }
 
         if (ParentOB.GetComponent<MovementControll>() != null) return;
-        n = Instantiate<GameObject>(inv.GetItemInDatabase(OB_IDs[i]).ObjectPrefs);
+        n = Instantiate(itemDatabase.FindItem(OB_IDs[i]).ObjectPrefs);
 
         n.name = OB_xpos[i] + "_" + OB_ypos[i];
         PubObject _PubObject = n.GetComponent<PubObject>();
@@ -519,7 +541,7 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
 
             if (_PubObject != null)
             {
-                ParentOB.GetComponent<PubObject>().TopObjectsCount++;
+                ParentOB.GetComponent<PubObject>().FloorsCount++;
                 _PubObject.TrueName.Add(OB_names[i]);
 
                 _PubObject.enabled = false;
@@ -527,9 +549,8 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
                 if (ParentOB.GetComponent<SpriteRenderer>() != null && _SpriteRenderer != null)
                     _SpriteRenderer.sortingOrder = ParentOB.GetComponent<SpriteRenderer>().sortingOrder + 1 * ParentOB.transform.childCount + 1;
 
-                if (!_PubObject.decoration)
-                    n.transform.position = new Vector3(ParentOB.transform.position.x, ParentOB.transform.position.y + 1 * ParentOB.GetComponent<PubObject>().TopObjectsCount, 0);
-                else n.transform.position = new Vector3(ParentOB.transform.position.x, ParentOB.transform.position.y, 0);
+                  n.transform.position = new Vector3(ParentOB.transform.position.x, ParentOB.transform.position.y + 1 * ParentOB.GetComponent<PubObject>().FloorsCount, 0);
+            
             }
             else
             {
@@ -571,7 +592,7 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
         if (n.GetComponent<StatsControll>() != null)
         {
             n.GetComponent<StatsControll>().BuildedStructure = true;
-
+            n.GetComponent<StatsControll>().Floor = ParentOB.GetComponent<PubObject>().FloorsCount;
         }
 
         if (n.GetComponent<BoxCollider2D>() != null)
@@ -590,24 +611,33 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
     
 
     }
+
+
+
+
     void CheckParent(ref GameObject ParentOB, int i)
     {
-        for (int ii = 0; ii < _constr.OBOnBoard.Count; ii++)
-        {
-            if (OB_xpos[i] == _constr.OBOnBoard[ii].Place.x && OB_ypos[i] == _constr.OBOnBoard[ii].Place.y )
-            {
-                if (GameObject.Find(_constr.OBOnBoard[ii].Name) != null)
-                {
-                    if (GameObject.Find(_constr.OBOnBoard[ii].Name).GetComponent<PubObject>() != null)
-                    {
-                        if (GameObject.Find(_constr.OBOnBoard[ii].Name).tag != "Pers")
-                        {
-                            ParentOB = _constr.OBOnBoard[ii].Object;
 
-                            break;
-                        }
-                    }
-                }
+        Vector2 pos;
+        Vector2 pos2;
+
+
+        for (int ii = 0; ii < _constr.ConstructedStructures.Count; ii++)
+        {
+            pos = new Vector2(OB_xpos[i], OB_ypos[i]);
+            pos2 = new Vector2(_constr.ConstructedStructures[ii].Object.transform.position.x, _constr.ConstructedStructures[ii].Object.transform.position.y);
+            
+            if (Vector2.Distance(pos, pos2)<0.1f)
+            {
+                if (_constr.ConstructedStructures[ii].Object == null) continue;
+                if (_constr.ConstructedStructures[ii].Object.GetComponent<PubObject>() == null) continue;
+                if (_constr.ConstructedStructures[ii].Object.tag == "Pers") continue;
+                if (_constr.ConstructedStructures[ii].Object.transform.parent!=null) continue;
+
+                ParentOB = _constr.ConstructedStructures[ii].Object;
+
+                return;
+                
             }
         }
     }
@@ -650,7 +680,7 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
                     if (VaultIDs[j] > -1)
                     {
 
-                        inv.VaultUI.Slots[i].items[ii] = inv.DeepCopyItem(VaultIDs[j], VaultCount[j], inv.GetItemInDatabase(VaultIDs[j]).Durability);
+                        inv.VaultUI.Slots[i].items[ii] = inv.DeepCopyItem(VaultIDs[j], VaultCount[j], itemDatabase.FindItem(VaultIDs[j]).Durability);
                     }
                     j++;
                 }
@@ -713,12 +743,10 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
 
         Unlocked_IDs = new List<int>();
         GrowStateList = new List<int>();
-        BPConstructed = new List<int>();
+       // BPConstructed = new List<int>();
 
         FloorStates = new List<int>();
 
-
-        print("OB_names " + OB_names);
     }
 
 
@@ -766,8 +794,7 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
                     if (GenMap.CreatedObjects[i] != null && GenMap.CreatedObjects[i].GetComponent<StatsControll>() != null)
                         GenMap.CreatedObjects[i].GetComponent<StatsControll>().CurrentGrowState = GenMap_GrowStates[i];
 
-                    print("SetGrowStatueToMapGenObjects " + GenMap_GrowStates_Count);
-
+                    
                 }
             }
         }
@@ -777,7 +804,7 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
     public void SetGrowStatuesPreplaced()
     {
         int prepnum = 0;
-
+    
         for (int i = 0; i < _constr.OBOnBoard.Count; i++)
         {
 
@@ -824,6 +851,9 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
 
     }
 
+    public abstract void MENU_LOAD_DATA(byte[] data);
+
+    public abstract void MAIN_LOAD_DATA(byte[] data);
 
     public void ResetPolygonColliders()
     {
@@ -859,19 +889,10 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
         {
             for (int i = 0; i < _constr.ConstructedStructures.Count; i++)
             {
-                if (i <= OB_SpawnPoint.Count - 1)
-                {
-                    if (GameObject.Find(OB_SpawnPoint[i]) != null)
-                    {
-                        _constr.ConstructedStructures[i].Object.GetComponent<StatsControll>().SpawnPointName = OB_SpawnPoint[i];
-
-                        GameObject.Find(OB_SpawnPoint[i]).GetComponent<Enemies>().BuildedPers.Add(_constr.ConstructedStructures[i].Object);
-                    }
-                }
+                SetupConstructedStructure(i);
 
             }
         }
-
 
 
         for (int i = 0; i < _constr.OBOnBoard.Count; i++)
@@ -893,6 +914,37 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
 
         pl.PathScan();
     }
+
+
+    void SetupConstructedStructure(int i)
+    {
+        if (i > OB_SpawnPoint.Count - 1) return;
+        
+        if (GameObject.Find(OB_SpawnPoint[i]) == null) return;
+        
+        if (_constr.ConstructedStructures[i].Object == null) return;
+        
+        _constr.ConstructedStructures[i].Object.GetComponent<StatsControll>().SpawnPointName = OB_SpawnPoint[i];
+
+        GameObject SpawnPoint = GameObject.Find(OB_SpawnPoint[i]);
+
+        if (_constr.CheckWallTiles(_constr.ConstructedStructures[i].Object.transform.position))
+        {
+            _constr.ConstructedStructures[i].Object.transform.position = SpawnPoint.transform.position;
+            _constr.ConstructedStructures[i].Place = SpawnPoint.transform.position;
+            _constr.ConstructedStructures[i].BaseObjectPosition = SpawnPoint.transform.position;
+
+            if(_constr.ConstructedStructures[i].CharMove!=null)
+            _constr.ConstructedStructures[i].CharMove.StartPoint = SpawnPoint.transform.position;
+
+        }
+
+        _constr.ConstructedStructures[i].Object.transform.parent = null;
+        SpawnPoint.GetComponent<Enemies>().BuildedPers.Add(_constr.ConstructedStructures[i].Object);
+        
+        
+    }
+
 
 
 
@@ -936,5 +988,19 @@ public abstract class SaveLoadBasic : MonoBehaviour, ISaveLoad
 
 
     }
+
+
+    private GameObject Instantiate(GameObject prefab)
+    {
+        return MonoBehaviour.Instantiate<GameObject>(prefab);
+
+    }
+
+    private void Destroy (GameObject dest)
+    {
+        MonoBehaviour.Destroy(dest);
+
+    }
+
 
 }

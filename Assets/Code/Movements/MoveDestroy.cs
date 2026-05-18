@@ -32,10 +32,10 @@ public class MoveDestroy : MonoBehaviour
 
 
         if (constr.Game_SPEED == 0)
-            transform.position = new Vector3(StartPos.x, StartPos.y + 0.01f * sideY * constr.Game_SPEED, transform.position.z);
+            transform.position = new Vector3(StartPos.x, StartPos.y + Time.deltaTime * sideY , transform.position.z);
         else
         {
-            transform.position = new Vector3(StartPos.x, transform.position.y + 0.01f * sideY * constr.Game_SPEED, transform.position.z);
+            transform.position = new Vector3(StartPos.x, transform.position.y + Time.deltaTime * sideY , transform.position.z);
             StartPos = new Vector3(transform.position.x, transform.position.y, transform.position.z);
         }
 

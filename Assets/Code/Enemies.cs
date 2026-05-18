@@ -59,7 +59,7 @@ public class Enemies : MonoBehaviour
         if (DelayStart < 0) DelayStart = DelayBetweenWaves;
 
         if (DelayStart > pl.DayNight.DayLength)
-            timer = DelayStart - _constr.SL.DayTime;
+            timer = DelayStart - _constr.SL.SaveLoadCurrent.DayTime;
         else timer = DelayStart;
 
     }
@@ -70,7 +70,7 @@ public class Enemies : MonoBehaviour
     {
         if (pl.StartLoading || pl.menu.MenuONOFF) return;
 
-        timer -= Time.deltaTime * _constr.Game_SPEED;
+        timer -= Time.deltaTime ;
 
  
         if (NotInTheMorning && pl.DayNight.Day_Cycle == DayAndNight.DayCycle.Morning) return;
@@ -178,30 +178,6 @@ public class Enemies : MonoBehaviour
                 stats.Durability--;
         }
 
-
-
-        GameObject Enemy = Instantiate<GameObject>(EnemyObjects[num]);
-
-  
-   
-
-        BuildedPers.Add(Enemy);
-        Enemy.name = EnemyObjects[num].name + BuildedPers.Count;
-
-      
-        while (GameObject.Find(Enemy.name) != null && GameObject.Find(Enemy.name)!= Enemy)
-        Enemy.name += "N";
-
-        
-
-        StatsControll Enemy_Stats = Enemy.GetComponent<StatsControll>();
-
-        Enemy_Stats.enabled = true;
-       // Enemy_Stats.BuildedStructure = true;
-        Enemy_Stats.SpawnPointName = name;
-
-        _constr.ConstructedStructures.Add(new ObjectOnBoard(Enemy_Stats.DatabaseID, Enemy.transform.position, Enemy.name, Enemy, Enemy.GetComponent<StatsControll>(), Enemy.GetComponent<PubObject>()));
-
         Vector3 EnemyPos = CalculateRandomPosition();
 
 
@@ -214,6 +190,7 @@ public class Enemies : MonoBehaviour
         }
         else
         {
+
             int n = Random.Range(0, SpawnPositions.Length);
             int notallareempty = 0;
 
@@ -231,10 +208,10 @@ public class Enemies : MonoBehaviour
                 Vector3Int pp = new Vector3Int(-50, -50, 0);
                 for (int ii = 0; ii < SpawnPositions.Length; ii++)
                 {
-                       
-                           
-                        SpawnPositions[ii].transform.position += new Vector3( Random.Range(-10,10), Random.Range(-10, 10),0);
-                        
+
+
+                    SpawnPositions[ii].transform.position += new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), 0);
+
                 }
             }
 
@@ -253,8 +230,46 @@ public class Enemies : MonoBehaviour
                 SpawnPositions[n].position.y, 1);
 
 
-              
+
         }
+
+        if (_constr.CheckStructures(EnemyPos) ||
+               !_constr.CheckTheGround(EnemyPos) ||
+               _constr.CheckWallTiles(EnemyPos)) return;
+        
+
+        GameObject Enemy = Instantiate<GameObject>(EnemyObjects[num]);
+
+
+       
+        BuildedPers.Add(Enemy);
+        Enemy.name = EnemyObjects[num].name + BuildedPers.Count;
+
+      
+        while (GameObject.Find(Enemy.name) != null && GameObject.Find(Enemy.name)!= Enemy)
+        Enemy.name += "N";
+
+        
+
+        StatsControll Enemy_Stats = Enemy.GetComponent<StatsControll>();
+
+      
+
+        Enemy_Stats.enabled = true;
+       // Enemy_Stats.BuildedStructure = true;
+        Enemy_Stats.SpawnPointName = name;
+
+
+        _constr.ConstructedStructures.Add(
+            new ObjectOnBoard(
+            Enemy_Stats.DatabaseID, 
+            Enemy.transform.position, 
+            Enemy.name, 
+            Enemy, 
+            Enemy.GetComponent<StatsControll>(), 
+            Enemy.GetComponent<PubObject>()));
+
+    
 
 
         Enemy.transform.position = EnemyPos;
@@ -272,7 +287,7 @@ public class Enemies : MonoBehaviour
     Vector3 CalculateRandomPosition()
     {
         Vector3 pos = transform.position;
-        int maxsearchattempts = 10;
+        int maxsearchattempts = 100;
 
         float StartPos = 10f;
 
@@ -291,11 +306,17 @@ public class Enemies : MonoBehaviour
             if (_constr.CheckStructures(pos) ||
                !_constr.CheckTheGround(pos) ||
                _constr.CheckWallTiles(pos))
+            {
                 pos =
                     transform.position +
                     new Vector3(Random.Range(-StartPos, StartPos), Random.Range(-StartPos, StartPos), 0);
-            else return pos;
-
+               // print(name + " / CalculateRandomPosition " + pos);
+            }
+            else
+            {
+              //  print(name + " / CalculateRandomPosition " + pos);
+                return pos;
+            }
         }
 
         

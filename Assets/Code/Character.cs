@@ -15,7 +15,7 @@ public class  Character : MonoBehaviour
     private GameObject ChattingObject;
     private Player pl;
 
-    private GameObject ChattingUIObject;
+    private Dialog ChattingUIObject;
     public int DialogID;
     public int DialogID_AfterItem = -1;
     public int DialogID_QuestDone_NoItem = -1;
@@ -53,12 +53,13 @@ public class  Character : MonoBehaviour
 
 
     public bool DestroyOnDialogEnd;
-
+    private ItemDatabase database;
   
     private void Start()
     {
         pl = InitializeObjects.PL;
-      
+        database = InitializeObjects.Itemdatabase;
+
         ChattingOnColl = false;
 
         if (!NotAlive && Chatting && !Enemy) Save = true;
@@ -102,7 +103,7 @@ public class  Character : MonoBehaviour
 
 
 
-        ChattingUIObject = GameObject.Find("Chatting");
+        ChattingUIObject = InitializeObjects.ChattingUIObject;
 
 
         StartMaterial = GetComponent<SpriteRenderer>().material;
@@ -114,7 +115,7 @@ public class  Character : MonoBehaviour
         ChattingObject.name = "ChattingSine";
         ChattingObject.transform.position = new Vector3(transform.position.x, transform.position.y + 0.2f, 1);
         ChattingObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
-        pl.menu.ONOFFUI(ChattingObject.transform, false);
+
         ChattingObject.transform.Find("QuestItem").gameObject.SetActive(false);
 
 
@@ -127,8 +128,7 @@ public class  Character : MonoBehaviour
         {
             pl.Chatting = false;
             pl.ChattingObject = null;
-            pl.menu.ONOFFUI(ChattingUIObject.transform, false);
-
+           
             Chatting = false;
         }
 
@@ -195,10 +195,10 @@ public class  Character : MonoBehaviour
             {
                 ChattingObject.transform.Find("QuestItem").gameObject.SetActive(true);
 
-                if ( ChattingObject.transform.Find("QuestItem").gameObject.activeInHierarchy && pl.inv.GetItemInDatabase(Quest_End_Item_ID) != null)
+                if ( ChattingObject.transform.Find("QuestItem").gameObject.activeInHierarchy && database.FindItem(Quest_End_Item_ID) != null)
                 {
                     ChattingObject.transform.Find("QuestItem").gameObject.GetComponent<SpriteRenderer>().sprite =
-                      Resources.Load<Sprite>("Sprites/Items/" + pl.inv.GetItemInDatabase(Quest_End_Item_ID).itemNames[0]);
+                      Resources.Load<Sprite>("Sprites/Items/" + database.FindItem(Quest_End_Item_ID).itemNames[0]);
 
                     
                 }
@@ -239,7 +239,7 @@ public class  Character : MonoBehaviour
                     pl.journal.AddQuest(QuestID);
 
                     if (!pl.journal.CheckQuestDone(QuestID))
-                        pl.inv.DropItemDifferentSpotsNearby(transform.position, DropItemCount, new int[1] { DropItem },pl.inv.GetItemInDatabase(DropItem).Durability);
+                        pl.inv.DropItemDifferentSpotsNearby(transform.position, DropItemCount, new int[1] { DropItem }, database.FindItem(DropItem).Durability);
 
 
                     pl.journal.DoneQuest(QuestID);
@@ -253,10 +253,10 @@ public class  Character : MonoBehaviour
 
             pl.Chatting = true;
             pl.ChattingObject = gameObject;
-            pl.menu.ONOFFUI(ChattingUIObject.transform, true);
-            
 
-            ChattingUIObject.GetComponent<Dialog>().StartDialog(DialogID);
+            ChattingUIObject.enabled = true;
+
+            ChattingUIObject.StartDialog(DialogID);
 
         }
 
@@ -266,7 +266,7 @@ public class  Character : MonoBehaviour
             pl.IM.ActionDelay = Time.fixedTime + 0.5f;
             pl.Chatting = false;
             pl.ChattingObject = null;
-            pl.menu.ONOFFUI(ChattingUIObject.transform, false);
+      
 
         }
 
@@ -279,7 +279,7 @@ public class  Character : MonoBehaviour
                 {
                     pl.journal.AddQuest(QuestID);
 
-                    ChattingUIObject.GetComponent<Dialog>().LastLine = false;
+                    ChattingUIObject.LastLine = false;
                 }
             }
 
@@ -290,9 +290,9 @@ public class  Character : MonoBehaviour
         {
             if (pl.Chatting && pl.ChattingObject == gameObject)
             {
-                pl.menu.ONOFFUI(ChattingUIObject.transform, false);
+       
 
-            ChattingUIObject.GetComponent<Dialog>().ResetDialog();
+                ChattingUIObject.ResetDialog();
 
             if (DestroyOnDialogEnd)
             {

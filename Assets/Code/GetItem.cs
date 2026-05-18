@@ -10,6 +10,7 @@ public class GetItem : MonoBehaviour {
     private Player pl;
     private Constructor Constr;
     private Inventory inv;
+
     public int[] item;
 
    // [HideInInspector]
@@ -99,7 +100,7 @@ public class GetItem : MonoBehaviour {
                     itemcount[i] = 1;
 
                 if (durability[i] == 0)
-                    durability[i] = inv.GetItemInDatabase(item[i]).Durability;
+                    durability[i] = database.FindItem(item[i]).Durability;
 
 
                 if (!Seller)
@@ -206,7 +207,7 @@ public class GetItem : MonoBehaviour {
         }
     }
 
-    void AninControll()
+    void AnimControll()
     {
         if (GetComponent<Animator>() == null) return;
         
@@ -274,7 +275,9 @@ public class GetItem : MonoBehaviour {
     }
     void Update()
     {
-        if(!inv.showinvent || Constr.CurrentMerchantID != _Stats.DatabaseID) isCraftingTable = false;
+        if (inv.blueprintshow) return;
+
+        if (!inv.showinvent || Constr.CurrentMerchantID != _Stats.DatabaseID) isCraftingTable = false;
 
 
         if (inv.crafting && !isCraftingTable && Constr.CurrentMerchantID == _Stats.DatabaseID && inv.CurrentCraftingTable != GetComponent<GetItem>())
@@ -327,7 +330,7 @@ public class GetItem : MonoBehaviour {
 
 
 
-        if (inv.showinvent || pl.IM.ActionDelay > Time.fixedTime) return;
+        if (inv.crafting || pl.IM.ActionDelay > Time.fixedTime) return;
 
         if (DrawNeedItems) DrawNeedItemControll();
 
@@ -375,9 +378,9 @@ public class GetItem : MonoBehaviour {
 
 
         if (Destroying || pl.menu.MenuONOFF || pl.StartLoading || pl._gameover) return;
-        
 
-        AninControll();
+
+        AnimControll();
 
 
        
@@ -422,7 +425,7 @@ public class GetItem : MonoBehaviour {
             !pl.Chatting && pl.MutationTimer < Time.fixedTime && !Constr.ChooseMouseObject)
         {
 
-            if (!inv.showjournal && !inv.showinvent  && !Constr.Building && pl.MutationTimer < Time.fixedTime && pl.IM.ActionDelay < Time.fixedTime && !pl.GetMouseOBCollList().Contains(inv.EscapeInventory))
+            if (!inv.showjournal && !Constr.Building && pl.MutationTimer < Time.fixedTime && pl.IM.ActionDelay < Time.fixedTime && !pl.GetMouseOBCollList().Contains(inv.EscapeInventory))
             {
                 if (Crafting)
                 {

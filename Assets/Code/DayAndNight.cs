@@ -8,7 +8,7 @@ public class DayAndNight : MonoBehaviour
 {
 
     public float DayLength = 600;
-    public float Day { get; set; }
+    public float DayTime { get; set; }
 
     public Color DayLight;
     public Color DawnLight;
@@ -23,7 +23,7 @@ public class DayAndNight : MonoBehaviour
     private Constructor constr;
 
     public AudioSource[] AudioSources;
-    private string DayTime;
+    private string DayTimeString;
 
     public Vector2 _morningborder_Div = new Vector2(9999999999, 9999999999);
     public Vector2 _dayborder_Div = new Vector2(9999999999, 2);
@@ -65,56 +65,70 @@ public class DayAndNight : MonoBehaviour
         constr.AddLogPart("Morning time! Time to relax!",
                                 "Настав ранок!", "朝の時間！リラックスする時間だ！", null);
 
-
+        DayTime = constr.SL.SaveLoadCurrent.DayTime;
 
     }
 
 
     void Update()
     {
-        if (constr.pl.StartLoading || constr.pl._gameover || constr.pl.menu.MenuONOFF) return;
+        if (constr._menu.TEST)
+        {
+            if (Input.GetKeyDown(KeyCode.Equals))
+            {
+                constr.SL.SaveLoadCurrent.DayNumber++;
 
+            }
+            if (Input.GetKeyDown(KeyCode.Minus))
+            {
+                constr.SL.SaveLoadCurrent.DayNumber--;
+
+            }
+
+            if (Input.GetKeyDown(KeyCode.P))
+                Time.timeScale++;
+            if (Input.GetKeyDown(KeyCode.O))
+                if (Time.timeScale > 0) Time.timeScale--;
+
+
+        }
+
+        if (constr.pl.StartLoading || constr.pl._gameover || constr._menu.MenuONOFF) return;
+
+        if (constr.Game_SPEED <= 0) return;
 
 
         if (SliderUI)
         {
-            DayNightCycleImage.transform.position = DayNightCycle.transform.position - new Vector3((Day / DayLength) * (800 - 150), 1, 0);
+            DayNightCycleImage.transform.position = DayNightCycle.transform.position - new Vector3((DayTime / DayLength) * (800 - 150), 1, 0);
         }
 
         if (ArrowUI)
         {
             ArrowRotation = 360 / DayLength * -1;
 
-            Arrow.transform.rotation = Quaternion.Euler(0, 0, ArrowRotation * Day);
+            Arrow.transform.rotation = Quaternion.Euler(0, 0, ArrowRotation * DayTime);
 
         }
+        
 
-        if (Input.GetKeyDown(KeyCode.Equals) && Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.LeftAlt))
+
+        DayTime += Time.deltaTime ;
+
+        constr.SL.SaveLoadCurrent.DayTime = DayTime;
+
+
+        if (DayTime > DayLength)
         {
-            constr.SL.DayNumber++;
-            constr.pl.inv.AddItem(9, 200, 99, transform.position);
-        }
-
-        if (Input.GetKeyDown(KeyCode.P) && Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.LeftAlt))
-            Time.timeScale++;
-        if (Input.GetKeyDown(KeyCode.O) && Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.LeftAlt) && Time.timeScale > 1)
-            Time.timeScale--;
-
-        Day += Time.deltaTime;
-        constr.SL.DayTime = Day;
-
-
-        if (Day > DayLength)
-        {
-            constr.SL.DayNumber++;
-            Day = 0;
+            constr.SL.SaveLoadCurrent.DayNumber++;
+            DayTime = 0;
         }
 
 
-        DayNightCycleText.GetComponent<TextMeshProUGUI>().text = DayTime + (constr.SL.DayNumber + 1);
+        DayNightCycleText.GetComponent<TextMeshProUGUI>().text = DayTimeString + (constr.SL.SaveLoadCurrent.DayNumber + 1);
 
 
-        if (Day > _morningborder.x && Day < _morningborder.y)
+        if (DayTime > _morningborder.x && DayTime < _morningborder.y)
         {
 
             for (int i = 0; i < AudioSources.Length; i++)
@@ -137,15 +151,15 @@ public class DayAndNight : MonoBehaviour
                                     "Настав ранок!", "朝の時間！リラックスする時間だ！", null);
                 Day_Cycle = DayCycle.Morning;
             }
-            DayTime = "Morning";
+            DayTimeString = "Morning";
             if (constr._menu.Language == 1)
-                DayTime = "Ранок";
+                DayTimeString = "Ранок";
             if (constr._menu.Language == 2)
-                DayTime = "朝";
+                DayTimeString = "朝";
         }
 
 
-        if (Day > _dayborder.x && Day < _dayborder.y)
+        if (DayTime > _dayborder.x && DayTime < _dayborder.y)
         {
 
             for (int i = 0; i < AudioSources.Length; i++)
@@ -170,14 +184,14 @@ public class DayAndNight : MonoBehaviour
             }
 
             if (constr._menu.Language == 0)
-                DayTime = "Day";
+                DayTimeString = "Day";
             if (constr._menu.Language == 1)
-                DayTime = "День";
+                DayTimeString = "День";
             if (constr._menu.Language == 2)
-                DayTime = "日";
+                DayTimeString = "日";
         }
 
-        if (Day >= _dawnborder.x && Day < _dawnborder.y)
+        if (DayTime >= _dawnborder.x && DayTime < _dawnborder.y)
         {
             for (int i = 0; i < AudioSources.Length; i++)
             {
@@ -192,14 +206,14 @@ public class DayAndNight : MonoBehaviour
 
             L.color = new Color(Mathf.Lerp(L.color.r, DawnLight.r, Time.deltaTime), Mathf.Lerp(L.color.g, DawnLight.g, Time.deltaTime), Mathf.Lerp(L.color.b, DawnLight.b, Time.deltaTime), 1);
             Day_Cycle = DayCycle.Dawn;
-            DayTime = "Dusk";
+            DayTimeString = "Dusk";
             if (constr._menu.Language == 1)
-                DayTime = "Захід сонця";
+                DayTimeString = "Захід сонця";
             if (constr._menu.Language == 2)
-                DayTime = "黄昏";
+                DayTimeString = "黄昏";
         }
 
-        if (Day >= _nightborder.x && Day < _nightborder.y)
+        if (DayTime >= _nightborder.x && DayTime < _nightborder.y)
         {
             for (int i = 0; i < AudioSources.Length; i++)
             {
@@ -220,11 +234,11 @@ public class DayAndNight : MonoBehaviour
 
             L.color = new Color(Mathf.Lerp(L.color.r, NightLight.r, Time.deltaTime), Mathf.Lerp(L.color.g, NightLight.g, Time.deltaTime), Mathf.Lerp(L.color.b, NightLight.b, Time.deltaTime), 1);
 
-            DayTime = "Night";
+            DayTimeString = "Night";
             if (constr._menu.Language == 1)
-                DayTime = "Ніч";
+                DayTimeString = "Ніч";
             if (constr._menu.Language == 2)
-                DayTime = "夜";
+                DayTimeString = "夜";
         }
 
 

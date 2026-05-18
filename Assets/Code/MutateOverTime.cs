@@ -10,8 +10,12 @@ public class MutateOverTime : MonoBehaviour
     private DayAndNight DayNight;
 
     private int NumberOfDays = 1;
+    private ItemDatabase itemDatabase;
+
+
     private void Start()
     {
+        itemDatabase = InitializeObjects.Itemdatabase;
         inv = GameObject.Find("Player").GetComponent<Inventory>();
         DayNight = GameObject.Find("Player").GetComponent<Player>().DayNight;
 
@@ -23,7 +27,7 @@ public class MutateOverTime : MonoBehaviour
     {
         if (Timer < Time.fixedTime)
         {
-            GameObject O = Instantiate(inv.GetItemInDatabase(ID).ObjectPrefs);
+            GameObject O = Instantiate(itemDatabase.FindItem(ID).ObjectPrefs);
             O.transform.position = transform.position;
             Destroy(gameObject);
 

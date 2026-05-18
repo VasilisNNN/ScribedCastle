@@ -11,7 +11,7 @@ public class Trigger : MonoBehaviour
 {
     private Player pl;
     private Inventory inv;
-
+    private ItemDatabase itemDatabase;
     public bool OnEnter;
     public float PushDelay = 0.1f;
    
@@ -66,6 +66,7 @@ public class Trigger : MonoBehaviour
         pl = InitializeObjects.PL;
         inv = pl.inv;
         Constr = InitializeObjects.Constr;
+        itemDatabase = InitializeObjects.Itemdatabase;
 
         if (StartOFF)
         {
@@ -92,7 +93,7 @@ public class Trigger : MonoBehaviour
                 NeedItemCount = 1;
                 
 
-                g.transform.Find("NeedItemSineImage").GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/Items/" + inv.GetItemInDatabase(NeedItemID).itemNames[0]);
+                g.transform.Find("NeedItemSineImage").GetComponent<Image>().sprite = Resources.Load<Sprite>("Sprites/Items/" + itemDatabase.FindItem(NeedItemID).itemNames[0]);
                 g.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = "x " + NeedItemCount;
                 NeedItemGameobject.Add(g);
             
@@ -108,7 +109,7 @@ public class Trigger : MonoBehaviour
 
         if (NeedBuildingsToConstruct.Length > 0)
         {
-
+         
             for (int i = 0; i < Constr.OBOnBoard.Count; i++)
             {
                 for (int j = 0; j < NeedBuildingsToConstruct.Length; j++)

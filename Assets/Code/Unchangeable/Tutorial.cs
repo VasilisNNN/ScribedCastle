@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEditor;
 using static UnityEngine.EventSystems.StandaloneInputModule;
+using static Pathfinding.AnimationLink;
 
 [System.Serializable]
 public class TutorialPhase
@@ -26,7 +27,7 @@ public class TutorialPhase
 
     private int Language;
 
-    private int Phase { get; set; }
+    public int Phase { get; set; }
     public List<TutorialPhase> PhaseParts = new List<TutorialPhase>();
 
 
@@ -35,7 +36,7 @@ public class TutorialPhase
 
     private GameObject TutorialUI;
     private RectTransform TutorialUI_RectTr;
-    private GameObject Merchant;
+    private GameObject MerchantGrass, Merchant, MerchantKnight, MerchantGuard, MerchantCleric;
 
 
     [HideInInspector]
@@ -45,16 +46,33 @@ public class TutorialPhase
     private TextDatabase textdatabase;
     private MenuCustom _menu;
     private InputMode IM;
-    void Awake()
+
+    private GameObject CloseBigTips, EButton;
+    public AudioClip UIOpen;
+    private void Start()
     {
-     
+        Init();
+    }
+    public void Init()
+    {
+        MerchantKnight = GameObject.Find("Merchant Knight");
+        MerchantKnight.SetActive(false);
+        MerchantGuard = GameObject.Find("Merchant Guard");
+        MerchantGuard.SetActive(false);
+        MerchantCleric = GameObject.Find("Merchant Cleric");
+        MerchantCleric.SetActive(false);
+
+        MerchantGrass = GameObject.Find("Merchant Grass");
+        MerchantGrass.SetActive(false);
+
         Merchant = GameObject.Find("Merchant");
         Merchant.SetActive(false);
+
 
         pl = InitializeObjects.PL;
         Constr = InitializeObjects.Constr;
         textdatabase = InitializeObjects.Textdatabase;
-        BlueMenu = GameObject.Find("BlueprintMenu").GetComponent<BlueprintMenu>();
+        BlueMenu = GameObject.Find("BlueprintManager").GetComponent<BlueprintMenu>();
         _menu = Constr.GetComponent<MenuCustom>();
         TipsPause = GameObject.Find("TipsPause");
 
@@ -67,15 +85,13 @@ public class TutorialPhase
 
         IM = pl.IM;
 
+        pl.inv.AddItem(301, 5, 99, pl._transform.position);
+        SetPhase(0);
+        BlueMenu.MaxBlueprint = 2;
 
-
-        SetBigTip(0);
-
-       
-
-
-
-
+        CloseBigTips = TipsPause.transform.Find("CloseBigTips").gameObject;
+        EButton = TipsPause.transform.Find("EButton").gameObject;
+        UIOpen = Resources.Load<AudioClip>("Sound/UI/UI_Open");
 
     }
 
@@ -98,8 +114,12 @@ public class TutorialPhase
         {
             if (!IM.joystick)
             {
-                if (((pl.GetMouseCollList().Contains(GameObject.Find("CloseBigTips")) && IM.LeftMouseButtonDown) || IM.exit_b || IM.menu_b || IM.enter_b || pl.IM.OKey) && IM.ActionDelay < Time.fixedTime)
+                if (((_menu.UIColl(CloseBigTips) && IM.LeftMouseButtonDown) ||
+                    (_menu.UIColl(EButton) && IM.LeftMouseButtonDown)
+
+                    || IM.exit_b || IM.menu_b || IM.enter_b || pl.IM.OKey) && IM.ActionDelay < Time.fixedTime)
                 {
+                    _menu.PlayAudio(UIOpen);
                     UnsetBigTips();
                 }
 
@@ -107,7 +127,7 @@ public class TutorialPhase
             else
             if ((IM.menu_b || IM.exit_b || IM.enter_b || pl.IM.OKey ) && Constr.TutorialPause && TipsPause.activeInHierarchy && IM.ActionDelay < Time.fixedTime)
             {
-
+                _menu.PlayAudio(UIOpen);
                 UnsetBigTips();
             }
 
@@ -127,13 +147,16 @@ public class TutorialPhase
             }
         }
 
-       
 
-        if (pl.IM.enter_b || (pl.menu.UIColl(GameObject.Find("CloseBigTips")) && pl.IM.LeftMouseButtonDown) || 
-            Constr.TutorialPause == false)
+
+        if (pl.IM.enter_b ||
+            (_menu.UIColl(CloseBigTips) && pl.IM.LeftMouseButtonDown) ||
+            (_menu.UIColl(EButton) && pl.IM.LeftMouseButtonDown)||
+            !Constr.TutorialPause)
         {
             if (Phase == 0)
             {
+                _menu.PlayAudio(UIOpen);
                 pl.inv.SetFolder(1);
                 SetPhase(1);
                 print("PHASE 1");
@@ -185,7 +208,7 @@ public class TutorialPhase
         {
             pl.inv.SetFolder(0);
             SetPhase(6);
-            Merchant.SetActive(true);
+            MerchantGrass.SetActive(true);
             pl.inv.AddItem(9, 160, -1, new Vector2(9999, 9999));
         }
 
@@ -224,7 +247,9 @@ public class TutorialPhase
           
             pl.inv.SetFolder(0);
             SetPhase(8);
+            MerchantGrass.SetActive(false);
             pl.inv.AddItem(9, 160, -1, new Vector2(9999, 9999));
+            pl.inv.AddItem(980, 12, -1, new Vector2(9999, 9999));
         }
 
         
@@ -237,34 +262,42 @@ public class TutorialPhase
         if (BlueMenu.CheckBlueprint(0) && Phase == 8)
         {
             SetPhase(9);
-
+            MerchantGuard.SetActive(true);
             pl.IM.ActionDelay = Time.fixedTime + 0.1f;
         }
 
 
-        //------Build protections
-
+        //------Build protections Guard
 
         if (Constr.LastBuildingConstructed == 370 && Phase == 9)
         {
             SetPhase(10);
-
+            MerchantGuard.SetActive(false);
+            MerchantKnight.SetActive(true);
+            pl.inv.AddItem(9, 200, -1, new Vector2(9999, 9999));
             pl.IM.ActionDelay = Time.fixedTime + 0.1f;
         }
 
+
+
+        //------Build protections Knight
 
         if (Constr.LastBuildingConstructed == 375 && Phase == 10)
         {
             SetPhase(11);
-
+            MerchantKnight.SetActive(false);
+            MerchantCleric.SetActive(true);
+            pl.inv.AddItem(9, 200, -1, new Vector2(9999, 9999));
             pl.IM.ActionDelay = Time.fixedTime + 0.1f;
         }
 
 
+        //------Build protections Cleric
+
         if (Constr.LastBuildingConstructed == 398 && Phase == 11)
         {
             SetPhase(12);
-
+            pl.inv.AddItem(9, 200, -1, new Vector2(9999, 9999));
             pl.IM.ActionDelay = Time.fixedTime + 0.1f;
         }
 
@@ -273,10 +306,15 @@ public class TutorialPhase
 
         if (Phase >= 12 && pl.IM.ActionDelay < Time.fixedTime)
         {
-            if (pl.IM.enter_b || pl.IM.exit_b || (pl.menu.UIColl(GameObject.Find("CloseBigTips")) &&
-                pl.IM.LeftMouseButtonDown) || 
+            if (pl.IM.enter_b || pl.IM.exit_b || 
+
+                (_menu.UIColl(CloseBigTips) && pl.IM.LeftMouseButtonDown) ||
+                (_menu.UIColl(EButton) && pl.IM.LeftMouseButtonDown) ||
+
                 Constr.TutorialPause == false)
             {
+
+                _menu.PlayAudio(UIOpen);
                 Constr._menu.FirstStart = 0;
 
                 Constr._menu.TransitionToTheScene("Island", false);
@@ -393,8 +431,7 @@ public class TutorialPhase
 
     public void SetBigTip(int texttipnum)
     {
-        print("SetBigTip 0");
-
+       
         if (TutorialPhaseBigTip.Contains(texttipnum))
         {
             Constr.TutorialPause = false;
@@ -403,24 +440,21 @@ public class TutorialPhase
 
             return;
         }
-       
+        print("SetBigTip 1");
+
         if (texttipnum <= -1)
         {
 
             TutorialPhaseBigTip.Add(texttipnum);
             return;
         }
-      
-        if (_menu.DrawTutorial == 0)
-        {
-            Constr.TutorialPause = false;
-            TipsPause.SetActive(false);
-            TutorialPhaseBigTip.Add(texttipnum);
-            return;
-        }
-    
+       
+        print("SetBigTip 3");
 
-        if (textdatabase.textEN[NumberInData(texttipnum)].line[0].line[0] != "" && !Constr.TutorialPause)
+        if (textdatabase.textEN[NumberInData(texttipnum)] == null) return;
+
+        if (textdatabase.textEN[NumberInData(texttipnum)].line[0].line[0] != "" 
+            && !Constr.TutorialPause)
         {
             TipsPause.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = textdatabase.GetFirstLine(texttipnum, _menu.Language);
 

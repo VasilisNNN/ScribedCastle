@@ -41,7 +41,6 @@ public class CharacterPath : MonoBehaviour
 
 
     public bool Dodging = false;
-    public bool Zombie = false;
     private float DodgeSpeed_Y, DodgeSpeed_X;
 
     
@@ -68,14 +67,13 @@ public class CharacterPath : MonoBehaviour
     
     private ItemDatabase database;
     public GameObject CurrentGun { get; set; }
-    private GameObject ZombieTarget;
+
     private float ShootTimer;
     public float MovePauseTimer { get; set; }
 
     public bool GoBackAfterDamage;
     
-    private GameObject NewZombie;
-    private GameObject ZombieToLoad;
+  
 
     public float slope = 0;
     public bool Fliping = true;
@@ -95,7 +93,7 @@ public class CharacterPath : MonoBehaviour
     private Constructor Const;
     private List<GameObject> RayColliders = new List<GameObject>();
     private MovementControll MControll;
-
+    public bool OnThePoint;
 
     void Awake()
     {
@@ -103,14 +101,20 @@ public class CharacterPath : MonoBehaviour
         gameObject.AddComponent<PathUpdate>();
 
         MControll = GetComponent<MovementControll>();
+        pl = InitializeObjects.PL;
+        Const = InitializeObjects.Constr;
+        _transform = transform;
+
+        rb = GetComponent<Rigidbody2D>();
+
+        anim = GetComponent<Animator>();
 
     }
 
 
     void Start()
     {
-        pl = InitializeObjects.PL;
-        Const = InitializeObjects.Constr;
+      
 
         character = GetComponent<Character>();
 
@@ -122,8 +126,7 @@ public class CharacterPath : MonoBehaviour
 
         if (FollowPlayer) MovePoints = new Transform[1] { GameObject.Find("Player").transform };
 
-         _transform = transform;
-        ZombieToLoad = Resources.Load<GameObject>("Prefabs/Pers/Zombie");
+      
         StartPoint = transform.position;
 
         if (MovePoints.Length > 0) 
@@ -134,13 +137,7 @@ public class CharacterPath : MonoBehaviour
             }
         }
 
-        if (Zombie && MovePointsBuffer.Count == 0) MovePointsBuffer.Add(Vector2.zero);
-
-    
-        rb = GetComponent<Rigidbody2D>();
-
-        anim = GetComponent<Animator>();
-
+        
         if (_transform.Find("Legs") != null) LegsAnim = _transform.Find("Legs").GetComponent<Animator>();
 
    
@@ -150,11 +147,6 @@ public class CharacterPath : MonoBehaviour
  
     void UpdatePoints()
     {
-
-  
-
-        if (!Zombie)
-        {
 
             for (int i = 0; i < MovePointsBuffer.Count; i++)
             {
@@ -171,35 +163,7 @@ public class CharacterPath : MonoBehaviour
                 }
             }
 
-        }
-        else
-        {
-            if (ZombieTarget == null && pl.Characters.Count>0)
-            {
-                
-
-                for (int i = 0; i < pl.Characters.Count; i++)
-                {
-                    if (pl.Characters[i] != null)
-                    {
-                        if (pl.Characters[i].GetComponent<SpriteRenderer>().enabled && !pl.Characters[i].GetComponent<Character>().Zombie && !pl.Characters[i].GetComponent<Character>().NotAlive && pl.Characters[i] != gameObject)
-                        {
-                           
-                            MovePointsBuffer[0] = pl.Characters[i].transform.position;
-                            ZombieTarget = pl.Characters[i];
-                          
-                            
-                            break;
-                        }
-                    }
-                }
-            }
-
-            
-           
-
-
-        }
+        
         
     }
 
@@ -207,7 +171,7 @@ public class CharacterPath : MonoBehaviour
 
   
 
-    void Update()
+    public void CharacterPathUpdate()
     {
         
 
@@ -218,10 +182,6 @@ public class CharacterPath : MonoBehaviour
         }
 
 
-
-
-
-        ZombieCharacter();
 
         UpdatePoints();
         
@@ -242,7 +202,7 @@ public class CharacterPath : MonoBehaviour
         Animations();
         //   GunControll(pl.gameObject);
 
-        if (!pl.StartLoading && !pl.inv.blueprintshow && !pl.menu.MenuONOFF)
+        if (!pl.StartLoading && !pl.inv.blueprintshow && !pl.Pause())
         {
             PositionMove();
 
@@ -255,37 +215,7 @@ public class CharacterPath : MonoBehaviour
 
       
     }
-    void ZombieCharacter()
-    {
-        if (!Zombie) return;
-        if (GetComponent<CollList>() == null) return;
-
-
-        for (int i = 0; i < pl.Characters.Count; i++)
-        {
-          
-            
-            if (GetComponent<CollList>().GetCollList().Contains(pl.Characters[i]))
-            {
-                NewZombie = Instantiate(ZombieToLoad);
-                NewZombie.transform.position = pl.Characters[i].transform.position;
-                NewZombie.name += pl.Characters[i].GetInstanceID();
-
-
-
-                Destroy(pl.Characters[i]);
-
-                ZombieTarget = null;
-
-            }
-
-            
-        }
-        
-
-    }
-
-
+   
 
     void DodgeBullets()
     {
@@ -369,9 +299,8 @@ public class CharacterPath : MonoBehaviour
     void PositionMove()
     {
         if(pl.StartLoading) return;
-
-
-        if (pl._gameover || pl.PathRescanBoundTimer > 0 || pl.PathRescan > 0)
+       
+        if (pl._gameover || pl.PathRescanBoundTimer > 0 || pl.PathRescan > 0 || OnThePoint)
         {
             SpeedForce = Vector3.zero;
             return;
@@ -407,7 +336,7 @@ public class CharacterPath : MonoBehaviour
 
         if (MovePauseTimer < Time.fixedTime)
         {
-            SpeedForce = (directionFixed * Time.deltaTime) * SpeedMultiplier * Const.Game_SPEED;
+            SpeedForce = (directionFixed * Time.deltaTime) * SpeedMultiplier ;
         }
         else
         {
@@ -429,8 +358,7 @@ public class CharacterPath : MonoBehaviour
 
         }
 
-      
-
+   
         if (Mathf.Abs(SpeedForce.x) > 0.001f || Mathf.Abs(SpeedForce.y) > 0.001f) 
             Walk = true;
         else Walk = false;
@@ -525,8 +453,11 @@ public class CharacterPath : MonoBehaviour
 
     void Animations()
     {
-        if (pl.menu.MenuONOFF)
+        if (pl == null) return;
+
+        if (pl.Pause())
         {
+            if(LegsAnim!=null)
             LegsAnim.speed = 0;
             if (anim != null)
                 anim.speed = 0;
@@ -548,16 +479,7 @@ public class CharacterPath : MonoBehaviour
         if (anim != null)
         {
             anim.speed = 1;
-            anim.SetBool("Attacking", Attacking);
-
-
-            anim.SetBool("Walk", Walk);
-      
-            if (Attacking && AttackDelay < Time.fixedTime)
-            {
-                anim.SetBool("Attacking", true);
-            }
-            if (!Attacking || AttackDelay >= Time.fixedTime) anim.SetBool("Attacking", false);
+           
 
         }
 

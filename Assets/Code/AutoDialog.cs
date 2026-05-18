@@ -43,6 +43,7 @@ public class AutoDialog : MonoBehaviour
         timer = Time.fixedTime + 1 + textdatabase.textEN[NumberInData(ID)].line[0].line[0].Length * 0.04f;
         DialogOBAS = DialogOB.GetComponent<AudioSource>();
 
+        DialogOB.SetActive(false);
         IM = GetComponent<InputMode>();
         PlayerTurn = true;
     }
@@ -165,149 +166,7 @@ public class AutoDialog : MonoBehaviour
 
     public void ONOFFUI(Transform tr, bool TF)
     {
-
-        if (tr.GetComponent<Image>() != null)
-            tr.GetComponent<Image>().enabled = TF;
-
-
-        if (tr.GetComponent<Text>() != null)
-            tr.GetComponent<Text>().enabled = TF;
-
-        if (tr.GetComponent<TextMeshProUGUI>() != null)
-            tr.GetComponent<TextMeshProUGUI>().enabled = TF;
-
-
-        
-        if (tr.GetComponent<Slider>() != null)
-            tr.GetComponent<Slider>().enabled = TF;
-
-        if (tr.GetComponent<Dialog>() != null)
-            tr.GetComponent<Dialog>().enabled = TF;
-
-        if (tr.GetComponent<BoxCollider2D>() != null)
-            tr.GetComponent<BoxCollider2D>().enabled = TF;
-
-        for (int i = 0; i < tr.childCount; i++)
-        {
-
-            if (tr.GetChild(i).GetComponent<Image>() != null)
-            {
-                if (tr.GetChild(i).GetComponent<Image>().enabled != TF)
-                    tr.GetChild(i).GetComponent<Image>().enabled = TF;
-
-            }
-
-            if (tr.GetChild(i).GetComponent<Text>() != null)
-            {
-                if (tr.GetChild(i).GetComponent<Text>().enabled != TF)
-                    tr.GetChild(i).GetComponent<Text>().enabled = TF;
-                
-            }
-
-            if (tr.GetChild(i).GetComponent<TextMeshProUGUI>() != null)
-            {
-                if (tr.GetChild(i).GetComponent<TextMeshProUGUI>().enabled != TF)
-                    tr.GetChild(i).GetComponent<TextMeshProUGUI>().enabled = TF;
-
-            }
-            
-
-            if (tr.GetChild(i).GetComponent<Slider>() != null)
-            {
-                if (tr.GetChild(i).GetComponent<Slider>().enabled != TF)
-                    tr.GetChild(i).GetComponent<Slider>().enabled = TF;
-               
-            }
-
-            if (tr.GetChild(i).GetComponent<BoxCollider2D>() != null)
-                tr.GetChild(i).GetComponent<BoxCollider2D>().enabled = TF;
-
-            for (int ii = 0; ii < tr.GetChild(i).childCount; ii++)
-            {
-
-                if (tr.GetChild(i).GetChild(ii).GetComponent<Image>() != null)
-                {
-                    if (tr.GetChild(i).GetChild(ii).GetComponent<Image>().enabled != TF)
-                        tr.GetChild(i).GetChild(ii).GetComponent<Image>().enabled = TF;
-                    else if (tr.GetChild(i).GetChild(ii).childCount == 0) break;
-                }
-
-                if (tr.GetChild(i).GetChild(ii).GetComponent<Text>() != null)
-                {
-                    if (tr.GetChild(i).GetChild(ii).GetComponent<Text>().enabled != TF)
-                        tr.GetChild(i).GetChild(ii).GetComponent<Text>().enabled = TF;
-                    else if (tr.GetChild(i).GetChild(ii).childCount == 0) break;
-                }
-
-                if (tr.GetChild(i).GetChild(ii).GetComponent<TextMeshProUGUI>() != null)
-                {
-                    if (tr.GetChild(i).GetChild(ii).GetComponent<TextMeshProUGUI>().enabled != TF)
-                        tr.GetChild(i).GetChild(ii).GetComponent<TextMeshProUGUI>().enabled = TF;
-                    else if (tr.GetChild(i).GetChild(ii).childCount == 0) break;
-                }
-
-                
-                if (tr.GetChild(i).GetChild(ii).GetComponent<Slider>() != null)
-                    tr.GetChild(i).GetChild(ii).GetComponent<Slider>().enabled = TF;
-
-
-                if (tr.GetChild(i).GetChild(ii).GetComponent<BoxCollider2D>() != null)
-                    tr.GetChild(i).GetChild(ii).GetComponent<BoxCollider2D>().enabled = TF;
-
-                for (int iii = 0; iii < tr.GetChild(i).GetChild(ii).childCount; iii++)
-                {
-
-                    if (tr.GetChild(i).GetChild(ii).GetChild(iii).GetComponent<Image>() != null)
-                    {
-                        if (tr.GetChild(i).GetChild(ii).GetChild(iii).GetComponent<Image>().enabled != TF)
-                            tr.GetChild(i).GetChild(ii).GetChild(iii).GetComponent<Image>().enabled = TF;
-                        else if (tr.GetChild(i).GetChild(ii).GetChild(iii).childCount == 0) break;
-                    }
-                    if (tr.GetChild(i).GetChild(ii).GetChild(iii).GetComponent<Text>() != null)
-                    {
-                        if (tr.GetChild(i).GetChild(ii).GetChild(iii).GetComponent<Text>().enabled != TF)
-                            tr.GetChild(i).GetChild(ii).GetChild(iii).GetComponent<Text>().enabled = TF;
-                        else if (tr.GetChild(i).GetChild(ii).GetChild(iii).childCount == 0) break;
-                    }
-
-                    if (tr.GetChild(i).GetChild(ii).GetChild(iii).GetComponent<TextMeshProUGUI>() != null)
-                    {
-                        if (tr.GetChild(i).GetChild(ii).GetChild(iii).GetComponent<TextMeshProUGUI>().enabled != TF)
-                            tr.GetChild(i).GetChild(ii).GetChild(iii).GetComponent<TextMeshProUGUI>().enabled = TF;
-                        else if (tr.GetChild(i).GetChild(ii).GetChild(iii).childCount == 0) break;
-                    }
-
-                    
-
-                    if (tr.GetChild(i).GetChild(ii).GetChild(iii).GetComponent<Slider>() != null)
-                        tr.GetChild(i).GetChild(ii).GetChild(iii).GetComponent<Slider>().enabled = TF;
-
-                    if (tr.GetChild(i).GetChild(ii).GetChild(iii).GetComponent<BoxCollider2D>() != null)
-                        tr.GetChild(i).GetChild(ii).GetChild(iii).GetComponent<BoxCollider2D>().enabled = TF;
-
-                    for (int iiii = 0; iiii < tr.GetChild(i).GetChild(ii).GetChild(iii).childCount; iiii++)
-                    {
-                        if (tr.GetChild(i).GetChild(ii).GetChild(iii).GetChild(iiii).GetComponent<Image>() != null)
-                            tr.GetChild(i).GetChild(ii).GetChild(iii).GetChild(iiii).GetComponent<Image>().enabled = TF;
-
-                        if (tr.GetChild(i).GetChild(ii).GetChild(iii).GetChild(iiii).GetComponent<Text>() != null)
-                            tr.GetChild(i).GetChild(ii).GetChild(iii).GetChild(iiii).GetComponent<Text>().enabled = TF;
-
-                        if (tr.GetChild(i).GetChild(ii).GetChild(iii).GetChild(iiii).GetComponent<TextMeshProUGUI>() != null)
-                            tr.GetChild(i).GetChild(ii).GetChild(iii).GetChild(iiii).GetComponent<TextMeshProUGUI>().enabled = TF;
-
-
-                        
-                        if (tr.GetChild(i).GetChild(ii).GetChild(iii).GetChild(iiii).GetComponent<Slider>() != null)
-                            tr.GetChild(i).GetChild(ii).GetChild(iii).GetChild(iiii).GetComponent<Slider>().enabled = TF;
-
-                        if (tr.GetChild(i).GetChild(ii).GetChild(iii).GetChild(iiii).GetComponent<BoxCollider2D>() != null)
-                            tr.GetChild(i).GetChild(ii).GetChild(iii).GetChild(iiii).GetComponent<BoxCollider2D>().enabled = TF;
-
-                    }
-                }
-            }
-        }
+        tr.gameObject.SetActive(TF);
 
     }
 

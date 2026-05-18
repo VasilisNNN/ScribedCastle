@@ -202,32 +202,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 968c0051690728c46b0bb41c47ea1dfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Red: 0
-  Green: 0
-  Gold: 0
-  Cost: 20
-  CornCost: 0
   Table: 0
-  Shield: 0
   TransperentWall: 0
   ComfortPlus: 0
   TimePlus: 0
-  GodDelayPlus: 0
   DamageFromWall: 1
   floors: 0
-  kitchenfloors: 0
   tables: 0
-  beds: 0
   ground: 0
   wall: 0
-  oven: 0
-  toilet: 0
   people: 0
   Trash: 0
   Poop: 0
   CharactersOnThisStructure: []
   decoration: 0
-  TopObject: 0
   TrueName: []
   Draw: 1
   DishesOnTable: []
@@ -277,7 +265,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5000001, y: 0.11608429}
-    oldSize: {x: 1, y: 1.875}
+    oldSize: {x: 1.09375, y: 2.1875}
     newSize: {x: 4, y: 4}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -323,7 +311,7 @@ PolygonCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5000001, y: 0.11608429}
-    oldSize: {x: 1, y: 1.875}
+    oldSize: {x: 1.09375, y: 2.1875}
     newSize: {x: 4, y: 4}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -357,6 +345,7 @@ MonoBehaviour:
   MinSniff: -99
   MaxSniff: 99
   DatabaseID: 351
+  DatabaseOriginalID: -1
   AddItemAutomaticly: 0
   ItemIDs: 01000000
   ItemCount: 1
@@ -368,12 +357,12 @@ MonoBehaviour:
   StartGrowWithZero: 0
   Destructible: 1
   CanBeStunned: 0
-  CanTurnInEgg: 0
   CollisionClips: []
   AudioPlayed: 0
   GettingDamageFromWalls: 0
   ReduceAlphaOnColl: 0
   NewMaterialOnColl: {fileID: 0}
+  ConstructorID: -1
   CanBeHungry: 0
   HungerDamage: 1
   Friend: 0
@@ -390,6 +379,20 @@ MonoBehaviour:
   IgnoreDestroyList: 0
   BuildedStructure: 0
   SpawnPointName: 
+  ColorMaterial: {fileID: 0}
+  MiddleReplacement: {fileID: 0}
+  OBOnBoardElement:
+    Place: {x: 0, y: 0}
+    Name: 
+    ID: 0
+    Object: {fileID: 0}
+    Stats: {fileID: 0}
+    CharMove: {fileID: 0}
+    PO: {fileID: 0}
+    BaseObjectPosition: {x: 0, y: 0}
+    hasParrent: 0
+    orderinParrent: 0
+    _TileBase: {fileID: 0}
 --- !u!95 &6114253242823471861
 Animator:
   serializedVersion: 7
@@ -426,4 +429,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DayToAct: 000000000100000002000000
   Money: 5
-  OnOccupation: 0
+  MoneyGrowSide: 1
+  IgnoreOccupation: 1
+  MinDelay: 25

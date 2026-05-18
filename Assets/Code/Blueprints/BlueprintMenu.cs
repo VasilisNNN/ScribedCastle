@@ -6,12 +6,15 @@ using UnityEngine.UI;
 using System.Linq;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEditor;
 
 
 public class BlueprintMenu : MonoBehaviour
 {
     public List<Blueprint> BP = new List<Blueprint>();
+
     public List<GameObject> BlueprintsBG = new List<GameObject>();
+    public List<GameObject> BlueprintsBase = new List<GameObject>();
 
     private List<GameObject> BluePrintObjects = new List<GameObject>();
     private List<GameObject> BlueFloorObjects = new List<GameObject>();
@@ -48,12 +51,15 @@ public class BlueprintMenu : MonoBehaviour
     private int[] ConstructionStates;
 
     private float ScrollDelay = 0;
-    public int LastBlueprint { get; set; }
+ 
+    public int MaxBlueprint { get; set; }
+    private int LastBlueprintID;
 
     private TextMeshProUGUI BlueprintText;
     private GameObject EscapeBlueprint;
 
     private BlueprintDatabase BData;
+    private ItemDatabase itemDatabase;
     private Transform BlueprintNameBG, BlueprintBG;
     private TextMeshProUGUI BlueprintNameText, BlueprintDescText;
     private float partWidth = 80;
@@ -66,8 +72,15 @@ public class BlueprintMenu : MonoBehaviour
     private Transform BlueprintMenu_Transfrom , ButtonsUI;
     private GameObject Reward;
 
+    private void Awake()
+    {
+        MaxBlueprint = BP.Count;
+    }
+
+
     void Start()
     {
+        
         CanvasTransform = InitializeObjects.CanvasTransform.GetComponent<RectTransform>();
         BlueprintMenu_Transfrom = GameObject.Find("BlueprintMenu").transform;
 
@@ -88,8 +101,7 @@ public class BlueprintMenu : MonoBehaviour
         EscapeBlueprint = GameObject.Find("EscapeBlueprint");
 
         BlueprintText = BlueprintMenu_Transfrom.Find("BlueprintText").GetComponent<TextMeshProUGUI>();
-        LastBlueprint = -1;
-
+  
         FadeCursor = BlueprintMenu_Transfrom.Find("FadeCursor").gameObject;
 
         StatsOBJ = GameObject.Find("Stats");
@@ -112,13 +124,18 @@ public class BlueprintMenu : MonoBehaviour
         inv = pl.inv;
         Constr = InitializeObjects.Constr;
         menu = Constr.GetComponent<MenuCustom>();
-
+        itemDatabase = InitializeObjects.Itemdatabase;
 
         BlueprintsButton = GameObject.Find("BlueprintsButton");
 
         for (int i = 0; i < BP.Count; i++)
         {
+            print("menu.SL.BPConstructed[i] " + menu.SL.SaveLoadCurrent.BPConstructed[i]);
+
+            if (menu.SL.SaveLoadCurrent.BPConstructed[i + startBlueprint()]==0)
             BP[i].Unlocked = false;
+            else BP[i].Unlocked = true;
+
             BP[i].UpdateBP();
            
         }
@@ -182,9 +199,9 @@ public class BlueprintMenu : MonoBehaviour
 
 
             GameObject BluePr = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/BlueprintBase"), BlueprintMenu_Transfrom);
-       
+            BlueprintsBase.Add(BluePr);
 
-            Vector2 BluePrPOS = new Vector2(i * 500, 1);
+                 Vector2 BluePrPOS = new Vector2(i * 500, 1);
             BluePr.GetComponent<RectTransform>().anchoredPosition = BluePrPOS;
             BluePrintObjects.Add(BluePr);
 
@@ -211,8 +228,8 @@ public class BlueprintMenu : MonoBehaviour
                 if (pivoty < 0.58f && pivoty > 0.48f) pivoty = 0.5f;
 
                 BluePrintBrick.GetComponent<RectTransform>().pivot = new Vector2(
-              0.5f,
-              pivoty);
+                    0.5f,
+                    pivoty);
 
 
 
@@ -244,7 +261,7 @@ public class BlueprintMenu : MonoBehaviour
 
         
             Reward = Instantiate(Resources.Load<GameObject>("Prefabs/Blueprints/Reward"), BlueprintMenu_Transfrom);
-            Vector2 RewardPOS = new Vector2(-685, -250);
+            Vector2 RewardPOS = new Vector2(-684, -200);
             Reward.GetComponent<RectTransform>().anchoredPosition = RewardPOS;
 
           
@@ -261,7 +278,7 @@ public class BlueprintMenu : MonoBehaviour
         RightArrow.transform.SetAsLastSibling();
 
 
-
+        PlayButton.transform.SetAsLastSibling();
 
         BlueprintMenu_Transfrom.Find("BG").SetAsFirstSibling();
         EscapeBlueprint.transform.SetAsLastSibling();
@@ -352,8 +369,83 @@ public class BlueprintMenu : MonoBehaviour
                 TMesh.text += "報酬: ";
 
             for (int j = 0; j < BP[CurrentBP].Rewards.Length; j++)
-                TMesh.text += inv.GetItemInDatabase(BP[CurrentBP].Rewards[j].itemID).itemNames[menu.Language] + " x" + BP[CurrentBP].Rewards[j].Count + "\n";
+                TMesh.text += itemDatabase.FindItem(BP[CurrentBP].Rewards[j].itemID).itemNames[menu.Language] + " x" + BP[CurrentBP].Rewards[j].Count + "\n";
 
+
+        TMesh.text += ParameterText(BData.FindItem(BP[CurrentBP].DatabaseID).Peasants_CollectMoney_Timer_Boost.ToString(),
+            "Peasants work speed boost: ",
+            "Швидкість роботи селян: ",
+            "農民の作業速度向上: ");
+
+        TMesh.text += ParameterText(BData.FindItem(BP[CurrentBP].DatabaseID).Peasants_CollectMoney_Amount_Boost.ToString(),
+             "Peasants earnings: +",
+             "Заробіток селян: +",
+             "農民の収入: +");
+
+
+        TMesh.text += ParameterText(BData.FindItem(BP[CurrentBP].DatabaseID).Buildings_CollectMoney_Timer_Boost.ToString(),
+            "Buildings work speed boost: ",
+            "Прискорення будівель: ",
+            "建築現場における生産の加速：");
+
+        TMesh.text += ParameterText(BData.FindItem(BP[CurrentBP].DatabaseID).Buildings_CollectMoney_Amount_Boost.ToString(),
+            "Buildings earnings: +",
+            "Заробіток будівель: +",
+            "建物収益： +");
+
+
+        TMesh.text += ParameterText(BData.FindItem(BP[CurrentBP].DatabaseID).Peasant_HP_Boost.ToString(),
+        "Peasants HP boost: ",
+        "Підвищення HP селян: ",
+        "農民のHP増加： ");
+
+
+
+        TMesh.text += ParameterText(BData.FindItem(BP[CurrentBP].DatabaseID).Knight_HP_Boost.ToString(),
+                "Knights HP boost: ",
+                "Підвищення HP лицарів: ",
+                "騎士HP増加： ");
+
+
+        TMesh.text += ParameterText(BData.FindItem(BP[CurrentBP].DatabaseID).Guard_HP_Boost.ToString(),
+                "Guards HP boost: ",
+                "Заробіток будівель: ",
+                "建物収益： ");
+
+        TMesh.text += ParameterText(BData.items[BP[CurrentBP].DatabaseID].Cleric_HP_Boost.ToString(),
+                "Clerics HP boost: ",
+                "Підвищення HP кліриків:  ",
+                "聖職者のHP増加：  ");
+
+
+        TMesh.text += ParameterText(BData.FindItem(BP[CurrentBP].DatabaseID).Knight_Damage_Boost.ToString(),
+            "Knights Damage boost: ",
+            "Підвищення шкоди лицарів:  ",
+            "騎士ダメージ増加：  ");
+
+
+        TMesh.text += ParameterText(BData.FindItem(BP[CurrentBP].DatabaseID).Guard_Damage_Boost.ToString(),
+            "Guards Damage boost: ",
+            "Підвищення шкоди від охоронців:  ",
+            "ガードダメージ増加:  ");
+
+
+        TMesh.text += ParameterText(BData.FindItem(BP[CurrentBP].DatabaseID).Cleric_Damage_Boost.ToString(),
+            "Clerics Damage boost: ",
+            "Підвищення шкоди від кліриків:  ",
+            "聖職者ダメージ増加:  ");
+
+
+        TMesh.text += ParameterText(BData.FindItem(BP[CurrentBP].DatabaseID).Blueprints_Money_Boost.ToString(),
+            "Orders Money boost: ",
+            "Підвищення нагороди від замовлень:  ",
+            "落書きの指示資金増加：   ");
+
+        if(BData.FindItem(BP[CurrentBP].DatabaseID).Progression>0)
+        TMesh.text += ProgressionText(
+     "Unlocks new location.",
+     "Відкриває нову локацію.",
+     "新しい場所が解放されます。");
 
         Reward.transform.SetAsLastSibling();
     }
@@ -380,14 +472,17 @@ void MoveBlueprints()
                 BluePrintObjects[i].SetActive(false);
                 BlueprintsBG[i].SetActive(false);
                 BlueFloorObjects[i].SetActive(false);
-                
+                BlueprintsBase[i].SetActive(false);
             }
             else
             {
-                BluePrintObjects[i].SetActive(true);
-                BlueprintsBG[i].SetActive(true);
-                BlueFloorObjects[i].SetActive(true);
-             
+                if (MaxBlueprint > i)
+                {
+                    BluePrintObjects[i].SetActive(true);
+                    BlueprintsBG[i].SetActive(true);
+                    BlueFloorObjects[i].SetActive(true);
+                    BlueprintsBase[i].SetActive(true);
+                }
             }
         }
 
@@ -402,33 +497,40 @@ void MoveBlueprints()
         int i = blueprintnum ;
 
         RewardsControl();
-        print("BPConstructed.count " + menu.SL.BPConstructed.Count);
-        if (!BP[i].Unlocked && menu.SL.BPConstructed[b] > 0)
+  
+        if (!BP[i].Unlocked && menu.SL.SaveLoadCurrent.BPConstructed[b] > 0)
         {
-              
-            BP[i].Unlocked = true;
-            BP[i].UpdateBP();
-            UpdateBricks();
-
-            BackToNormalNumber = 0;
+            BlueprointIsConstructed(i);
+       
         }
 
-           
-        if (ReadObject(BP[i].ObjectList)  && BP[i].Rewards.Length>0 && menu.SL.BPConstructed[b] != 1)
-        {
-          
-            for (int r = 0; r < BP[i].Rewards.Length; r++)
-                inv.AddItem(BP[i].Rewards[r].itemID, BP[i].Rewards[r].Count, inv.GetItemInDatabase(BP[i].Rewards[r].itemID).Durability, inv.transform.position);
+      
+      
+            if (ReadObject(BP[i].ObjectList) && BP[i].Rewards.Length > 0 && menu.SL.SaveLoadCurrent.BPConstructed[b] != 1)
+            {
 
-               
-            LastBlueprint = i;
-            menu.SL.BPConstructed[b] = 1;
+                for (int r = 0; r < BP[i].Rewards.Length; r++)
+                {
+                    if (BP[i].Rewards[r].itemID == 9)
+                        inv.AddItem(BP[i].Rewards[r].itemID, BP[i].Rewards[r].Count + pl.Blueprints_Money_Boost, itemDatabase.FindItem(BP[i].Rewards[r].itemID).Durability, inv.transform.position);
+                    else
+                        inv.AddItem(BP[i].Rewards[r].itemID, BP[i].Rewards[r].Count, itemDatabase.FindItem(BP[i].Rewards[r].itemID).Durability, inv.transform.position);
 
-                
+                }
 
-        }
+                if (BData.FindItem(BP[i].DatabaseID).Progression > 0)
+                    if (menu.Progression < BData.FindItem(BP[i].DatabaseID).Progression)
+                        menu.Progression = BData.FindItem(BP[i].DatabaseID).Progression;
 
 
+                LastBlueprintID = BP[i].DatabaseID;
+                menu.SL.SaveLoadCurrent.BPConstructed[b] = 1;
+
+
+
+            }
+
+        
 
         blueprintnum++;
 
@@ -438,15 +540,18 @@ void MoveBlueprints()
     public void BluePrintsDoneManager()
     {
 
-   
-
+        
 
 
         for (int i = 0; i < BlueprintsDone.Count; i++)
         {
+            
 
-            if ( menu.SL.BPConstructed[i + startBlueprint()] == 1)
+
+            if ( menu.SL.SaveLoadCurrent.BPConstructed[i + startBlueprint()] == 1)
             {
+                LastBlueprintID = BP[i].DatabaseID;
+                ProgressionManager();
 
                 BlueprintsDone[i].SetActive(true);
 
@@ -470,6 +575,21 @@ void MoveBlueprints()
 
 
         return startbp;
+    }
+
+    void ProgressionManager()
+    {
+        if(LastBlueprintID == 17)
+            if (menu.Progression < 1) menu.Progression = 1;
+
+        if (LastBlueprintID == 39)
+            if (menu.Progression < 2) menu.Progression = 2;
+
+        if (LastBlueprintID == 42)
+            if (menu.Progression < 3) menu.Progression = 3;
+
+
+
     }
 
     float DisAssembleXPos(RectTransform BrickRT, GameObject BP, int currentchild)
@@ -706,7 +826,7 @@ void MoveBlueprints()
         menu.MenuActionDelay = Time.fixedTime + 0.1f;
 
         if (pl.menu.Language==0)
-            BlueprintText.text = "Orders to scribe";
+            BlueprintText.text = "Requests to scribe";
 
         if (pl.menu.Language ==1)
             BlueprintText.text = "Замовлення для малювання";
@@ -717,13 +837,13 @@ void MoveBlueprints()
 
         if (CurrentBP == 0)
             menu.ONOFFUI(LeftArrow.transform, false);
+        else menu.ONOFFUI(LeftArrow.transform, true);
 
-
-        if (CurrentBP >= BP.Count - 1)
+        if (CurrentBP >= MaxBlueprint - 1)
             menu.ONOFFUI(RightArrow.transform, false);
+        else menu.ONOFFUI(RightArrow.transform, true);
 
-
-        if ((menu.UIColl(LeftArrow) && (menu.IM.enter_b || menu.IM.LeftMouseButtonDown)) || (menu.IM._horizontal<0 && menu.IM._horizontalPush && ScrollDelay < Time.fixedTime) || (menu.IM.DPADX<0 && ScrollDelay<Time.fixedTime))
+        if ((menu.UIColl(LeftArrow) && (menu.IM.enter_b || menu.IM.LeftMouseButtonDown)) || (menu.IM._horizontal < 0 && menu.IM._horizontalPush && ScrollDelay < Time.fixedTime) || (menu.IM.DPADX < 0 && ScrollDelay < Time.fixedTime))
         {
             if (CurrentBP > 0)
             {
@@ -741,9 +861,9 @@ void MoveBlueprints()
 
         if ((menu.UIColl(RightArrow) &&( menu.IM.enter_b || menu.IM.LeftMouseButtonDown)) || (menu.IM._horizontal > 0 && menu.IM._horizontalPush && ScrollDelay<Time.fixedTime) || (menu.IM.DPADX > 0 && ScrollDelay < Time.fixedTime))
         {
-            if (CurrentBP < BP.Count - 1)
+            if (CurrentBP < MaxBlueprint - 1)
             {
-                if (CurrentBP == BP.Count - 2)
+                if (CurrentBP == MaxBlueprint - 2)
                 {
                     menu.ONOFFUI(RightArrow.transform, false);
                 }
@@ -763,9 +883,9 @@ void MoveBlueprints()
 
 
             MoveBlueprints();
-
-        BlueprintNameText.text = BData.items[BP[CurrentBP].DatabaseID].itemNames[menu.Language];
-        BlueprintDescText.text = BData.items[BP[CurrentBP].DatabaseID].itemDesc[menu.Language];
+     
+        BlueprintNameText.text = BData.FindItem(BP[CurrentBP].DatabaseID).itemNames[menu.Language];
+        BlueprintDescText.text = BData.FindItem(BP[CurrentBP].DatabaseID).itemDesc[menu.Language];
 
         BlueprintNameBG.SetAsLastSibling();
         BlueprintBG.SetAsLastSibling();
@@ -829,13 +949,15 @@ void MoveBlueprints()
             }
         }
 
-        print("BlueprintsButton 0");
+
 
         if ((menu.IM.BKey || (menu.UIColl(BlueprintsButton) && menu.IM.LeftMouseButtonDown && menu.IM.MouseMode)) && !menu.MenuONOFF && !inv.showjournal && menu.IM.ActionDelay < Time.fixedTime)
         {
             showbp = !showbp;
 
-          
+
+           
+
 
             if (showbp)
             {
@@ -858,6 +980,26 @@ void MoveBlueprints()
                 inv.ONOFF(StatsOBJ, true);
             }
 
+
+            for (int i = 0; i < BP.Count; i++)
+            {
+                if (MaxBlueprint <= i)
+                {
+                    BlueFloorObjects[i].SetActive(false);
+                    BlueprintsBG[i].SetActive(false);
+                    BlueprintsBase[i].SetActive(false);
+                }
+                else
+
+                {
+                    BlueFloorObjects[i].SetActive(true);
+                    BlueprintsBG[i].SetActive(true);
+                    BlueprintsBase[i].SetActive(true);
+
+                }
+            }
+
+
             menu.IM.ActionDelay = Time.fixedTime + 0.1f;
         }
 
@@ -878,7 +1020,8 @@ void MoveBlueprints()
 
                 if (BP[i].ObjectList.Count == 0) return;
            
-                BluePrintObjects[i].transform.GetChild(ii).GetComponent<RectTransform>().anchoredPosition = new Vector2(BP[i].ObjectList[ii].Place.x * partWidth, BP[i].ObjectList[ii].Place.y * partWidth);
+                BluePrintObjects[i].transform.GetChild(ii).GetComponent<RectTransform>().anchoredPosition = 
+                    new Vector2(BP[i].ObjectList[ii].Place.x * partWidth, BP[i].ObjectList[ii].Place.y * partWidth);
               
             }
 
@@ -895,6 +1038,7 @@ void MoveBlueprints()
 
     void SetALLCandidate(int i, ObjectOnBoard OBN, ref List<ObjectOnBoard> AllCandidates)
     {
+   
         if (Constr.OBOnBoard[i].ID != OBN.ID || AllCandidates.Contains(Constr.OBOnBoard[i]))
         {
 
@@ -932,9 +1076,10 @@ void MoveBlueprints()
         bool result = false;
       
         Vector2 StartPlace = new Vector2(0, 0);
-        List<ObjectOnBoard> StartCandidates = new List<ObjectOnBoard>();
-        List<ObjectOnBoard> AllCandidates = new List<ObjectOnBoard>();
+        List<ObjectOnBoard> StartCandidates = new List< ObjectOnBoard>();
+        List<ObjectOnBoard> AllCandidates = new List< ObjectOnBoard>();
 
+     
         for (int i = 0; i < Constr.OBOnBoard.Count; i++)
         {
             if (Constr.OBOnBoard[i].ID == objectList[0].ID)
@@ -943,11 +1088,11 @@ void MoveBlueprints()
 
             }
 
-
-
-            for (int ii = 0; ii < objectList.Count; ii++)
+     
+            for (int ii = 0; ii < Constr.OBOnBoard.Count; ii++)
             {
-                SetALLCandidate(i, objectList[ii], ref AllCandidates);
+
+                SetALLCandidate(i, Constr.OBOnBoard[ii], ref AllCandidates);
             }
             
         }
@@ -969,12 +1114,14 @@ void MoveBlueprints()
                 for (int i = 0; i < AllCandidates.Count; i++)
                 {
                  
+
                     if (AllCandidates[i].ID == objectList[j].ID &&
                             AllCandidates[i].Place - StartPlace ==  objectList[j].Place - objectList[0].Place &&
                             objectList[j].hasParrent == AllCandidates[i].hasParrent && objectList[j].orderinParrent == AllCandidates[i].orderinParrent)
                     {
 
-                
+                       
+
                         ConstructionStates[j] = 1;
                         
                        
@@ -1002,6 +1149,42 @@ void MoveBlueprints()
 
    
 
+string ParameterText(string param, string EnText, string UAText, string JapText)
+{
+        if (param == "0") return "";
+
+    string ret = EnText + param;
+
+
+    if (menu.Language == 1)
+            ret = UAText + param;
+
+    if (menu.Language == 2)
+            ret = JapText + param;
+
+
+        ret += " ";
+
+    return ret;
+}
+
+    string ProgressionText( string EnText, string UAText, string JapText)
+    {
+     
+        string ret = EnText ;
+
+
+        if (menu.Language == 1)
+            ret = UAText ;
+
+        if (menu.Language == 2)
+            ret = JapText ;
+
+
+        ret += " ";
+
+        return ret;
+    }
 
 
     Vector2 ConvertBlueFloorPart_To_BluePrintObjects(Vector2 ObjectListPlace)
@@ -1019,12 +1202,19 @@ void MoveBlueprints()
 
     public bool CheckBlueprint(int Number)
     {
-        if (menu.SL.BPConstructed[Number] == 1) return true;
+        if (menu.SL.SaveLoadCurrent.BPConstructed[Number] == 1) return true;
         else return false;
         
     }
 
+    void BlueprointIsConstructed(int i)
+    {
+        BP[i].Unlocked = true;
+        BP[i].UpdateBP();
+        UpdateBricks();
 
+        BackToNormalNumber = 0;
+    }
     public void PlayAudio(AudioClip AC)
     {
         AS.clip = AC;

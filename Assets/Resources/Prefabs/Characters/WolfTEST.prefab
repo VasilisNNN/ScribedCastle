@@ -498,6 +498,7 @@ GameObject:
   - component: {fileID: 7676687251500870770}
   - component: {fileID: 1014306684247863610}
   - component: {fileID: 6908824512042607772}
+  - component: {fileID: 4938489401283780448}
   m_Layer: 0
   m_Name: WolfTEST
   m_TagString: Flipping
@@ -585,32 +586,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 968c0051690728c46b0bb41c47ea1dfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Red: 0
-  Green: 0
-  Gold: 0
-  Cost: 0
-  CornCost: 0
   Table: 0
-  Shield: 0
   TransperentWall: 0
   ComfortPlus: 0
   TimePlus: 0
-  GodDelayPlus: 0
   DamageFromWall: 1
   floors: 0
-  kitchenfloors: 0
   tables: 0
-  beds: 0
   ground: 0
   wall: 0
-  oven: 0
-  toilet: 0
   people: 0
   Trash: 0
   Poop: 0
   CharactersOnThisStructure: []
-  decoration: 0
-  TopObject: 0
   TrueName: []
   Draw: 1
   DishesOnTable: []
@@ -639,11 +627,9 @@ MonoBehaviour:
   GoingBack: 1
   ItemPicker: 0
   BringsPickedItemToThePlayer: 0
-  MoveBetweenA_B: 0
   PickSpecificItem: 
-  Enemy: 0
-  Soldier: 0
   DropItemsOnTarget: 0
+  KeepItemForThemselves: 0
   DestroyTarget: 1
   LeavesTrash: 0
   ActionDelay: 10
@@ -652,11 +638,11 @@ MonoBehaviour:
   MoveDelayMax: 5
   FollowTimerDelay: 10
   FollowBorder: 2
-  A_Point: []
   TargetGameObjects:
   - {fileID: 5062304670444103666, guid: a31502b5e1d29e045886a7cce481d4ab, type: 3}
   - {fileID: 5062304670444103666, guid: 6be40c35f373d7b43ba5c0582a7b6571, type: 3}
   - {fileID: 5062304670444103666, guid: 4f55381b0c86bf34997a1e9dc33de924, type: 3}
+  mindistanceToTarget: 0.33
   IgnoreOccupation: 0
   ObjectOfOccupation: {fileID: 0}
   TriggerOFF_OffScreen: 0
@@ -684,11 +670,11 @@ MonoBehaviour:
   AttackDelayTime: 1
   Suicide: 0
   Dodging: 0
-  Zombie: 0
   GoBackAfterDamage: 0
   slope: 0
   Fliping: 1
   FollowPlayer: 0
+  OnThePoint: 0
 --- !u!50 &7676687251500870770
 Rigidbody2D:
   serializedVersion: 4
@@ -795,12 +781,23 @@ MonoBehaviour:
   StartGrowWithZero: 0
   Destructible: 1
   CanBeStunned: 0
-  CanTurnInEgg: 0
   CollisionClips: []
   AudioPlayed: 0
   GettingDamageFromWalls: 0
   ReduceAlphaOnColl: 0
   NewMaterialOnColl: {fileID: 0}
+  ConstructorElement:
+    Place: {x: 0, y: 0}
+    Name: 
+    ID: 0
+    Object: {fileID: 0}
+    Stats: {fileID: 0}
+    CharMove: {fileID: 0}
+    PO: {fileID: 0}
+    BaseObjectPosition: {x: 0, y: 0}
+    hasParrent: 0
+    orderinParrent: 0
+    _TileBase: {fileID: 0}
   CanBeHungry: 1
   HungerDamage: 1
   Friend: 0
@@ -817,6 +814,116 @@ MonoBehaviour:
   IgnoreDestroyList: 0
   BuildedStructure: 0
   SpawnPointName: 
+  ColorMaterial: {fileID: 0}
+  MiddleReplacement: {fileID: 0}
+  OBOnBoardElement:
+    Place: {x: 0, y: 0}
+    Name: 
+    ID: 0
+    Object: {fileID: 0}
+    Stats: {fileID: 0}
+    CharMove: {fileID: 0}
+    PO: {fileID: 0}
+    BaseObjectPosition: {x: 0, y: 0}
+    hasParrent: 0
+    orderinParrent: 0
+    _TileBase: {fileID: 0}
+--- !u!82 &4938489401283780448
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5062304670444103666}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: -3004925821248371385, guid: 8cc0028b7826d254ab836cd5065840c6, type: 2}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 0
+  MinDistance: 3
+  MaxDistance: 9
+  Pan2D: 0
+  rolloffMode: 1
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.46388888
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &5195774147458371193
 GameObject:
   m_ObjectHideFlags: 0

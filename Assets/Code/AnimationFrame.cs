@@ -47,10 +47,10 @@ public class AnimationFrame : MonoBehaviour
             {
                 if (StartFromRND)
                 {
-                    Timer = FramesDelay / constr.Game_SPEED + Random.Range(0.1f, 0.6f);
+                    Timer = FramesDelay  + Random.Range(0.1f, 0.6f);
                   
                 }
-                else Timer = FramesDelay / constr.Game_SPEED;
+                else Timer = FramesDelay ;
             }
             else
             {
@@ -96,7 +96,7 @@ public class AnimationFrame : MonoBehaviour
             sp = constr.Game_SPEED;
         }
 
-        Timer -= 0.02f * sp * Time.deltaTime * 100;
+        Timer -= 0.02f * Time.deltaTime * 100;
 
 
         if (num >= SPRT.Length) num = SPRT.Length - 1;

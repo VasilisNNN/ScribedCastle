@@ -10,6 +10,8 @@ using TMPro;
 using System.Linq;
 using static UnityEngine.EventSystems.StandaloneInputModule;
 using UnityEditor;
+using Unity.VisualScripting;
+
 
 
 
@@ -44,8 +46,11 @@ public class MenuCustom : MonoBehaviour
     public bool gameover { get; set; }
     public UnityEngine.Audio.AudioMixer mg;
 
-    private string[] MenuNamesEN, MenuNamesUA, MenuNamesJP, ModesNamesEN, ModesNamesUA, ModesNamesJP;
-    private string[] ModesDescNamesEN, ModesDescNamesUA, ModesDescNamesJP;
+    private string[] MenuNamesEN, MenuNamesUA, MenuNamesJP, 
+        ModesNamesEN, ModesNamesUA, ModesNamesJP,
+        ModesNamesLockedEN, ModesNamesLockedUA, ModesNamesLockedJP;
+    private string[] ModesDescNamesEN, ModesDescNamesUA, ModesDescNamesJP,
+        ModesDescNamesENLocked, ModesDescNamesUALocked, ModesDescNamesJPLocked;
 
 
 
@@ -61,7 +66,9 @@ public class MenuCustom : MonoBehaviour
     private List<GameObject> YesNoButtons = new List<GameObject>();
     private List<GameObject> ModeMenuButtons = new List<GameObject>();
 
-
+    public bool DEMO { get; private set; }
+    public bool TEST { get; set; }
+    public bool DEMOTEST { get; set; }
     private Player pl;
     public SaveLoad SL { get; set; }
     private int MenuButtonNum, SaveSlotNum;
@@ -78,6 +85,8 @@ public class MenuCustom : MonoBehaviour
     private int SlotXPOS, SlotYPOS;
     private GameObject  BackFromSaveSlots, ChooseSlot, MenuAllObject, MouseObject, ResDropDown, LanguageDropdown, ToolTipsYesNoOB, WindowDropdown;
     private Transform MenuAllTransform, OptionsAllTransform, SaveSlotsUI, ModeMenu, YesNoOB_Transform;
+    private TMP_Dropdown WindowDropdown_Dropdown;
+
     [HideInInspector]
     public float MasterSliderValue, BGSliderValue, ObjectsSliderValue;
     [HideInInspector]
@@ -92,7 +101,7 @@ public class MenuCustom : MonoBehaviour
     public int CurrentSlotNumber, ContinueNumber, CurrentYesNoNumber, ResolutionNumber, Language, LastSystemLanguage, DrawTutorial, FirstStart, FirstLanguage , Progression;
     public string StartLocation;
 
-    private GameObject ExitBuildingMode, ContinueOB, QuitGameOB, ToMenuOB, ToolTipsYesButtonOB, ToolTipsNoButtonOB, StartOB, SaveOB, LoadOB, OptionsOB, AchOB, ExitOB, OptionsApplyOB;
+    private GameObject BackFromYesNo, ExitBuildingMode, ContinueOB, QuitGameOB, ToMenuOB, ToolTipsYesButtonOB, ToolTipsNoButtonOB, StartOB, SaveOB, LoadOB, OptionsOB, AchOB, ExitOB, OptionsApplyOB;
 
 
     [HideInInspector]
@@ -122,10 +131,12 @@ public class MenuCustom : MonoBehaviour
 
     private string ExitBuildingMode_text;
     private string ScreenZoomText;
+    private string RemoveBuildingText;
     private string BuildingModeText;
     private string HideUIText;
     private string TransparencyUIText;
-    private string[] LanguageNames_EN, LanguageNames_UA, LanguageNames_JP;
+    private string DistanceFadeUIText;
+    private string[] LanguageNames_EN, LanguageNames_UA, LanguageNames_JP, ScreenoptionsTexts;
     private string SceneToTransition = "";
     public float TransitionTimer { get; private set; }
     private float fonttexttime;
@@ -142,14 +153,19 @@ public class MenuCustom : MonoBehaviour
 
     private RectTransform CanvasRectTransform ;
     private BlueprintDatabase bluedatabase;
-
-
+    private List<Sprite> ModeSprites = new List<Sprite>();
+    private List<Sprite> ModeLockedSprites = new List<Sprite>();
     private void Awake()
     {
         DefaultVariables();
     }
     void Start()
     {
+       // DEMO = true;
+       // TEST = true;
+       // DEMOTEST = true;
+       // PlayerPrefs.DeleteAll();
+
         CanvasTransform = InitializeObjects.CanvasTransform;
         CanvasRectTransform = GameObject.Find("Canvas").GetComponent<RectTransform>();
 
@@ -171,12 +187,13 @@ public class MenuCustom : MonoBehaviour
 
         BackFromSaveSlots = GameObject.Find("BackFromSaveSlots");
         ExitBuildingMode = GameObject.Find("ExitBuildingMode");
+        BackFromYesNo = GameObject.Find("BackFromYesNo");
 
         LanguageNames_EN = new string[] { "English", "Ukrainian" };
         LanguageNames_UA = new string[] { "Англійська", "Українська" };
         LanguageNames_JP = new string[] { "英語", "ウクライナ語" };
 
-       
+        ScreenoptionsTexts = new string[] { "Screen options", "Налаштування екрана", "画面オプション" };
 
         MenuChooseMove = Resources.Load<AudioClip>("Sound/UI/Click_0");
         MenuApplyClip = Resources.Load<AudioClip>("Sound/UI/Confirm0");
@@ -184,7 +201,17 @@ public class MenuCustom : MonoBehaviour
         ErrorClip = Resources.Load<AudioClip>("Sound/UI/Error");
         SaveSlotsUI = GameObject.Find("SaveSlotsUI").transform;
         ModeMenu = GameObject.Find("ModeMenu").transform;
-  
+
+        ModeSprites.Add(Resources.Load<Sprite>("Sprites/UI/Mode_Island"));
+        ModeSprites.Add(Resources.Load<Sprite>("Sprites/UI/Mode_Lake"));
+        ModeSprites.Add(Resources.Load<Sprite>("Sprites/UI/Mode_Mountain"));
+        ModeSprites.Add(Resources.Load<Sprite>("Sprites/UI/Mode_Hell"));
+
+        ModeLockedSprites.Add(Resources.Load<Sprite>("Sprites/UI/Mode_Island"));
+        ModeLockedSprites.Add(Resources.Load<Sprite>("Sprites/UI/Mode_Lake"));
+        ModeLockedSprites.Add(Resources.Load<Sprite>("Sprites/UI/Mode_Mountain"));
+        ModeLockedSprites.Add(Resources.Load<Sprite>("Sprites/UI/Mode_Hell_Locked"));
+
 
         YesNoOB_Transform = GameObject.Find("ToolTipsYesNo").transform;
 
@@ -342,7 +369,7 @@ public class MenuCustom : MonoBehaviour
         
 
         MenuNamesEN = new string[12] { "New scroll", "Load", "Save", "Options", "Back", "Exit", "New game", "To main menu", "Modes" + "\n" + "(Play the main game first)", "Modes", "Start Main field", "Continue" };
-        MenuNamesUA = new string[12] { "Нова гра", "Завантажити", "Зберігти", "ОпціЇ", "Назад", "Вийти з гри", "Старт", "Головне меню", "Моди", "Моди", "Старт" , "Продовжити"};
+        MenuNamesUA = new string[12] { "Нова гра", "Завантажити", "Зберегти", "ОпціЇ", "Назад", "Вийти з гри", "Старт", "Головне меню", "Моди", "Моди", "Старт" , "Продовжити"};
         MenuNamesJP = new string[12] { "ゲームを開始する", "ロード", "セーブ", "オプション", "戻る", "ゲームを終了する", "新しいゲーム", "メインメニューへ", "モード" + "\n" + "（メインゲームを最初にプレイする）", "モード", "ゲームを開始する", "続ける" };
 
         for(int i=0;i< MenuNamesJP.Length;i++)
@@ -352,26 +379,53 @@ public class MenuCustom : MonoBehaviour
         ModesNamesUA = new string[5] { "Острів", "Озеро", "Гора", "Пекло", "Назад", };
         ModesNamesJP = new string[5] { "冬", "血液", "武器と壁", "ボスラッシュ", "戻る" };
 
+        ModesNamesLockedEN = new string[5] { "Island", "Lake", "Mountain", "???", "Go back" };
+        ModesNamesLockedUA = new string[5] { "Острів", "Озеро", "Гора", "???", "Назад", };
+        ModesNamesLockedJP = new string[5] { "冬", "血液", "武器と壁", "???", "戻る" };
 
+    
         ModesDescNamesEN = new string[4] { 
             "Your can start here", 
-            "Build "+ bluedatabase.FindItem(14).itemNames[0] + "on the Island",
-            "Build "+ bluedatabase.FindItem(32).itemNames[0] + " near the Lake",
-            "Build "+ bluedatabase.FindItem(50).itemNames[0] + " near the Mountain" };
+            "Unlocked",
+            "Unlocked",
+            "Unlocked" };
 
 
         ModesDescNamesUA = new string[4] {
             "Починай тут",
-            "Побудуй "+ bluedatabase.FindItem(14).itemNames[1] + " на Острові",
-            "Побудуй "+ bluedatabase.FindItem(32).itemNames[1] + " на Озері",
-            "Побудуй "+ bluedatabase.FindItem(50).itemNames[1] + " на Горі" };
+            "Відкрито",
+            "Відкрито",
+            "Відкрито" };
 
 
         ModesDescNamesJP = new string[4] {
             "ここから始められます",
-            "構築してください "+ bluedatabase.FindItem(14).itemNames[2] + " 島で",
-            "構築してください "+ bluedatabase.FindItem(32).itemNames[2] + " 湖で",
-            "構築してください "+ bluedatabase.FindItem(50).itemNames[2] + " 山の上で"};
+            "アンロック済み",
+            "アンロック済み",
+            "アンロック済み"};
+
+
+
+
+        ModesDescNamesENLocked = new string[4] {
+            "Your can start here",
+            "To unlock build "+ bluedatabase.FindItem(17).itemNames[0] + " on the Island",
+            "To unlock build "+ bluedatabase.FindItem(39).itemNames[0] + " near the Lake",
+            "To unlock build "+ bluedatabase.FindItem(42).itemNames[0] + " near the Mountain" };
+
+
+        ModesDescNamesUALocked = new string[4] {
+            "Починай тут",
+            "Щоб відкрити побудуй "+ bluedatabase.FindItem(17).itemNames[1] + " на Острові",
+            "Щоб відкрити побудуй "+ bluedatabase.FindItem(39).itemNames[1] + " біля Озера",
+            "Щоб відкрити побудуй "+ bluedatabase.FindItem(42).itemNames[1] + " біля Гори" };
+
+
+        ModesDescNamesJPLocked = new string[4] {
+            "ここから始められます",
+            "構築してください "+ bluedatabase.FindItem(17).itemNames[2] + " 島で",
+            "構築してください "+ bluedatabase.FindItem(39).itemNames[2] + " 湖で",
+            "構築してください "+ bluedatabase.FindItem(42).itemNames[2] + " 山の上で"};
 
 
         for (int i = 0; i < ModesNamesJP.Length; i++)
@@ -416,24 +470,24 @@ public class MenuCustom : MonoBehaviour
             ResDropDown.GetComponent<TMP_Dropdown>().SetValueWithoutNotify(ResolutionNumber);
            
         }
-        //  DropNum = new int[OptionsButtons.Count];
-
-       
-        //SL.Save(false);
-        //  LoadMenu();
+        // DropNum = new int[OptionsButtons.Count];
+        // SL.Save(false);
+        // LoadMenu();
         LanguagesControll();
     }
+
 
     void Update()
     {
 
-        if (LanguageTimer < Time.fixedTime && SceneManager.GetActiveScene().name == "StartMenu")
-        {
-            LanguagesControll();
-            LanguageTimer = Time.fixedTime + 3;
-        }
+        if (Input.GetKey(KeyCode.LeftShift) && 
+            Input.GetKey(KeyCode.LeftAlt) && 
+            Input.GetKey(KeyCode.T))
+            TEST = true;
 
 
+        LanguageManager();
+       
 
         if (SceneToTransition.Length > 1)
         {
@@ -501,8 +555,7 @@ public class MenuCustom : MonoBehaviour
             else TransparencyUIValue = 1;
 
         }
-        
-        ProgressionManager();
+
 
         if (pl != null)
         {
@@ -561,8 +614,8 @@ public class MenuCustom : MonoBehaviour
 
 
        
-        if (GetComponent<Achivements>() != null)
-            ShowAchivements = GetComponent<Achivements>().ShowAch;
+        if (GetComponent<Achievements>() != null)
+            ShowAchivements = GetComponent<Achievements>().ShowAch;
 
 
         if ((IM.exit_b||IM.menu_b) && !DrawSaveSlots)
@@ -634,40 +687,40 @@ public class MenuCustom : MonoBehaviour
     {
       
         if (!MenuONOFF) return;
-        
-
         if (_options || _modes || SaveSlotsOn || LoadSlotsOn) return;
-
-
 
         if (YesNo)
             YesNoChoiseMove();
 
-
-
-        if (!YesNo)
+        if (!YesNo && !DrawSaveSlots)
         {
-            if (!DrawSaveSlots)
+            if (IM.MouseMode)
             {
+                for (int i = 0; i < MenuButtons.Count; i++)
+                    if (UIColl(MenuButtons[i])) SetChoisePosition(MenuButtons[i]);
+
+            }
+            else
+            {
+
                 MoveChouse_UP_DOWN(ref MenuButtonNum, MenuButtons.Count - 1);
-             
                 SetChoisePosition(MenuButtons[MenuButtonNum]);
             }
+        }
 
+    }
+
+
+    void YesNoChoiseMove()
+    {
+        if (!IM.MouseMode)
+        {
+            MoveChouse_LEFT_RIGHT(ref MenuButtonNum, YesNoButtons.Count - 1);
+            SetChoisePosition(YesNoButtons[MenuButtonNum]);
         }
 
 
-        
-
-    }
-    void YesNoChoiseMove()
-    {
-
-        MoveChouse_LEFT_RIGHT(ref MenuButtonNum, YesNoButtons.Count-1);
-        
-        SetChoisePosition(YesNoButtons[MenuButtonNum]);
-
-        if (IM.exit_b || IM.menu_b || PressButton(GameObject.Find("BackFromYesNo"))) 
+        if (IM.exit_b || IM.menu_b || PressButton(BackFromYesNo)) 
           BackToMainMenu(ref YesNoOB_Transform, ref YesNo);
        
     }
@@ -693,6 +746,57 @@ public class MenuCustom : MonoBehaviour
 
     }
 
+    void LanguageManager()
+    {
+        if (MenuONOFF)
+        {
+            if (LanguageTimer < Time.fixedTime)
+            {
+                LanguagesControll();
+                LanguageTimer = Time.fixedTime + 2;
+            }
+
+          
+        }
+
+
+
+        if (LanguageDropdown != null)
+        {
+            for (int i = 0; i < LanguageNames_EN.Length; i++)
+            {
+                if (Language == 0)
+                {
+                    if (LanguageDropdown.GetComponent<TMP_Dropdown>().captionText.text == LanguageNames_EN[i])
+                    {
+                        Language = i;
+
+                    }
+                }
+
+                if (Language == 1)
+                {
+                    if (LanguageDropdown.GetComponent<TMP_Dropdown>().captionText.text == LanguageNames_UA[i])
+                    {
+                        Language = i;
+
+                    }
+                }
+
+                if (Language == 2)
+                {
+                    if (LanguageDropdown.GetComponent<TMP_Dropdown>().captionText.text == LanguageNames_JP[i])
+                    {
+                        Language = i;
+
+                    }
+                }
+
+
+
+            }
+        }
+    }
 
 
     void ApplyOptions()
@@ -703,13 +807,14 @@ public class MenuCustom : MonoBehaviour
 #if UNITY_STANDALONE
             if (WindowDropdown != null)
             {
-                if (WindowDropdown.GetComponent<TMP_Dropdown>().captionText.text == "Fullscreen")
+                if (WindowDropdown.GetComponent<TMP_Dropdown>().value == 0)
                 {
                     print("Full screen on");
                     FullScreen = true;
                     Screen.fullScreenMode = FullScreenMode.FullScreenWindow;
                 }
-                if (WindowDropdown.GetComponent<TMP_Dropdown>().captionText.text == "Windowed")
+
+                if (WindowDropdown.GetComponent<TMP_Dropdown>().value == 1)
                 {
 
                     FullScreen = false;
@@ -717,11 +822,7 @@ public class MenuCustom : MonoBehaviour
                 }
             }
 
-            if (GameObject.Find("ScreenModeText") != null)
-            {
-                if (Screen.fullScreen) GameObject.Find("ScreenModeText").GetComponent<TextMeshProUGUI>().text = "Full Screen";
-                else GameObject.Find("ScreenModeText").GetComponent<TextMeshProUGUI>().text = "Window mode";
-            }
+           
 #endif
 
 
@@ -801,39 +902,48 @@ public class MenuCustom : MonoBehaviour
         
         if (ResDropDown != null)
         {
-                if (ResDropDown.GetComponent<TMP_Dropdown>().captionText.text == "800 * 600")
-                {
+
+            if (ResDropDown.GetComponent<TMP_Dropdown>().captionText.text == "1920 * 1080")
+            {
+                Screen.SetResolution(1920, 1080, FullScreen);
+                ResolutionNumber = 0;
+            }
+
+            if (ResDropDown.GetComponent<TMP_Dropdown>().captionText.text == "800 * 600")
+            {
 
                     Screen.SetResolution(800, 600, FullScreen);
-                    ResolutionNumber = 0;
-
-                }
-
-                if (ResDropDown.GetComponent<TMP_Dropdown>().captionText.text == "1280 * 720")
-                {
-
-                    Screen.SetResolution(1280, 720, FullScreen);
                     ResolutionNumber = 1;
 
-                }
+            }
 
-                if (ResDropDown.GetComponent<TMP_Dropdown>().captionText.text == "1920 * 1080")
-                {
-                    Screen.SetResolution(1920, 1080, FullScreen);
-                    ResolutionNumber = 2;
-                }
+            if (ResDropDown.GetComponent<TMP_Dropdown>().captionText.text == "1280 * 720")
+            {
+
+                Screen.SetResolution(1280, 720, FullScreen);
+                ResolutionNumber = 2;
+
+            }
+
+
+            if (ResDropDown.GetComponent<TMP_Dropdown>().captionText.text == "2560 * 1080")
+            {
+                Screen.SetResolution(2560, 1080, FullScreen);
+                ResolutionNumber = 3;
+            }
+            
 
                 if (ResDropDown.GetComponent<TMP_Dropdown>().captionText.text == "1600 * 900")
                 {
                     Screen.SetResolution(1600, 900, FullScreen);
-                    ResolutionNumber = 3;
+                    ResolutionNumber = 4;
                 }
 
                 if (ResDropDown.GetComponent<TMP_Dropdown>().captionText.text == "4096 * 2160")
                 {
 
                     Screen.SetResolution(4096, 2160, FullScreen);
-                    ResolutionNumber = 4;
+                    ResolutionNumber = 5;
                 }
         }
 #endif
@@ -857,7 +967,8 @@ public class MenuCustom : MonoBehaviour
         if (!MenuONOFF) return;
 
 
-        if (_modes)
+
+            if (_modes)
         {
             ModesManager();
             return;
@@ -969,24 +1080,39 @@ public class MenuCustom : MonoBehaviour
             PlayAudio(MenuApplyClip);
             ONOFFUI(MenuAllTransform, false);
            
-            if (GetComponent<Achivements>() != null)
-                GetComponent<Achivements>().ShowAch = true;
+            if (GetComponent<Achievements>() != null)
+                GetComponent<Achievements>().ShowAch = true;
 
             IM.ActionDelay = Time.fixedTime + 0.3f;
         }
 
         if (PressButton(StartOB) && !_modes)
         {
+            if (DEMO)
+            {
+                StartLocation = ModesNamesEN[0];
+               
 
-            _modes = true;
-            SetChoisePosition(ModeMenuButtons[0]);
-            ONOFFUI(ModeMenu, true);
+                ONOFFUI(ToolTipsYesNoOB.transform, true);
+                SetChoisePosition(YesNoButtons[0]);
 
-            ONOFFUI(OptionsAllTransform, false);
-            ONOFFUI(MenuAllTransform, false);
-            MenuButtonNum = 0;
-            IM.ActionDelay = Time.fixedTime + 0.3f;
+                YesNo = true;
+                _modes = false;
+                IM.ActionDelay = Time.fixedTime + 0.3f;
 
+
+            }
+            else
+            {
+                _modes = true;
+                SetChoisePosition(ModeMenuButtons[0]);
+                ONOFFUI(ModeMenu, true);
+
+                ONOFFUI(OptionsAllTransform, false);
+                ONOFFUI(MenuAllTransform, false);
+                MenuButtonNum = 0;
+                IM.ActionDelay = Time.fixedTime + 0.3f;
+            }
         }
 
 
@@ -1100,9 +1226,10 @@ public class MenuCustom : MonoBehaviour
 
 
           TransitionToTheScene(StartLocation, false);
-   
 
+#if UNITY_PS5 || UNITY_PS4
         Invoke("StartActivityNow", 1f);
+#endif
 
     }
 
@@ -1141,6 +1268,13 @@ public class MenuCustom : MonoBehaviour
 
     void Options()
     {
+
+        if (GameObject.Find("ScreenModeText") != null)
+        {
+            GameObject.Find("ScreenModeText").GetComponent<TextMeshProUGUI>().text = ScreenoptionsTexts[Language];
+
+        }
+
 
 
         float master = 3 * (MasterSlider.value * 10) - 30;
@@ -1734,10 +1868,15 @@ public class MenuCustom : MonoBehaviour
 
     void SetChoisePosition(GameObject Button)
     {
-        if( Vector3.Distance( ChooseUITransfrom.position , Button.GetComponent<RectTransform>().position)>0.1f && IM.MouseMode) 
+        print("SetChoisePosition " + Button.name);
+
+        Vector3 ChooseUITransfromPos = new Vector3(ChooseUITransfrom.position.x, ChooseUITransfrom.position.y, 0);
+        Vector3 ButtonPos = new Vector3(Button.GetComponent<RectTransform>().position.x, Button.GetComponent<RectTransform>().position.y, 0);
+
+        if (Vector2.Distance(ChooseUITransfromPos, ButtonPos) >0.2f && IM.MouseMode) 
             PlayAudio(MenuChooseMove);
      
-    ChooseSlot.transform.position = Button.GetComponent<RectTransform>().position;
+        ChooseSlot.transform.position = Button.GetComponent<RectTransform>().position;
         ChooseUITransfrom.position = Button.GetComponent<RectTransform>().position;
 
         ChooseSlot.GetComponent<RectTransform>().sizeDelta = Button.GetComponent<RectTransform>().sizeDelta * 1.2f;
@@ -1772,24 +1911,26 @@ public class MenuCustom : MonoBehaviour
             IM.ActionDelay = Time.fixedTime + 0.3f;
             return;
         }
-   
-      
+
+        if (TEST) Progression = 4;
+
 
         for (int i = 0; i < ModeMenuButtons.Count; i++)
         {
             if (Progression >= i)
             {
+                ModeMenuButtons[i].GetComponent<Image>().sprite = ModeSprites[i];
 
                 if (UIColl(ModeMenuButtons[i]) && IM.MouseMode)
                 {
-             
+
                     MenuButtonNum = i;
-                
+
                 }
 
                 if (PressButton(ModeMenuButtons[i]))
                 {
-                
+
                     ONOFFUI(ModeMenu, false);
                     ONOFFUI(OptionsAllTransform, false);
                     ONOFFUI(MenuAllTransform, false);
@@ -1797,9 +1938,9 @@ public class MenuCustom : MonoBehaviour
 
                     if (i <= 0)
                     {
-                    ONOFFUI(ToolTipsYesNoOB.transform, true);
-                    SetChoisePosition(YesNoButtons[0]);
-                        print("ModesManager 0");
+                        ONOFFUI(ToolTipsYesNoOB.transform, true);
+                        SetChoisePosition(YesNoButtons[0]);
+
                         YesNo = true;
                         _modes = false;
 
@@ -1815,13 +1956,19 @@ public class MenuCustom : MonoBehaviour
                         StartGame();
 
                     }
-               
+
                 }
             }
-            else if (PressButton_NoScalse(ModeMenuButtons[i]))
+            else
             {
-                PlayAudio(ErrorClip);
+                ModeMenuButtons[i].GetComponent<Image>().sprite = ModeLockedSprites[i];
 
+                if (PressButton_NoScalse(ModeMenuButtons[i]))
+                {
+
+                    PlayAudio(ErrorClip);
+
+                }
             }
 
 
@@ -1912,7 +2059,7 @@ public class MenuCustom : MonoBehaviour
         AS.Play();
     }
 
-  public  void LanguagesControll()
+  public void LanguagesControll()
     {
 
         if (Language == 0) ExitBuildingMode_text = "Exit Building mode";
@@ -1929,12 +2076,42 @@ public class MenuCustom : MonoBehaviour
         if (Language == 1) ScreenZoomText = "Зум екрану";
         if (Language == 2) ScreenZoomText = "ズームイン/ズームアウト";
 
+
+        if (Language == 0) RemoveBuildingText = "Erase (During scribbling)";
+        if (Language == 1) RemoveBuildingText = "Стирання (під час написання)";
+        if (Language == 2) RemoveBuildingText = "消去（落書き中）";
+
+
+        if (WindowDropdown != null)
+        {
+            WindowDropdown_Dropdown.captionText.text = WindowDropdown_Dropdown.options[WindowDropdown_Dropdown.value].text;
+
+            if (Language == 0) 
+            {
+                WindowDropdown_Dropdown.options[0].text = "Fullscreen";
+                WindowDropdown_Dropdown.options[1].text = "Windowed";
+            }
+
+            if (Language == 1)
+            {
+                WindowDropdown_Dropdown.options[0].text = "Весь екран";
+                WindowDropdown_Dropdown.options[1].text = "Вікно";
+            }
+
+            if (Language == 2)
+            {
+                WindowDropdown_Dropdown.options[0].text = "全画面表示";
+                WindowDropdown_Dropdown.options[1].text = "ウィンドウ表示";
+            }
+        }
+
+
         if (ExitBuildingMode != null)
         {
            ExitBuildingMode.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = ExitBuildingMode_text;
             ExitBuildingMode.transform.Find("BuildingModeButton").Find("Text").GetComponent<TextMeshProUGUI>().text = BuildingModeText;
             ExitBuildingMode.transform.Find("ScreenZoomButton").Find("Text").GetComponent<TextMeshProUGUI>().text = ScreenZoomText;
-
+            ExitBuildingMode.transform.Find("RemoveBuilding").Find("Text").GetComponent<TextMeshProUGUI>().text = RemoveBuildingText;
 
         }
 
@@ -2095,17 +2272,17 @@ public class MenuCustom : MonoBehaviour
         {
             if (Language == 0)
             {
-                SetModeMenuLables(ModesNamesEN, ModesDescNamesEN);
+                SetModeMenuLables(ModesNamesEN, ModesNamesLockedEN, ModesDescNamesEN, ModesDescNamesENLocked);
             }
 
             if (Language == 1)
             {
-                SetModeMenuLables(ModesNamesUA, ModesDescNamesUA);
+                SetModeMenuLables(ModesNamesUA, ModesNamesLockedUA, ModesDescNamesUA, ModesDescNamesUALocked);
             }
 
             if (Language == 2)
             {
-                SetModeMenuLables(ModesNamesJP, ModesDescNamesJP);
+                SetModeMenuLables(ModesNamesJP, ModesNamesLockedJP, ModesDescNamesJP, ModesDescNamesJPLocked);
             }
 
 
@@ -2119,7 +2296,10 @@ public class MenuCustom : MonoBehaviour
         if (Language == 1) TransparencyUIText = "Прозорість при будівництві";
         if (Language == 2) TransparencyUIText = "スクライビング中の透明性";
 
-        
+        if (Language == 0) DistanceFadeUIText = "Distance fade";
+        if (Language == 1) DistanceFadeUIText = "Зміна кольору на відстані";
+        if (Language == 2) DistanceFadeUIText = "水平線に近い色の変化";
+
 
         if (OptionsAllTransform != null)
             OptionsAllTransform.Find("HideUI").Find("Label").GetComponent<TextMeshProUGUI>().text = HideUIText;
@@ -2129,7 +2309,10 @@ public class MenuCustom : MonoBehaviour
             OptionsAllTransform.Find("TransparencyUI").Find("Label").GetComponent<TextMeshProUGUI>().text = TransparencyUIText;
 
 
-        
+        if (OptionsAllTransform != null)
+            OptionsAllTransform.Find("DistanceFadeUIToggle").Find("Label").GetComponent<TextMeshProUGUI>().text = DistanceFadeUIText;
+
+
 
         if (Language == 0)
         {
@@ -2150,19 +2333,25 @@ public class MenuCustom : MonoBehaviour
     }
 
 
-    void SetModeMenuLables(string[] modelabels, string[] descs)
+    void SetModeMenuLables(string[] modelabels, string[] modelabelslocked, string[] descs, string[] lockeddescs)
     {
+        for (int i = 0; i < descs.Length; i++)
+        {
+            if (Progression >= i)
+            {
+                ModeMenu.Find("Option " + i.ToString()).Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = modelabels[i];
 
-        ModeMenu.Find("Option 0").Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = modelabels[0];
-        ModeMenu.Find("Option 1").Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = modelabels[1];
-        ModeMenu.Find("Option 2").Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = modelabels[2];
-        ModeMenu.Find("Option 3").Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = modelabels[3];
+                ModeMenu.Find("Description " + i.ToString()).Find("Text").GetComponent<TextMeshProUGUI>().text = descs[i];
+            }
+            else
+            {
+                ModeMenu.Find("Option " + i.ToString()).Find("Start Button").Find("Text").GetComponent<TextMeshProUGUI>().text = modelabelslocked[i];
 
-        ModeMenu.Find("Description 0").Find("Text").GetComponent<TextMeshProUGUI>().text = descs[0];
-        ModeMenu.Find("Description 1").Find("Text").GetComponent<TextMeshProUGUI>().text = descs[1];
-        ModeMenu.Find("Description 2").Find("Text").GetComponent<TextMeshProUGUI>().text = descs[2];
-        ModeMenu.Find("Description 3").Find("Text").GetComponent<TextMeshProUGUI>().text = descs[3];
+                ModeMenu.Find("Description " + i.ToString()).Find("Text").GetComponent<TextMeshProUGUI>().text = lockeddescs[i];
 
+
+            }
+        }
 
 
 #if UINITY_SWITCH || UNITY_PS4 || UNITY_PS5 || UNITY_XBOX
@@ -2315,37 +2504,7 @@ public class MenuCustom : MonoBehaviour
         }
     }
 
-    void ProgressionManager()
-    {
-        int[] blueprIDs = new int[] { 21, 7, 1 };
-
-        int startbp = blueprIDs[0];
-        if (SceneManager.GetActiveScene().name == "Island")
-        {
-            startbp =  blueprIDs[0];
-            if (SL.BPConstructed[startbp] > 1)
-                if (Progression < 1) Progression = 1;
-        }
-
-        if (SceneManager.GetActiveScene().name == "Lake")
-        {
-            startbp = 39 + blueprIDs[1];
-            if (SL.BPConstructed[startbp] > 1)
-                if (Progression < 2) Progression = 2;
-        }
-        if (SceneManager.GetActiveScene().name == "Mountain")
-        {    startbp = 59 + blueprIDs[2];
-            if (SL.BPConstructed[startbp] > 1)
-            if (Progression < 3) Progression = 3;
-         }
-     
-        
-        if (SceneManager.GetActiveScene().name == "Hell")
-            startbp = 79;
-
-
-
-    }
+    
 
 
 
@@ -2362,7 +2521,8 @@ public class MenuCustom : MonoBehaviour
         TransparencyUIToggle = GameObject.Find("TransparencyUI").GetComponent<Toggle>();
         DistanceFadeUIToggle = GameObject.Find("DistanceFadeUIToggle").GetComponent<Toggle>();
         WindowDropdown = GameObject.Find("WindowDropdown");
-
+        if(WindowDropdown!=null)
+        WindowDropdown_Dropdown = WindowDropdown.GetComponent<TMP_Dropdown>();
 
         ContinueNumber = 0;
         MasterSliderValue = 0;

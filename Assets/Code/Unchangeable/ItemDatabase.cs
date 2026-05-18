@@ -44,10 +44,13 @@ public class ItemDatabase {
         Resources.Load<TileBase>("Brushes/Floor"),
         Resources.Load<TileBase>("Brushes/Dark sand"),
         Resources.Load<TileBase>("Brushes/Stone floor"),
+           Resources.Load<TileBase>("Brushes/Dark stone"),
          };
 
         PlantsRegularTileList = new TileBase[] {
-        Resources.Load<TileBase>("Brushes/Mud")
+        Resources.Load<TileBase>("Brushes/Mud"),
+        Resources.Load<TileBase>("Brushes/Dark sand"),
+        Resources.Load<TileBase>("Brushes/Sand")
          };
 
         //--------------------RESOURCES--------------------//
@@ -148,8 +151,8 @@ new string[7] { "", "", "", "", "", "", "" },
 
         items.Add(new Item(
 81, 81, Item.type.item,
-new string[7] { "Client1", "", "", "", "", "", "" },
-new string[7] { "Client1", "", "", "", "", "", "" },
+new string[7] { "Peasant", "", "", "", "", "", "" },
+new string[7] { "Peasant", "", "", "", "", "", "" },
 /*Cost*/ 0
 ));
         items[items.Count - 1].CanStack = true;
@@ -285,6 +288,47 @@ new string[7] { "Demon", "", "", "", "", "", "" },
 
         items[items.Count - 1].NeedItemsIDs = new int[1] { 43 };
         items[items.Count - 1].NeedItemsCounts = new int[1] { 1 };
+
+
+        items.Add(new Item(
+91, 91, Item.type.item,
+new string[7] { "Dragon", "Дракон", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 0
+));
+        items[items.Count - 1].CanStack = true;
+
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Characters/Dragon");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+
+        items.Add(new Item(
+92, 92, Item.type.item,
+new string[7] { "Dragon sitting", "Дракон що сидить", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 0
+));
+        items[items.Count - 1].CanStack = true;
+
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Characters/DragonSitting");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
+
+        items.Add(new Item(
+93, 93, Item.type.item,
+new string[7] { "Rabbit", "Кролик", "", "", "", "", "" },
+new string[7] { "", "", "", "", "", "", "" },
+/*Cost*/ 0
+));
+        items[items.Count - 1].CanStack = true;
+
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Characters/Rabbit");
+        items[items.Count - 1].TargetBrush = new TileBase[1] { Resources.Load<TileBase>("Brushes/Floor") };
 
 
         //--------------------CRAFTING TABLES--------------------//
@@ -596,7 +640,7 @@ new string[7] { "Earns 5 gold", "Заробляє 5 золота", "5ゴール�
         items.Add(new Item(
 352, 352, Item.type.item,
 new string[7] { "House", "Будинок", "家", "", "", "", "" },
-new string[7] { "Pesants live here", "Тут живуть кріпаки", "農民が住んでいる", "", "", "", "" },
+new string[7] { "Peasants live here. Spawns 2 peasants.", "Тут живуть 2 селянина.", "農民が住んでいる", "", "", "", "" },
 /*Cost*/ 10
 ));
         items[items.Count - 1].CanStack = true;
@@ -666,13 +710,14 @@ new string[7] { "", "", "", "", "", "", "" },
         items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
         items[items.Count - 1].NeedItemsCounts = new int[1] { 1 };
 
-        if (SceneManager.GetActiveScene().name == "Island" ||
+        if (SceneManager.GetActiveScene().name == "Tutorial" || 
+            SceneManager.GetActiveScene().name == "Island" ||
             SceneManager.GetActiveScene().name == "Lake" ||
              SceneManager.GetActiveScene().name == "Mountain")
         {
             items.Add(new Item(
     355, 355, Item.type.item,
-    new string[7] { "Island soil", "Земля", "土地", "", "", "", "" },
+    new string[7] { "Soil to scribble on", "Земля для будування", "土地", "", "", "", "" },
     new string[7] { "Expands available land on the island", "Розширює доступну землю острова", "島で利用可能な土地の拡大", "", "", "", "" },
     /*Cost*/ 150
     ));
@@ -692,7 +737,7 @@ new string[7] { "", "", "", "", "", "", "" },
         {
             items.Add(new Item(
     355, 355, Item.type.item,
-    new string[7] { "Island hell soil", "Земля", "土地", "", "", "", "" },
+    new string[7] { "Island hell soil", "Земля пекла", "土地", "", "", "", "" },
     new string[7] { "Expands available land in the hell", "Розширює доступну землю пекла", "地獄のアクセス可能な土地を拡大する", "", "", "", "" },
     /*Cost*/ 150
     ));
@@ -713,7 +758,9 @@ new string[7] { "", "", "", "", "", "", "" },
         items.Add(new Item(
 370, 370, Item.type.item,
 new string[7] { "Guard station", "Пост охорони", "守衛所", "", "", "", "" },
-new string[7] { "Spawns guards. Guards kill wolves and can be killed by thieves.", "Спавнить вартових. Вартові вбивають вовків і можуть бути вбиті злодіями.", "衛兵を作る。警備兵は狼を殺し、泥棒に殺されることもある。", "", "", "", "" },
+new string[7] { "Spawns guards. Guards kill Wolves, Rabbits and Dragons. Can be killed by Thieves.", 
+    "Спавнить вартових. Вартові вбивають Вовків, Кролів, Драконів. Можуть бути вбиті злодіями.",
+    "ガードを出現させる。ガードはオオカミ、ウサギ、ドラゴンを倒す。盗賊に倒されることがある。", "", "", "", "" },
 /*Cost*/ 180
 ));
         items[items.Count - 1].CanStack = true;
@@ -733,8 +780,10 @@ new string[7] { "Spawns guards. Guards kill wolves and can be killed by thieves.
 
         items.Add(new Item(
 375, 375, Item.type.item,
-new string[7] { "Knights building", "Будинок лицарів", "ナイツ・ビル", "", "", "", "" },
-new string[7] { "Spawns One Knight. Knights kill thieves and can be killed by heretics.", "Спавнить одного лицаря. Лицарі вбивають злодіїв і можуть бути вбиті єретиками.", "騎士を1人作る。騎士は盗賊を殺し、異端者に殺されることもある。", "", "", "", "" },
+new string[7] { "Knights mansion", "Будинок лицарів", "ナイツ・ビル", "", "", "", "" },
+new string[7] { "Spawns One Knight. Knights kill Thieves and Dragons. Can be killed by Heretics.", 
+    "Спавнить одного лицаря. Лицарі вбивають Злодіївб Драконів. Можуть бути вбиті Єретиками.",
+    "騎士を1体出現させる。騎士は盗賊とドラゴンを倒す。異端者によって倒されることがある。", "", "", "", "" },
 /*Cost*/ 180
 ));
         items[items.Count - 1].CanStack = true;
@@ -910,13 +959,14 @@ new string[7] { "", "", "", "", "", "", "" },
 
         items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
         items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
-        items[items.Count - 1].BuildingCost = 12;
+      //  items[items.Count - 1].BuildingCost = 12;
+
 
 
 
         items.Add(new Item(
    600, 600, Item.type.item,
-   new string[7] { "Base wall", "", "", "", "", "", "" },
+   new string[7] { "Base wall", "Базова стіна", "", "", "", "", "" },
    new string[7] { "Wall block", "", "", "", "", "", "" },
    /*Cost*/ 3
    ));
@@ -986,7 +1036,7 @@ new string[7] { "Wall block", "", "", "", "", "", "" },
 
         items.Add(new Item(
 670, 670, Item.type.item,
-new string[7] { "Assassins wall", "", "", "", "", "", "" },
+new string[7] { "Assassins wall", "Стіна ассасинів", "", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
 /*Cost*/ 15
 ));
@@ -1043,7 +1093,7 @@ new string[7] { "", "", "", "", "", "", "" },
 
         items.Add(new Item(
 675, 675, Item.type.item,
-new string[7] { "Thieves wall", "", "", "", "", "", "" },
+new string[7] { "Thieves wall", "Стіна крадіїв", "", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
 /*Cost*/ 12
 ));
@@ -1126,7 +1176,7 @@ new string[7] { "", "", "", "", "", "", "" },
 
         items.Add(new Item(
 681, 681, Item.type.item,
-new string[7] { "Church block 2", "", "", "", "", "", "" },
+new string[7] { "Church block 2", "Церковна стіна 2", "教会の壁2", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
 /*Cost*/ 15
 ));
@@ -1157,7 +1207,7 @@ new string[7] { "", "", "", "", "", "", "" },
 
         items.Add(new Item(
 682, 682, Item.type.item,
-new string[7] { "Church block 3", "", "", "", "", "", "" },
+new string[7] { "Church block 3", "Церковна стіна 3", "", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
 /*Cost*/ 15
 ));
@@ -1186,7 +1236,7 @@ new string[7] { "", "", "", "", "", "", "" },
 
         items.Add(new Item(
 683, 683, Item.type.item,
-new string[7] { "Church block 4", "", "", "", "", "", "" },
+new string[7] { "Church block 4", "Церковна стіна 4", "", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
 /*Cost*/ 15
 ));
@@ -1385,7 +1435,7 @@ new string[7] { "", "", "", "", "", "", "" },
 
         items.Add(new Item(
 710, 700, Item.type.item,
-new string[7] { "Wood wall mid", "", "", "", "", "", "" },
+new string[7] { "Wood wall mid", "Дерев'яна стіна середня", "", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
 /*Cost*/ 6
 ));
@@ -1402,7 +1452,7 @@ new string[7] { "", "", "", "", "", "", "" },
 
         items.Add(new Item(
 711, 700, Item.type.item,
-new string[7] { "Wood wall mid 1", "", "", "", "", "", "" },
+new string[7] { "Wood wall mid 1", "Дерев'яна стіна середня 1", "", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
 /*Cost*/ 6
 ));
@@ -1947,7 +1997,7 @@ new string[7] { "", "", "", "", "", "", "" },
 
         items.Add(new Item(
    966, 966, Item.type.item,
-   new string[7] { "Devil blue wall", "", "", "", "", "", "" },
+   new string[7] { "Devil blue wall", "Диявольська блакитна стіна", "", "", "", "", "" },
    new string[7] { "In His will is our peace.", "", "", "", "", "", "" },
    /*Cost*/ 4
    ));
@@ -2017,74 +2067,7 @@ new string[7] { "", "", "", "", "", "", "" },
 
 
 
-        items.Add(new Item(
-970, 970, Item.type.item,
-new string[7] { "Assassins wall", "", "", "", "", "", "" },
-new string[7] { "Those who bring death rest here", "", "", "", "", "", "" },
-/*Cost*/ 8
-));
-        items[items.Count - 1].CanStack = true;
-        items[items.Count - 1].Structure = true;
-        items[items.Count - 1].TargetTileMap = MainTileBase;
-        items[items.Count - 1]._StructureType = Item.StructureType.Building;
-
-
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/AssassinsWall");
-
-        items[items.Count - 1].ObjectPrefsBottom = new GameObject[] {
-            Resources.Load<GameObject>("Prefabs/Walls/AssassinsWall")};
-
-        items[items.Count - 1].ObjectPrefsMid = new GameObject[] {
-            Resources.Load<GameObject>("Prefabs/Walls/AssassinsWallMid")};
-
-        items[items.Count - 1].ObjectPrefsTop = new GameObject[] {
-            Resources.Load<GameObject>("Prefabs/Walls/AssassinsWallTop")};
-
-
-        items[items.Count - 1].TargetBrush = StructuresTileList;
-
-        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
-        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
-
-
-
-        items.Add(new Item(
-971, 970, Item.type.item,
-new string[7] { "Assassins wall Mid", "", "", "", "", "", "" },
-new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 4
-));
-        items[items.Count - 1].CanStack = true;
-        items[items.Count - 1].Structure = true;
-        items[items.Count - 1].TargetTileMap = MainTileBase;
-        items[items.Count - 1]._StructureType = Item.StructureType.Building;
-
-
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/AssassinsWallMid");
-        items[items.Count - 1].TargetBrush = StructuresTileList;
-
-        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
-        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
-
-
-
-        items.Add(new Item(
-972, 970, Item.type.item,
-new string[7] { "Assassins rooftop", "", "", "", "", "", "" },
-new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 4
-));
-        items[items.Count - 1].CanStack = true;
-        items[items.Count - 1].Structure = true;
-        items[items.Count - 1].TargetTileMap = MainTileBase;
-        items[items.Count - 1]._StructureType = Item.StructureType.Building;
-
-
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Walls/AssassinsWallTop");
-        items[items.Count - 1].TargetBrush = StructuresTileList;
-
-        items[items.Count - 1].NeedItemsIDs = new int[1] { 1 };
-        items[items.Count - 1].NeedItemsCounts = new int[1] { 2 };
+       
 
 
 
@@ -2685,7 +2668,7 @@ new string[7] { "", "", "", "", "", "", "" },
         items.Add(new Item(
 1015, 1015, Item.type.item,
 new string[7] { "Flower wall", "Квіткова стіна", "", "", "", "", "" },
-new string[7] { "Structure with flower decoration", "", "", "", "", "", "" },
+new string[7] { "Structure with flower decoration", "Стіна з квітковим декором", "", "", "", "", "" },
 /*Cost*/ 6
 ));
         items[items.Count - 1].CanStack = true;
@@ -2712,8 +2695,8 @@ new string[7] { "Structure with flower decoration", "", "", "", "", "", "" },
 
         items.Add(new Item(
 1016, 1016, Item.type.item,
-new string[7] { "Flower wall 1", "Квіткова стіна", "", "", "", "", "" },
-new string[7] { "", "", "", "", "", "", "" },
+new string[7] { "Flower wall 1", "Квіткова стіна 1", "", "", "", "", "" },
+new string[7] { "Structure with flower decoration", "Стіна з квітковим декором", "", "", "", "", "" },
 /*Cost*/ 6
 ));
         items[items.Count - 1].CanStack = true;
@@ -2815,7 +2798,7 @@ new string[7] { "", "", "", "", "", "", "" },
         items.Add(new Item(
 1030, 1030, Item.type.item,
 new string[7] { "German wall", "Німецька стіна", "", "", "", "", "" },
-new string[7] { "", "", "", "", "", "", "" },
+new string[7] { "The wall from the central regions of Europe", "Стіна з центральних регіонів Європи", "", "", "", "", "" },
 /*Cost*/ 6
 ));
         items[items.Count - 1].CanStack = true;
@@ -2880,7 +2863,7 @@ new string[7] { "", "", "", "", "", "", "" },
         items.Add(new Item(
 1033, 1033, Item.type.item,
 new string[7] { "Gothic church", "Готичний собор", "ゴシック様式の聖堂", "", "", "", "" },
-new string[7] { "", "", "", "", "", "", "" },
+new string[7] { "The wall of a Gothic cathedral", "Стіна готичного собору", "", "", "", "", "" },
 /*Cost*/ 4
 ));
         items[items.Count - 1].CanStack = true;
@@ -2909,7 +2892,7 @@ new string[7] { "", "", "", "", "", "", "" },
         items.Add(new Item(
 1034, 1034, Item.type.item,
 new string[7] { "Gothic church 1", "Готичний собор 1", "ゴシック様式の聖堂", "", "", "", "" },
-new string[7] { "", "", "", "", "", "", "" },
+new string[7] { "The wall of a Gothic cathedral", "Стіна готичного собору", "", "", "", "", "" },
 /*Cost*/ 4
 ));
         items[items.Count - 1].CanStack = true;
@@ -2938,7 +2921,7 @@ new string[7] { "", "", "", "", "", "", "" },
         items.Add(new Item(
 1035, 1035, Item.type.item,
 new string[7] { "Gothic church 2", "Готичний собор 2", "ゴシック様式の聖堂 2", "", "", "", "" },
-new string[7] { "", "", "", "", "", "", "" },
+new string[7] { "The wall of a Gothic cathedral", "Стіна готичного собору", "", "", "", "", "" },
 /*Cost*/ 4
 ));
         items[items.Count - 1].CanStack = true;
@@ -2968,7 +2951,7 @@ new string[7] { "", "", "", "", "", "", "" },
         items.Add(new Item(
 1036, 1036, Item.type.item,
 new string[7] { "Gothic church 3", "Готичний собор 3", "ゴシック様式の聖堂 3", "", "", "", "" },
-new string[7] { "", "", "", "", "", "", "" },
+new string[7] { "The wall of a Gothic cathedral", "Стіна готичного собору", "", "", "", "", "" },
 /*Cost*/ 4
 ));
         items[items.Count - 1].CanStack = true;
@@ -3143,7 +3126,7 @@ new string[7] { "", "", "", "", "", "", "" },
 1045, 1045, Item.type.item,
 new string[7] { "Magic church", "Магічний собор", "ゴシック様式の聖堂", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 20
+/*Cost*/ 40
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3172,7 +3155,7 @@ new string[7] { "", "", "", "", "", "", "" },
 1046, 1046, Item.type.item,
 new string[7] { "Magic church 1", "Магічний собор 1", "ゴシック様式の聖堂", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 20
+/*Cost*/ 40
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3201,7 +3184,7 @@ new string[7] { "", "", "", "", "", "", "" },
 1047, 1047, Item.type.item,
 new string[7] { "Magic church 2", "Магічний собор 2", "ゴシック様式の聖堂 2", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 20
+/*Cost*/ 40
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3231,7 +3214,7 @@ new string[7] { "", "", "", "", "", "", "" },
 1048, 1048, Item.type.item,
 new string[7] { "Magic church 3", "Магічний собор 3", "ゴシック様式の聖堂 3", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 20
+/*Cost*/ 40
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3261,7 +3244,7 @@ new string[7] { "", "", "", "", "", "", "" },
       1049, 1045, Item.type.item,
       new string[7] { "Magic church mid", "Магічний собор середня", "", "", "", "", "" },
       new string[7] { "", "", "", "", "", "", "" },
-      /*Cost*/ 20
+      /*Cost*/ 40
       ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3279,7 +3262,7 @@ new string[7] { "", "", "", "", "", "", "" },
       1050, 1046,  Item.type.item,
       new string[7] { "Magic church mid 1", "Магічний собор середня 1", "", "", "", "", "" },
       new string[7] { "", "", "", "", "", "", "" },
-      /*Cost*/ 20
+      /*Cost*/ 40
       ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3296,7 +3279,7 @@ new string[7] { "", "", "", "", "", "", "" },
      1051, 1047,  Item.type.item,
      new string[7] { "Magic church mid 2", "Магічний собор середня 2", "", "", "", "", "" },
      new string[7] { "", "", "", "", "", "", "" },
-     /*Cost*/ 20
+     /*Cost*/ 40
      ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3313,7 +3296,7 @@ new string[7] { "", "", "", "", "", "", "" },
     1052, 1048,  Item.type.item,
      new string[7] { "Magic church mid 3", "Магічний собор середня 3", "", "", "", "", "" },
      new string[7] { "", "", "", "", "", "", "" },
-     /*Cost*/ 20
+     /*Cost*/ 40
      ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3331,7 +3314,7 @@ new string[7] { "", "", "", "", "", "", "" },
        1053, 1045, Item.type.item,
        new string[7] { "Magic church top", "Магічна собор вершина", "", "", "", "", "" },
        new string[7] { "", "", "", "", "", "", "" },
-       /*Cost*/ 20
+       /*Cost*/ 40
        ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3347,7 +3330,7 @@ new string[7] { "", "", "", "", "", "", "" },
       1054, 1046, Item.type.item,
       new string[7] { "Magic church top 1", "Магічна собор вершина 1", "", "", "", "", "" },
       new string[7] { "", "", "", "", "", "", "" },
-      /*Cost*/ 20
+      /*Cost*/ 40
       ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3363,7 +3346,7 @@ new string[7] { "", "", "", "", "", "", "" },
     1055, 1047, Item.type.item,
     new string[7] { "Magic church top 2", "Магічна собор вершина", "", "", "", "", "" },
     new string[7] { "", "", "", "", "", "", "" },
-    /*Cost*/ 20
+    /*Cost*/ 40
     ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3379,7 +3362,7 @@ new string[7] { "", "", "", "", "", "", "" },
     1056, 1048, Item.type.item,
     new string[7] { "Magic church top 3", "Магічна собор вершина 3", "", "", "", "", "" },
     new string[7] { "", "", "", "", "", "", "" },
-    /*Cost*/ 20
+    /*Cost*/ 40
     ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3397,7 +3380,7 @@ new string[7] { "", "", "", "", "", "", "" },
 1057, 1057, Item.type.item,
 new string[7] { "Dragon block", "Блок з драконом", "建設ブロックとドラゴン", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 10
+/*Cost*/ 100
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3427,7 +3410,7 @@ new string[7] { "", "", "", "", "", "", "" },
 1058, 1058, Item.type.item,
 new string[7] { "Dragon block 1", "Блок з драконом 1", "建設ブロックとドラゴン 1", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 10
+/*Cost*/ 100
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3461,7 +3444,7 @@ new string[7] { "", "", "", "", "", "", "" },
 1059, 1059, Item.type.item,
 new string[7] { "Dragon block 2", "Блок з драконом 2", "建設ブロックとドラゴン 2", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 10
+/*Cost*/ 100
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3491,7 +3474,7 @@ new string[7] { "", "", "", "", "", "", "" },
     1060, 1060, Item.type.item,
         new string[7] { "Dragon block 3", "Блок з драконом 3", "建設ブロックとドラゴン 3", "", "", "", "" },
         new string[7] { "", "", "", "", "", "", "" },
-        /*Cost*/ 10
+        /*Cost*/ 100
         ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3525,7 +3508,7 @@ new string[7] { "", "", "", "", "", "", "" },
    1061, 1057, Item.type.item,
    new string[7] { "Dragon church mid", "", "", "", "", "", "" },
    new string[7] { "", "", "", "", "", "", "" },
-   /*Cost*/ 10
+   /*Cost*/ 100
    ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3542,7 +3525,7 @@ new string[7] { "", "", "", "", "", "", "" },
   1062, 1058, Item.type.item,
   new string[7] { "Dragon church mid 1", "", "", "", "", "", "" },
   new string[7] { "", "", "", "", "", "", "" },
-  /*Cost*/ 10
+  /*Cost*/ 100
   ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3558,7 +3541,7 @@ new string[7] { "", "", "", "", "", "", "" },
   1063, 1059, Item.type.item,
   new string[7] { "Dragon church mid 2", "", "", "", "", "", "" },
   new string[7] { "", "", "", "", "", "", "" },
-  /*Cost*/ 10
+  /*Cost*/ 100
   ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3575,7 +3558,7 @@ new string[7] { "", "", "", "", "", "", "" },
   1064, 1060, Item.type.item,
   new string[7] { "Dragon church mid 3", "", "", "", "", "", "" },
   new string[7] { "", "", "", "", "", "", "" },
-  /*Cost*/ 10
+  /*Cost*/ 100
   ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3592,7 +3575,7 @@ new string[7] { "", "", "", "", "", "", "" },
  1065, 1057, Item.type.item,
  new string[7] { "Dragon church top", "", "", "", "", "", "" },
  new string[7] { "", "", "", "", "", "", "" },
- /*Cost*/ 10
+ /*Cost*/ 100
  ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3609,7 +3592,7 @@ items.Add(new Item(
  1066, 1058, Item.type.item,
  new string[7] { "Dragon church top 1", "", "", "", "", "", "" },
  new string[7] { "", "", "", "", "", "", "" },
- /*Cost*/ 10
+ /*Cost*/ 100
  ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3625,7 +3608,7 @@ items.Add(new Item(
    1067, 1059, Item.type.item,
    new string[7] { "Dragon church top 2", "", "", "", "", "", "" },
    new string[7] { "", "", "", "", "", "", "" },
-   /*Cost*/ 10
+   /*Cost*/ 100
    ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3644,7 +3627,7 @@ items.Add(new Item(
    1068, 1060, Item.type.item,
    new string[7] { "Dragon church top 3", "", "", "", "", "", "" },
    new string[7] { "", "", "", "", "", "", "" },
-   /*Cost*/ 10
+   /*Cost*/ 100
    ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3664,7 +3647,7 @@ items.Add(new Item(
 1069, 1069, Item.type.item,
 new string[7] { "Faces block", "Блок з обличчам", "顔のあるブロック", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 6
+/*Cost*/ 60
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3694,7 +3677,7 @@ new string[7] { "", "", "", "", "", "", "" },
 1070, 1070, Item.type.item,
 new string[7] { "Faces block 1", "Блок з обличчам 1", "顔のあるブロック 1", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 6
+/*Cost*/ 60
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3723,7 +3706,7 @@ new string[7] { "", "", "", "", "", "", "" },
 1071, 1071, Item.type.item,
 new string[7] { "Faces block 2", "Блок з обличчам 2", "顔のあるブロック 2", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 6
+/*Cost*/ 60
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3752,7 +3735,7 @@ new string[7] { "", "", "", "", "", "", "" },
 1072, 1072, Item.type.item,
 new string[7] { "Faces block 3", "Блок з обличчам 3", "顔のあるブロック 3", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 6
+/*Cost*/ 60
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3780,7 +3763,7 @@ new string[7] { "", "", "", "", "", "", "" },
 1072, 1072, Item.type.item,
 new string[7] { "Faces block 3", "Блок з обличчам 3", "顔のあるブロック 3", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 6
+/*Cost*/ 60
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3810,7 +3793,7 @@ new string[7] { "", "", "", "", "", "", "" },
 1073, 1069, Item.type.item,
 new string[7] { "Faces block mid", "", "", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 6
+/*Cost*/ 60
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3827,7 +3810,7 @@ new string[7] { "", "", "", "", "", "", "" },
 1074, 1070, Item.type.item,
 new string[7] { "Faces block mid 1", "", "", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 6
+/*Cost*/ 60
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3844,7 +3827,7 @@ new string[7] { "", "", "", "", "", "", "" },
 1075, 1071, Item.type.item,
 new string[7] { "Faces block mid 2", "", "", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 6
+/*Cost*/ 60
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3862,7 +3845,7 @@ new string[7] { "", "", "", "", "", "", "" },
 1076, 1072, Item.type.item,
 new string[7] { "Faces block mid 3", "", "", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 6
+/*Cost*/ 60
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3879,7 +3862,7 @@ new string[7] { "", "", "", "", "", "", "" },
 1077, 1069, Item.type.item,
 new string[7] { "Faces church top", "", "", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 6
+/*Cost*/ 60
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3896,7 +3879,7 @@ new string[7] { "", "", "", "", "", "", "" },
 1078, 1070, Item.type.item,
 new string[7] { "Faces church top 1", "", "", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 6
+/*Cost*/ 60
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3913,7 +3896,7 @@ new string[7] { "", "", "", "", "", "", "" },
 1079, 1071, Item.type.item,
 new string[7] { "Faces church top 2", "", "", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 6
+/*Cost*/ 60
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -3930,7 +3913,7 @@ new string[7] { "", "", "", "", "", "", "" },
 1080, 1072, Item.type.item,
 new string[7] { "Faces church top 3", "", "", "", "", "", "" },
 new string[7] { "", "", "", "", "", "", "" },
-/*Cost*/ 6
+/*Cost*/ 60
 ));
         items[items.Count - 1].CanStack = true;
         items[items.Count - 1].Structure = true;
@@ -4750,9 +4733,9 @@ new string[7] { "", "", "", "", "", "", "" },
         items[items.Count - 1].NeedItemsCounts = new int[1] { 1 };
 
         items.Add(new Item(
-1302, 1301, Item.type.item,
-new string[7] { "Trees 1", "Дерева", "樹木", "", "", "", "" },
-new string[7] { "", "", "", "", "", "", "" },
+1302, 1302, Item.type.item,
+new string[7] { "Fat tree", "Широке дерево", "広い木", "", "", "", "" },
+new string[7] { "A fat tree, from a distant land", "Широке дерево, з далекої землі", "広い木、遠い国から", "", "", "", "" },
 /*Cost*/ 4
 ));
         items[items.Count - 1].CanStack = true;
@@ -4761,7 +4744,7 @@ new string[7] { "", "", "", "", "", "", "" },
         items[items.Count - 1].TargetTileMap = MainTileBase;
         items[items.Count - 1]._StructureType = Item.StructureType.Farms;
 
-        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Farms/Trees");
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Farms/Fat tree");
         items[items.Count - 1].TargetBrush = new TileBase[] {
         Resources.Load<TileBase>("Brushes/Mud"),
         Resources.Load<TileBase>("Brushes/Grass"),
@@ -4771,6 +4754,7 @@ new string[7] { "", "", "", "", "", "", "" },
         items[items.Count - 1].NeedItemsIDs = new int[1] { 44 };
         items[items.Count - 1].NeedItemsCounts = new int[1] { 1 };
 
+       
 
         items.Add(new Item(
 1303, 1303, Item.type.item,
@@ -4858,7 +4842,7 @@ new string[7] { "", "", "", "", "", "", "" },
         items[items.Count - 1]._StructureType = Item.StructureType.Building;
 
         items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Farms/Bush");
-        items[items.Count - 1].TargetBrush = PlantsRegularTileList;
+        items[items.Count - 1].TargetBrush = StructuresTileList;
 
 
         items.Add(new Item(
@@ -4874,7 +4858,7 @@ new string[7] { "", "", "", "", "", "", "" },
         items[items.Count - 1]._StructureType = Item.StructureType.Building;
 
         items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Farms/Bush square");
-        items[items.Count - 1].TargetBrush = PlantsRegularTileList;
+        items[items.Count - 1].TargetBrush = StructuresTileList;
 
 
         items.Add(new Item(
@@ -4890,10 +4874,30 @@ new string[7] { "", "", "", "", "", "", "" },
         items[items.Count - 1]._StructureType = Item.StructureType.Building;
 
         items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Farms/Tiny Bush");
-        items[items.Count - 1].TargetBrush = PlantsRegularTileList;
+        items[items.Count - 1].TargetBrush = StructuresTileList;
 
 
+        items.Add(new Item(
+1323, 1323, Item.type.item,
+new string[7] { "Twisted tree", "Покручене дерево", "ねじれた木", "", "", "", "" },
+new string[7] { "Twisted tree found in the forest", "Покручене дерево, знайдене в лісі", "森で見つかったねじれた木", "", "", "", "" },
+/*Cost*/ 4
+));
+        items[items.Count - 1].CanStack = true;
+        //items[items.Count - 1].Plague = 1;
+        items[items.Count - 1].Structure = true;
+        items[items.Count - 1].TargetTileMap = MainTileBase;
+        items[items.Count - 1]._StructureType = Item.StructureType.Farms;
 
+        items[items.Count - 1].ObjectPrefs = Resources.Load<GameObject>("Prefabs/Farms/Twisted tree");
+        items[items.Count - 1].TargetBrush = new TileBase[] {
+        Resources.Load<TileBase>("Brushes/Mud"),
+        Resources.Load<TileBase>("Brushes/Grass"),
+         Resources.Load<TileBase>("Brushes/Sand"),
+        Resources.Load<TileBase>("Brushes/Dark sand")};
+
+        items[items.Count - 1].NeedItemsIDs = new int[1] { 44 };
+        items[items.Count - 1].NeedItemsCounts = new int[1] { 1 };
 
         //--------------------ENEMIES--------------------//
 
@@ -5031,6 +5035,25 @@ new string[7] { "", "", "", "", "", "", "" },
     }
 
 
-      
+    public Item FindItem(int id)
+    {
+        Item result = new Item();
+    
+        for (int i = 0; i < items.Count; i++)
+        {
+            if (items[i].itemID == id)
+            {
+                result = items[i];
+                return result;
+            }
+
+
+        }
+
+
+        return result;
+    }
+
+
 
 }

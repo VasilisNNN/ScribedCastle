@@ -66,10 +66,8 @@ public class PCKeyboardInputs :  IInputs
 
     public float VerticalArrows => Input.GetAxis("VerticalArrows");
 
-    public bool shift => Input.GetButton("Shift");
 
-
-
+    public bool shift { get; set; }
 
     public bool HorizontalFlip => Input.GetButtonDown("HorizontalFlip");
     public bool Rightstickpush => Input.GetButtonDown("RightStickPush");
@@ -84,7 +82,7 @@ public class PCKeyboardInputs :  IInputs
     public bool _horizontal_DPAD_Push => false;
 
     public bool _vertical_DPAD_Push => false;
-
+ 
     public bool joystick {
         get
         {
@@ -109,7 +107,7 @@ public class PCKeyboardInputs :  IInputs
     }
     public void Body()
     {
-
+        shift = Input.GetKey(KeyCode.LeftShift);
     }
 
 

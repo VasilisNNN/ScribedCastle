@@ -4,11 +4,13 @@ using UnityEngine.UI;
 public class AssembleWallsUI : MonoBehaviour
 {
     private Inventory inv;
+    private ItemDatabase itemDatabase;
     private GameObject AssembleUI;
     private Image Bottom, Mid, Top;
     void Start()
     {
         inv = InitializeObjects.PL.inv;
+        itemDatabase = InitializeObjects.Itemdatabase;
         AssembleUI = GameObject.Find("AssembleWallsUI");
         Bottom = AssembleUI.transform.Find("Bottom").GetComponent<Image>();
         Mid = AssembleUI.transform.Find("Mid").GetComponent<Image>();
@@ -37,7 +39,7 @@ public class AssembleWallsUI : MonoBehaviour
 
             return;
         }
-        Item CurrentItem = inv.GetItemInDatabase(inv.CurrentItemToolTips.itemID);
+        Item CurrentItem = itemDatabase.FindItem(inv.CurrentItemToolTips.itemID);
         if (CurrentItem == null) return;
         if (CurrentItem.ObjectPrefs == null) return;
 
@@ -107,7 +109,7 @@ public class AssembleWallsUI : MonoBehaviour
 
     }
 
-    void TurnOFFUI()
+    public void TurnOFFUI()
     {
         Bottom.enabled = false;
         Mid.enabled = false;

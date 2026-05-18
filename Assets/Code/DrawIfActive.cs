@@ -145,7 +145,7 @@ public class DrawIfActive : MonoBehaviour
     void VisionDraw()
     {
 
-        if (MaxVision < pl.Vision || MinVision > pl.Vision || MaxSniff < pl.Sniff || MinSniff > pl.Sniff || MaxDay < constr.SL.DayNumber || MinDay > constr.SL.DayNumber)
+        if (MaxVision < pl.Vision || MinVision > pl.Vision || MaxSniff < pl.Sniff || MinSniff > pl.Sniff || MaxDay < constr.SL.SaveLoadCurrent.DayNumber || MinDay > constr.SL.SaveLoadCurrent.DayNumber)
         {
             if (Draw)
             {

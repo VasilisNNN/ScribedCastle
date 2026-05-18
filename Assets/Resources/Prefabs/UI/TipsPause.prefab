@@ -29,14 +29,14 @@ RectTransform:
   m_GameObject: {fileID: 7138421635803514086}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.0007809, y: 1.0007809, z: 1.0007809}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7138421636979634505}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 392, y: -279}
+  m_AnchoredPosition: {x: 402, y: -289}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7138421635803514085
@@ -67,7 +67,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 4c5ee8d6523520a47b3c48c0d033a7bf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8f3ec4cccce4b574b8d34d9f367e0766, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -89,9 +89,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c240c9534bc0b84595018cd77de9a67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DrawOnlyOnGamepad: 1
-  MouseSPRT: {fileID: 21300000, guid: 4c5ee8d6523520a47b3c48c0d033a7bf, type: 3}
-  KeyBoardSPRT: {fileID: 21300000, guid: 4c5ee8d6523520a47b3c48c0d033a7bf, type: 3}
+  DrawOnlyOnGamepad: 0
+  MouseSPRT: {fileID: 21300000, guid: 8f3ec4cccce4b574b8d34d9f367e0766, type: 3}
+  KeyBoardSPRT: {fileID: 21300000, guid: 8f3ec4cccce4b574b8d34d9f367e0766, type: 3}
   GamepadSPRT: {fileID: 21300000, guid: ca56c61c513585a488a6573027c543e5, type: 3}
   SwitchGamepad: {fileID: 21300000, guid: 7cb7580de1b20dd4dbe0c8c492c1b86c, type: 3}
 --- !u!61 &2073441129793922300
@@ -138,7 +138,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 80, y: 80}
   m_EdgeRadius: 0
 --- !u!1 &7138421635839602903
 GameObject:
@@ -205,8 +205,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 1877b5b3c2af1284e847f5bbd86dd048, type: 3}
-  m_Type: 1
+  m_Sprite: {fileID: -7414664612578975867, guid: bc7892ecfd46a244cb07ec36f1c2b614, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -379,7 +379,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7138421636979634504}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.0007784, y: 1.0007784, z: 1.0007784}
   m_ConstrainProportionsScale: 0
@@ -495,8 +495,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 42
-  m_fontSizeBase: 42
+  m_fontSize: 35
+  m_fontSizeBase: 35
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

@@ -50,9 +50,10 @@ public class Upgrades : MonoBehaviour
     private AudioClip TakeItemClip, ClickClip;
     private GameObject AttackEffect;
     private GameObject MouseOB;
-
+    private ItemDatabase itemDatabase;
     void Start()
     {
+        itemDatabase = InitializeObjects.Itemdatabase;
         MouseOB = GameObject.Find("MouseOB");
       
            Const = GameObject.Find("Constructor").GetComponent<Constructor>();
@@ -162,29 +163,29 @@ public class Upgrades : MonoBehaviour
         if (ItemID > -1)
         {
            
-            if (pl.inv.GetItemInDatabase(ItemID).AddSlots * direction>0) pl.inv.AddInvSlot(pl.inv.GetItemInDatabase(ItemID).AddSlots);
-            if (pl.inv.GetItemInDatabase(ItemID).AddSlots * direction < 0) pl.inv.RemoveInvSlot(pl.inv.GetItemInDatabase(ItemID).AddSlots);
+            if (itemDatabase.FindItem(ItemID).AddSlots * direction>0) pl.inv.AddInvSlot(itemDatabase.FindItem(ItemID).AddSlots);
+            if (itemDatabase.FindItem(ItemID).AddSlots * direction < 0) pl.inv.RemoveInvSlot(itemDatabase.FindItem(ItemID).AddSlots);
 
-            pl.inv.slotX += pl.inv.GetItemInDatabase(ItemID).AddSlots * direction;
+            pl.inv.slotX += itemDatabase.FindItem(ItemID).AddSlots * direction;
 
 
 
-            pl.DamageAmount += pl.inv.GetItemInDatabase(ItemID).DamageAmount * direction;
+            pl.DamageAmount += itemDatabase.FindItem(ItemID).DamageAmount * direction;
 
-            pl.Payment += pl.inv.GetItemInDatabase(ItemID).Payment * direction;
+            pl.Payment += itemDatabase.FindItem(ItemID).Payment * direction;
             if (pl.Payment < 1) pl.Payment = 1;
 
-            pl.LootItem += pl.inv.GetItemInDatabase(ItemID).LootItem * direction;
+            pl.LootItem += itemDatabase.FindItem(ItemID).LootItem * direction;
             if (pl.LootItem < 1) pl.LootItem = 1;
 
-            pl.MaxHP += pl.inv.GetItemInDatabase(ItemID).MaxHP * direction;
+            pl.MaxHP += itemDatabase.FindItem(ItemID).MaxHP * direction;
 
-            if (pl.inv.GetItemInDatabase(ItemID).MaxHP != 0)
+            if (itemDatabase.FindItem(ItemID).MaxHP != 0)
             {
                 if (pl.HP < pl.MaxHP)
                 {
-                    if (pl.MaxHP - pl.HP < pl.inv.GetItemInDatabase(ItemID).MaxHP)
-                        pl.HP += pl.inv.GetItemInDatabase(ItemID).MaxHP * direction;
+                    if (pl.MaxHP - pl.HP < itemDatabase.FindItem(ItemID).MaxHP)
+                        pl.HP += itemDatabase.FindItem(ItemID).MaxHP * direction;
                     else pl.HP = pl.MaxHP;
 
 
@@ -194,26 +195,26 @@ public class Upgrades : MonoBehaviour
                 if (pl.HP > pl.MaxHP) pl.HP = pl.MaxHP;
             }
 
-            pl.Height += pl.inv.GetItemInDatabase(ItemID).Height * direction;
+            pl.Height += itemDatabase.FindItem(ItemID).Height * direction;
 
             // print("pl.MaxHP "+ pl.inv.GetItemInDatabase(ItemID).itemID + " " + pl.inv.GetItemInDatabase(ItemID).MaxHP * direction);
 
-            pl.MaxStamina += pl.inv.GetItemInDatabase(ItemID).Stamina * direction;
-            pl.Stamina += pl.inv.GetItemInDatabase(ItemID).Stamina * direction;
+            pl.MaxStamina += itemDatabase.FindItem(ItemID).Stamina * direction;
+            pl.Stamina += itemDatabase.FindItem(ItemID).Stamina * direction;
 
-            pl.StaminaRestore += (pl.inv.GetItemInDatabase(ItemID).StaminaRecoverySpeed / 10) * direction;
+            pl.StaminaRestore += (itemDatabase.FindItem(ItemID).StaminaRecoverySpeed / 10) * direction;
 
             if (pl.StaminaRestore < 1) pl.StaminaRestore = 1;
             if (pl.StaminaRestore > 20) pl.StaminaRestore = 20;
 
 
 
-            pl.Speed += pl.inv.GetItemInDatabase(ItemID).Speed * direction;
-            pl.DashDuration += pl.inv.GetItemInDatabase(ItemID).DashDuration * direction;
-            pl.VisionBase += pl.inv.GetItemInDatabase(ItemID).Vision * direction;
+            pl.Speed += itemDatabase.FindItem(ItemID).Speed * direction;
+            pl.DashDuration += itemDatabase.FindItem(ItemID).DashDuration * direction;
+            pl.VisionBase += itemDatabase.FindItem(ItemID).Vision * direction;
          
 
-            pl.Sniff += pl.inv.GetItemInDatabase(ItemID).Sniff * direction;
+            pl.Sniff += itemDatabase.FindItem(ItemID).Sniff * direction;
 
         }
 
@@ -277,13 +278,13 @@ public class Upgrades : MonoBehaviour
         if (inv == null || pl == null )
             return;
 
-        if(inv.GetItemInDatabase(id) == null) return;
+        if(itemDatabase.FindItem(id) == null) return;
 
-        if (inv.GetItemInDatabase(id).itemID > -1)
+        if (itemDatabase.FindItem(id).itemID > -1)
             {
       
            
-            if (inv.GetItemInDatabase(id)._type == Item.type.weapon)
+            if (itemDatabase.FindItem(id)._type == Item.type.weapon)
                 {
 
                 PlayerGun.SetGunID(id, durability);
@@ -324,10 +325,10 @@ public class Upgrades : MonoBehaviour
             return;
         }
 
-        if (pl.inv == null || pl == null || pl.inv.GetItemInDatabase(id) == null)
+        if (pl.inv == null || pl == null || itemDatabase.FindItem(id) == null)
             return;
 
-        if (pl.inv.GetItemInDatabase(id)._bodypart == null || pl.inv.GetItemInDatabase(id)._bodypart.Length <= 0) return;
+        if (itemDatabase.FindItem(id)._bodypart == null || itemDatabase.FindItem(id)._bodypart.Length <= 0) return;
 
 
        
@@ -339,16 +340,16 @@ public class Upgrades : MonoBehaviour
 
         for (int x = 0; x < Slots.Length; x++)
             for (int y = 0; y < Slots[x].items.Count; y++)
-                for (int b = 0; b < pl.inv.GetItemInDatabase(id)._bodypart.Length; b++)
+                for (int b = 0; b < itemDatabase.FindItem(id)._bodypart.Length; b++)
                 {
-                    if (Slots[x].Slot[y].GetComponent<Slot>()._bodypart == pl.inv.GetItemInDatabase(id)._bodypart[b])
+                    if (Slots[x].Slot[y].GetComponent<Slot>()._bodypart == itemDatabase.FindItem(id)._bodypart[b])
                     {
                         Slots[x].items[y] = item;
-                        if (pl.inv.GetItemInDatabase(id).itemID > -1)
+                        if (itemDatabase.FindItem(id).itemID > -1)
                         {
 
 
-                            if (pl.inv.GetItemInDatabase(id)._type == Item.type.weapon)
+                            if (itemDatabase.FindItem(id)._type == Item.type.weapon)
                                 PlayerGun.SetGunID(item.itemID, durablity);
 
 
@@ -425,16 +426,16 @@ public class Upgrades : MonoBehaviour
         int emptyslotsX = -1;
         int emptyslotsY = -1;
 
-        if (pl.inv.GetItemInDatabase(ItemID) == null) return;
-        if (pl.inv.GetItemInDatabase(ItemID)._bodypart == null) return;
+        if (itemDatabase.FindItem(ItemID) == null) return;
+        if (itemDatabase.FindItem(ItemID)._bodypart == null) return;
 
         for (int x = 0; x < Slots.Length; x++)
         {
             for (int y = 0; y < Slots[x].Slot.Length; y++)
             {
-                for (int b = 0; b < pl.inv.GetItemInDatabase(ItemID)._bodypart.Length; b++)
+                for (int b = 0; b < itemDatabase.FindItem(ItemID)._bodypart.Length; b++)
                 {
-                    if (Slots[x].Slot[y].GetComponent<Slot>()._bodypart == pl.inv.GetItemInDatabase(ItemID)._bodypart[b] && Slots[x].items[y].itemID == -1)
+                    if (Slots[x].Slot[y].GetComponent<Slot>()._bodypart == itemDatabase.FindItem(ItemID)._bodypart[b] && Slots[x].items[y].itemID == -1)
                     {
 
                         emptyslotsX = x;
@@ -458,7 +459,7 @@ public class Upgrades : MonoBehaviour
 
         if (emptyslotsX == -1 && emptyslotsY == -1)
         {
-            for (int b = 0; b < pl.inv.GetItemInDatabase(ItemID)._bodypart.Length; b++)
+            for (int b = 0; b < itemDatabase.FindItem(ItemID)._bodypart.Length; b++)
             {
                 for (int x = 0; x < Slots.Length; x++)
                 {
@@ -466,7 +467,7 @@ public class Upgrades : MonoBehaviour
                     {
 
 
-                        if (Slots[x].Slot[y].GetComponent<Slot>()._bodypart == pl.inv.GetItemInDatabase(ItemID)._bodypart[b])
+                        if (Slots[x].Slot[y].GetComponent<Slot>()._bodypart == itemDatabase.FindItem(ItemID)._bodypart[b])
                         {
                             emptyslotsX = x;
                             emptyslotsY = y;
@@ -485,7 +486,7 @@ public class Upgrades : MonoBehaviour
         {
             if (Slots[emptyslotsX].items[emptyslotsY].itemID > -1)
             {
-                pl.inv.AddItem(Slots[emptyslotsX].items[emptyslotsY].itemID, 1, pl.inv.GetItemInDatabase(Slots[emptyslotsX].items[emptyslotsY].itemID).Durability, pl._transform.position);
+                pl.inv.AddItem(Slots[emptyslotsX].items[emptyslotsY].itemID, 1, itemDatabase.FindItem(Slots[emptyslotsX].items[emptyslotsY].itemID).Durability, pl._transform.position);
                 AddSubtractStats(Slots[emptyslotsX].items[emptyslotsY].itemID, -1);
                 Slots[emptyslotsX].items[emptyslotsY] = new Item();
 
@@ -500,16 +501,16 @@ public class Upgrades : MonoBehaviour
         }
 
        
-        if (pl.inv.GetItemInDatabase(ItemID).HP != 0)
+        if (itemDatabase.FindItem(ItemID).HP != 0)
         {
             print("HEAL");
-            pl.Heal(pl.inv.GetItemInDatabase(ItemID).HP, pl.inv.BufferItem.MagicEffectToCast);
+            pl.Heal(itemDatabase.FindItem(ItemID).HP, pl.inv.BufferItem.MagicEffectToCast);
        
         }
 
-        if (pl.inv.GetItemInDatabase(ItemID).Satiety != 0)
+        if (itemDatabase.FindItem(ItemID).Satiety != 0)
         {
-            pl.Eating(pl.inv.GetItemInDatabase(ItemID).Satiety, pl.inv.GetItemInDatabase(ItemID).MagicEffectToCast);
+            pl.Eating(itemDatabase.FindItem(ItemID).Satiety, itemDatabase.FindItem(ItemID).MagicEffectToCast);
            
         }
 
@@ -534,11 +535,11 @@ public class Upgrades : MonoBehaviour
         {
             for (int y = 0; y < Slots[x].Slot.Length; y++)
             {
-                if (Slots[x].Slot[y] != null && pl.inv.GetItemInDatabase(PlayerGun.CurrentGunID) != null && pl.inv.GetItemInDatabase(PlayerGun.CurrentGunID)._bodypart != null)
+                if (Slots[x].Slot[y] != null && itemDatabase.FindItem(PlayerGun.CurrentGunID) != null && itemDatabase.FindItem(PlayerGun.CurrentGunID)._bodypart != null)
                 {
-                    for (int b = 0; b < pl.inv.GetItemInDatabase(PlayerGun.CurrentGunID)._bodypart.Length; b++)
+                    for (int b = 0; b < itemDatabase.FindItem(PlayerGun.CurrentGunID)._bodypart.Length; b++)
                     {
-                        if (Slots[x].Slot[y].GetComponent<Slot>()._bodypart == pl.inv.GetItemInDatabase(PlayerGun.CurrentGunID)._bodypart[b])
+                        if (Slots[x].Slot[y].GetComponent<Slot>()._bodypart == itemDatabase.FindItem(PlayerGun.CurrentGunID)._bodypart[b])
                         {
 
                             AttackEffect = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Effects/Explosion_Wood_Effect"));

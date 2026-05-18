@@ -17,22 +17,28 @@ public class GenerateMoney : MonoBehaviour
     private bool IsActive;
     private float Delay;
     public int Money = 1;
-
-    public bool OnOccupation;
+    public int MoneyGrowSide  = 1;
+    
+    private StatsControll Stats;
+    public bool IgnoreOccupation;
+    public float MinDelay = 10;
     void Start()
     {
-    
+        Stats = GetComponent<StatsControll>();
         pl = InitializeObjects.PL;
         inv = pl.inv;
         Constr = InitializeObjects.Constr;
       
        
         Anim = GetComponent<Animator>();
+        Delay = MinDelay;
     }
 
     void Update()
     {
         if (pl.Pause()) return;
+
+        Delay -= Time.deltaTime ;
 
         if (Anim != null)
         {
@@ -55,27 +61,56 @@ public class GenerateMoney : MonoBehaviour
 
     void AddMoney()
     {
-        if (OnOccupation)
+
+        if (pl.Pause()) return;
+        if ((!Stats.Occupied || !Stats.HasCharacter) && !IgnoreOccupation) return;
+
+        if (Stats.ReverseMoney) MoneyGrowSide = -1;
+        else MoneyGrowSide = 1;
 
 
-       
-        if (!GetComponent<StatsControll>().Occupied || !GetComponent<StatsControll>().HasAChracter) return;
-
-        if (Delay > Time.fixedTime) return;
-        inv.AddItemNOAUDIO(9, Money, 99,transform.position);
-        Delay = Time.fixedTime + 10;
+        if (Delay > 0) return;
+        inv.AddItemNOAUDIO(9, (Money + MoneyBoost()) * MoneyGrowSide, 99,transform.position);
+        Delay = Mathf.Clamp(MinDelay - DelayBoost(),1,9999999999999);
 
 
     }
+    
+    int MoneyBoost()
+    {
+        if (MoneyGrowSide <= 0) return 0;
 
+        int moneyboost = 0;
+        if (!IgnoreOccupation)
+            moneyboost = pl.Peasants_CollectMoney_Amount_Boost;
+        else
+            moneyboost = pl.Buildings_CollectMoney_Amount_Boost;
+
+        return moneyboost;
+    }
+
+    float DelayBoost()
+    {
+        if (MoneyGrowSide <= 0) return 0;
+
+        float mindelay = 0;
+        if (!IgnoreOccupation)
+            mindelay = pl.Peasants_CollectMoney_Timer_Boost;
+        else
+            mindelay = pl.Buildings_CollectMoney_Timer_Boost;
+
+        return mindelay;
+    }
     bool CheckDayCycle()
     {
         bool result = false;
         for (int i = 0; i < DayToAct.Length; i++)
         {
-            if (pl.DayNight.Day_Cycle == DayToAct[i]) result = true;
+            if (pl.DayNight.Day_Cycle == DayToAct[i]) return true;
 
         }
+
+
         return result;
     }
 }

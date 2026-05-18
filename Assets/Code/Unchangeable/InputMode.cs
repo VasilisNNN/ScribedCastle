@@ -96,6 +96,7 @@ public class InputMode: MonoBehaviour
     public float ActionDelay { get; set; }
     public int CraftedItems { get; set; }
 
+    private float GamepadHorTimer, GamepadRHorTimer, GamepadVertTimer;
 #if UNITY_PS5 || UNITY_PS4
     private SonySaveDataMain PS_SaveMain;
 #endif
@@ -187,8 +188,8 @@ public class InputMode: MonoBehaviour
         FadeMode = CurrentInputs.FadeMode;
         _horizontalPush = CurrentInputs._horizontalPush;
         _verticalPush = CurrentInputs._verticalPush;
+        shift = CurrentInputs.shift;
 
-  
         MousePosition = Input.mousePosition;
 
 

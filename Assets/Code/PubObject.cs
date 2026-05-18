@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.SceneManagement;
+using System.Linq;
 
 public class Sit
 {
@@ -14,12 +15,11 @@ public class PubObject : MonoBehaviour
 {
  
     public bool Table;
-    public bool Shield;
+
     public bool TransperentWall;
 
     public int ComfortPlus;
     public int TimePlus;
-    public int GodDelayPlus;
 
     public int DamageFromWall =1;
 
@@ -30,22 +30,18 @@ public class PubObject : MonoBehaviour
 
 
 
-    public List<Sit> Sits = new List<Sit>();
-   
     private Constructor Const;
 
     public bool Hungry { get; set; }
 
     public int floors;
-    public int kitchenfloors;
+
     public int tables;
-    public int beds;
+
     public int ground;
     public int wall;
 
-    public int oven;
-    
-    public int toilet;
+
     public int people;
 
     public int Trash;
@@ -57,18 +53,16 @@ public class PubObject : MonoBehaviour
     public Tilemap MAPS { get; set; }
 
     private int durability = 20;
-    public bool decoration;
-    public bool TopObject;
+
+
 
     public List<string> TrueName = new List<string>();
     public bool Crowded { get; set; }
 
     private SpriteRenderer ObjSPRT;
 
-    public int TopObjectsCount { get; set; }
+    public int FloorsCount { get; set; }
 
-    private GameObject[] PersFG, PersBG;
-    private GameObject WalkingClient, BrakedownOB;
 
     public bool Draw = true;
 
@@ -102,21 +96,10 @@ public class PubObject : MonoBehaviour
             DishObject.transform.position = transform.position + new Vector3(0, 0.5f, 0);
         }
 
-        PersFG = new GameObject[2]
-        { Resources.Load<GameObject>("Prefabs/TablePers/Pers_FG0"),
-          Resources.Load<GameObject>("Prefabs/TablePers/Pers_FG1")
-        };
-
-        PersBG = new GameObject[2]
-         { Resources.Load<GameObject>("Prefabs/TablePers/Pers_BG0"),
-              Resources.Load<GameObject>("Prefabs/TablePers/Pers_BG1")
-         };
-
-        WalkingClient = Resources.Load<GameObject>("Prefabs/TablePers/Client");
-     
+    
 
       
-        if (wall <= 0) TopObjectsCount = 99;
+        if (wall <= 0) FloorsCount = 99;
 
        
         ObjSPRT = GetComponent<SpriteRenderer>();
@@ -182,24 +165,6 @@ public class PubObject : MonoBehaviour
         }
 
 
-
-        if (_GetItem == null && GetComponent<Trigger>() == null)
-        {
-            if (CharactersOnThisStructure.Count > 0)
-            {
-                if (GetComponent<Animator>() != null)
-                    GetComponent<Animator>().SetBool("Start", true);
-            }
-            else
-            {
-
-                if (GetComponent<Animator>() != null)
-                    GetComponent<Animator>().SetBool("Start", false);
-            }
-        }
-
-   
-        //Clients_Deprecated();
         if (Const == null) return;
         if (Const.Game_SPEED <= 0) return;
 
@@ -207,8 +172,7 @@ public class PubObject : MonoBehaviour
 
         Waiting = Const.TimerStay;
 
-      //  ShieldNeighbours();
-
+     
         PauseBetweenClients = 10 - (int)Const.Comfort / 2;
         if (PauseBetweenClients < 1) PauseBetweenClients = 1;
 
@@ -218,14 +182,9 @@ public class PubObject : MonoBehaviour
         if (_transform.parent != null) return;
         if (!Table) return;
 
-        // CharactersAtTheTable_Deprecated();
-
         if (TableTimer < 0)
         {
-            for (int i = 0; i < Sits.Count; i++)
-            {
-                Sits[i].Num = 1;
-            }
+           
             CrowdedCheck();
                         
             TableTimer = (PauseBetweenClients + Waiting) / Const.Game_SPEED;
@@ -233,26 +192,11 @@ public class PubObject : MonoBehaviour
         }
 
 
-        //if(StartCliantTimer<Time.fixedTime)
-        // GenerateClients_Deprecated();
-
-
     }
 
     void TableDurability()
     {
-        if (Const.DEMO)
-        {
-    
-            if (tag != "Pers")
-            {
-                if (ObjSPRT != null)
-                    ObjSPRT.color = new Color(1, 1, 1, ObjSPRT.color.a);
-
-
-            }
-            return;
-        }
+       
 
         if (durability > 0) return;
 
@@ -263,7 +207,7 @@ public class PubObject : MonoBehaviour
         if (ObjSPRT != null)
             ObjSPRT.color = new Color(0.5f, 0.5f, 0.5f, ObjSPRT.color.a);
 
-        if (TopObjectsCount <= 0)
+        if (FloorsCount <= 0)
         {
             for (int i = 0; i < _transform.childCount; i++)
             {
@@ -290,7 +234,7 @@ public class PubObject : MonoBehaviour
         
           
         int tables = 0;
-
+  
         for (int i = 0; i < Const.OBOnBoard.Count; i++)
         {
             if (Const.OBOnBoard[i] != null && Const.OBOnBoard[i].Place!=null)

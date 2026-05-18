@@ -152,7 +152,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 5317480860432103249}
   m_Father: {fileID: 2477509260100470022}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -412,8 +413,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -689, y: 337.7}
-  m_SizeDelta: {x: 433, y: 110}
+  m_AnchoredPosition: {x: -684, y: 337.7}
+  m_SizeDelta: {x: 433, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3190261602741399235
 CanvasRenderer:
@@ -626,7 +627,6 @@ RectTransform:
   - {fileID: 2890516880143265530}
   - {fileID: 9113126476531336254}
   - {fileID: 6624760623027978835}
-  - {fileID: 5317480860432103249}
   - {fileID: 6491758145872439048}
   - {fileID: 1597029390291585968}
   - {fileID: 5407471645761144198}
@@ -940,16 +940,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5440820507249539655}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2477509260100470022}
+  m_Father: {fileID: 6491758145872439048}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -572, y: -368}
+  m_AnchoredPosition: {x: 109, y: 3}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2292996105133497520
@@ -1495,8 +1495,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -689, y: 337.7}
-  m_SizeDelta: {x: 433, y: 150}
+  m_AnchoredPosition: {x: -684, y: 337.7}
+  m_SizeDelta: {x: 379.7, y: 157.49}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &129127423420747807
 CanvasRenderer:
@@ -1526,7 +1526,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Queens Orders
+  m_text: Requests to scribe
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 417543af2072d114d9601bc6433f1264, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 417543af2072d114d9601bc6433f1264, type: 2}

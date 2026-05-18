@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using static UnityEngine.GraphicsBuffer;
 
 public class MovementControll : MonoBehaviour
 {
@@ -15,12 +18,13 @@ public class MovementControll : MonoBehaviour
 
     public bool ItemPicker;
     public bool BringsPickedItemToThePlayer;
-    public bool MoveBetweenA_B;
+
     public int[] PickSpecificItem;
 
 
 
     public bool DropItemsOnTarget;
+    public bool KeepItemForThemselves;
     public bool DestroyTarget;
 
     public bool LeavesTrash;
@@ -29,7 +33,7 @@ public class MovementControll : MonoBehaviour
 
     private float PoisonDelay;
 
-    private float  OnTheTableWaiting, PoisonTimer, SearchForTargetsTimer;
+    private float  OnTheTableWaiting, PoisonTimer, SearchForTargetsTimer, DeathTimer;
 
 
     private Constructor Const;
@@ -37,9 +41,10 @@ public class MovementControll : MonoBehaviour
     private GameObject moneyui;
 
   
-    private List<TileBase> Brush = new List<TileBase>();
+
 
     public float ActionDelay = 10;
+    private float AttackCooldown;
     public Enemies EnemiesBase;
 
     [HideInInspector]
@@ -57,9 +62,9 @@ public class MovementControll : MonoBehaviour
 
     private List<GameObject> Beds = new List<GameObject>();
 
-    public GameObject[] A_Point;
-    public GameObject[] TargetGameObjects;
 
+    public GameObject[] TargetGameObjects;
+    public float mindistanceToTarget = 0.33f;
 
     private Item CarringDish;
 
@@ -93,8 +98,13 @@ public class MovementControll : MonoBehaviour
     private float OnPointAnimationTimer;
 
     private SpriteRenderer SPRT;
+    private bool StartIgnoreOccupation;
+    private ItemDatabase itemDatabase;
+
     void Start()
     {
+        itemDatabase = InitializeObjects.Itemdatabase;
+        StartIgnoreOccupation = IgnoreOccupation;
         SPRT = GetComponent<SpriteRenderer>();
         pl = InitializeObjects.PL;
         Const = InitializeObjects.Constr;
@@ -122,13 +132,11 @@ public class MovementControll : MonoBehaviour
 
        
 
-        if (pl.inv.GetItemInDatabase(315) != null)
-            Beds.Add(pl.inv.GetItemInDatabase(315).ObjectPrefs);
+        if (itemDatabase.FindItem(315) != null)
+            Beds.Add(itemDatabase.FindItem(315).ObjectPrefs);
 
        
 
-        Brush.Add(Resources.Load<TileBase>("Brushes/Wall_Red"));
-        Brush.Add(null);
 
     
         PoisonDelay = 10;
@@ -137,6 +145,10 @@ public class MovementControll : MonoBehaviour
 
     private void Update()
     {
+
+        DeathManager();
+        
+
         UpdateMoveControll();
         Animations();
     }
@@ -153,7 +165,7 @@ public class MovementControll : MonoBehaviour
     {
         if (Anim == null) return;
 
-        if (pl.menu.MenuONOFF)
+        if (pl.Pause())
         {
             Anim.speed = 0;
             return;
@@ -174,6 +186,19 @@ public class MovementControll : MonoBehaviour
 
     void UpdateMoveControll()
     {
+        if (DeathTimer > Time.fixedTime) return;
+
+            CM.CharacterPathUpdate();
+        if (OnPointAnimationTimer <= Time.fixedTime)
+            CM.OnThePoint = false;
+        else CM.OnThePoint = true;
+
+        if (Stats != null && transform!=null)
+        {
+          
+            Stats.ConstructorElement.Place = transform.position;
+        }
+
         if (GoBackOffScreen && (Mathf.Abs(transform.position.x - pl._transform.position.x) > 10 || Mathf.Abs(transform.position.y - pl._transform.position.y) > 10))
         {
             if (CM != null)
@@ -260,8 +285,6 @@ public class MovementControll : MonoBehaviour
         }
 
 
-        if (MoveBetweenA_B) MoveBetweenAB();
-
 
 
 
@@ -275,24 +298,12 @@ public class MovementControll : MonoBehaviour
 
 
 
-        if (InvisTimer - 0.8f > Time.fixedTime)
-        {
-            SetColotAndMaterial(0.5f, WhiteMaterial);
-        }
-        else
-        {
-            if (InvisTimer > Time.fixedTime)
-                SetColotAndMaterial(0.5f, StartMaterial);
-            else SetColotAndMaterial(1, StartMaterial);
-        }
-
-
 
 
 
         if (PoisonTimer < 0 && Poison > 0)
         {
-            Stats.HP--;
+            Stats.GetDamage(1);
             Poison--;
             PoisonTimer = PoisonDelay;
         }
@@ -301,10 +312,10 @@ public class MovementControll : MonoBehaviour
 
 
 
-        PoisonTimer -= Time.deltaTime * Const.Game_SPEED;
+        PoisonTimer -= Time.deltaTime ;
 
         
-        SearchForTargetsTimer -= Time.deltaTime * Const.Game_SPEED;
+        SearchForTargetsTimer -= Time.deltaTime;
 
 
 
@@ -315,77 +326,7 @@ public class MovementControll : MonoBehaviour
 
     }
 
-    void MoveBetweenAB()
-    {
-        if (CarringDish == null)
-        {
-
-            for (int i = 0; i < A_Point.Length; i++)
-                SearchForTargets(A_Point[i], 0);
-        }
-        else
-        {
-            for (int i = 0; i < TargetGameObjects.Length; i++)
-                SearchForTargets(TargetGameObjects[i], 0);
-        }
-
-    }
-
-
-    
-
-
-
-
-
-    bool CollWithOtherObject()
-    {
-        bool result = false;
-
-        if (GetComponent<CollList>() == null)
-            return false;
-
-
-        for (int i = 0; i < Const.OBOnBoard.Count; i++)
-        {
-            if (Const.OBOnBoard[i].Object != null)
-            {
-                if (GetComponent<CollList>().GetCollList().Contains(Const.OBOnBoard[i].Object))
-                {
-                    result = true;
-                    break;
-                }
-            }
-
-        }
-
-
-
-        return result;
-    }
-
-
-
-    bool CollWithMoveToObject()
-    {
-        bool result = false;
-
-        if (GetComponent<CollList>() == null)
-            return false;
-
-
-
-        if (GetComponent<CollList>().GetCollList().Contains(MoveToObject))
-            result = true;
-
-
-
-
-        return result;
-    }
-
-
-
+   
   
 
     void ItemPickerMove()
@@ -407,7 +348,7 @@ public class MovementControll : MonoBehaviour
 
     void ItemPickerMoveThroughDropped(ref GameObject dropped)
     {
-        if (dropped == null || pl.inv.GetItemInDatabase(dropped.GetComponent<GetItem>().item[0]).Dish)
+        if (dropped == null || itemDatabase.FindItem(dropped.GetComponent<GetItem>().item[0]).Dish)
             return;
 
         if (MoveToObject != null) return;
@@ -457,7 +398,8 @@ public class MovementControll : MonoBehaviour
             return;
         }
 
-
+       // if(CM.LegsAnim==null)
+        FadeToAnim("Walking");
 
         CM.MovePoints = new Transform[2] { _transform, MoveToObject.transform };
         CM.MovePointsBuffer = new List<Vector2>();
@@ -478,20 +420,23 @@ public class MovementControll : MonoBehaviour
     {
         Vector2 MoveSpeed = new Vector2(0.5f, 0.25f);
 
-
+        if (OnPointAnimationTimer > Time.fixedTime) return;
        
 
         if (MoveToObject == null)
         {
-            if (!ItemPicker && !MoveBetweenA_B)
+            if (!ItemPicker)
             {
 
                 SetOnPointToDefault();
 
                 if (TargetGameObjects.Length > 0)
                     for (int i = 0; i < TargetGameObjects.Length; i++)
-                        SearchForTargets(TargetGameObjects[i], 0);
+                    {
+                        if (i > TargetGameObjects.Length || TargetGameObjects.Length == 0) continue;
 
+                        SearchForTargets(TargetGameObjects[i], 0);
+                    }
 
             }
 
@@ -502,23 +447,25 @@ public class MovementControll : MonoBehaviour
 
 
 
-        float mindistance= 0.33f;
+ 
 
-        float distance = Mathf.Abs( Vector3.Distance(_transform.position, MoveToObject.transform.position));
+        float distance = Mathf.Abs( Vector2.Distance(_transform.position, MoveToObject.transform.position));
 
 
-        if (distance > mindistance)
+        if (distance > mindistanceToTarget)
         {
+            ActionOnPointComlete = false;
             WalkToTheTarget();
         }
         else
-        if (distance <= mindistance)
+        if (distance <= mindistanceToTarget)
         {
 
             OnThePoint();
 
         }
-        else
+        
+        if(MoveToObject==null)
         {
             FadeToAnim("Start");
 
@@ -530,61 +477,45 @@ public class MovementControll : MonoBehaviour
 
     void OnThePoint()
     {
+
+
+
+      
+
         if (!ActionOnPointComlete)
         {
+       
+            if(!DestroyTarget)
             OnPointAnimationTimer = Time.fixedTime + 3;
+            else OnPointAnimationTimer = Time.fixedTime + 1;
+            AttackCooldown = Time.fixedTime + 1;
             FadeToAnim("OnThePoint");
            
             ActionOnPointComlete = true;
             return;
         }
 
+
+        if (DestroyTarget && MoveToObject != null &&
+             AttackCooldown <= Time.fixedTime)
+        {
+            MTO_StatsControll.GetDamage(CharacterDamage());
+            AttackCooldown = Time.fixedTime + 1;
+            OnPointAnimationTimer = Time.fixedTime + 1;
+        }
+
         ObjectOfOccupation = MoveToObject;
-        if (OnPointAnimationTimer > Time.fixedTime) return;
+        if (OnPointAnimationTimer > Time.fixedTime)
+        {
+            FadeToAnim("OnThePoint");
+            return;
+        }
+
 
         if (MTO_StatsControll != null)
             CharacterEats();
 
-
-
        
-
-        if (MoveBetweenA_B)
-        {
-            if (CarringDish == null)
-            {
-
-                if (MTO_PubObject.DishesOnTable.Count > 0)
-                {
-                    CarringDish = MTO_PubObject.DishesOnTable[0];
-                    RemoveDishesOnTable(0, 1);
-
-                    UnSetMoveToObject();
-
-                    return;
-                }
-            }
-            else
-            {
-
-                AddDishesOnTable(CarringDish);
-
-                CarringDish = null;
-                UnSetMoveToObject();
-
-
-                return;
-
-            }
-
-
-        }
-
-        if (DestroyTarget && MoveToObject != null)
-        {
-            MTO_StatsControll.HP = 0;
-
-        }
 
         if (CarringDish != null && MoveToObject != null)
         {
@@ -611,8 +542,13 @@ public class MovementControll : MonoBehaviour
             bool table = false;
             if (MTO_PubObject != null) table = MTO_PubObject.Table;
 
-            if (MTO_StatsControll != null) MTO_StatsControll.HasAChracter = true;
-
+            if (MTO_StatsControll != null)
+            {
+                MTO_StatsControll.HasCharacter = true;
+            
+                if(KeepItemForThemselves) 
+                 MTO_StatsControll.ReverseMoney = true;
+            }
             
 
 
@@ -640,27 +576,6 @@ public class MovementControll : MonoBehaviour
 
 
 
-    void SetColotAndMaterial(float Alpha, Material material)
-    {
-        if (SPRT != null)
-        {
-            SPRT.material = material;
-            SPRT.color = new Color(SPRT.color.r, SPRT.color.g, SPRT.color.b, Alpha);
-        }
-
-
-        for (int i = 0; i < transform.childCount; i++)
-        {
-            if (_transform.GetChild(i).GetComponent<SpriteRenderer>() != null)
-            {
-                _transform.GetChild(i).GetComponent<SpriteRenderer>().material = material;
-                _transform.GetChild(i).GetComponent<SpriteRenderer>().color = new Color(_transform.GetChild(i).GetComponent<SpriteRenderer>().color.r, _transform.GetChild(i).GetComponent<SpriteRenderer>().color.g, _transform.GetChild(i).GetComponent<SpriteRenderer>().color.b, Alpha);
-
-            }
-        }
-    }
-
-
 
     void SearchForTargets(GameObject Target, int MinGrowState)
     {
@@ -668,31 +583,47 @@ public class MovementControll : MonoBehaviour
 
         if (SearchForTargetsTimer > 0)
             return;
-
+        int id = Target.GetComponent<StatsControll>().DatabaseID;
 
         GameObject MoveToOB = null;
 
-
-        if (Const.OBOnBoard.Count <= 0) return;
+        if (!Const.OBOnBoardTargets.TryGetValue(id, out var value)) return;
+        if (Const.OBOnBoardTargets[id].Count <= 0) return;
         
         maxpos = new Vector2(99999, 99999);
 
-        for (int i = 0; i < Const.OBOnBoard.Count; i++)
+        int startelement = Random.Range(0, Const.OBOnBoardTargets[id].Count);
+
+        IgnoreOccupation = StartIgnoreOccupation;
+
+        for (int i = 0; i < Const.OBOnBoardTargets[id].Count; i++)
         {
             if (MoveToObject != null && MTO_StatsControll != null)
                 if (MTO_StatsControll.DatabaseID == Target.GetComponent<StatsControll>().DatabaseID) break;
 
-
-            CheckAndSetTheTarget(i, Target, ref MoveToOB);
+            CheckAndSetTheTarget(i,id, Target, ref MoveToOB);
 
         }
 
+        if (MoveToObject == null && Target.GetComponent<MovementControll>()!=null)
+        {
+            IgnoreOccupation = true;
 
+            for (int i = 0; i < Const.OBOnBoardTargets[id].Count; i++)
+            {
+
+                CheckAndSetTheTarget(i, id, Target, ref MoveToOB);
+
+            }
+            
+        }
+
+        SearchForTargetsTimer = Random.Range(3,5);
     }
 
-    void SetMoveToObject(GameObject target)
+    public void SetMoveToObject(GameObject target)
     {
-
+     
 
         MoveToObject = target;
 
@@ -703,70 +634,115 @@ public class MovementControll : MonoBehaviour
         MTO_GetItem = target.GetComponent<GetItem>();
 
         if (MTO_StatsControll != null)
-            MTO_StatsControll.Occupied = true;
+        {
+            if (!IgnoreOccupation)
+                MTO_StatsControll.Occupied = true;
+            SetOccupation(target, true);
+
+        }
+
+
+
     }
 
 
-    bool CheckTheTarget(int i, GameObject Target)
+    bool CheckTheTarget(int i,int id, GameObject Target)
     {
-        if (Const.OBOnBoard[i].Object == null)
-            return false;
-        if (Const.OBOnBoard[i].ID != Target.GetComponent<StatsControll>().DatabaseID)
-            return false;
-        if (Const.OBOnBoard[i].Object.GetComponent<StatsControll>().Occupied && !IgnoreOccupation)
+        if (i >= Const.OBOnBoardTargets[id].Count) return false;
+
+
+        if (Const.OBOnBoardTargets[id][i].Object == null)
+            Const.OBOnBoardTargets[id].RemoveAt(i);
+
+        if (i > Const.OBOnBoardTargets[id].Count) 
+            i = Const.OBOnBoardTargets[id].Count - 1;
+
+       // int TargetID = Target.GetComponent<StatsControll>().DatabaseID;
+
+
+        if (Const.OBOnBoardTargets[id].Count<=0)
+           return false;
+
+      //  print(name + " DANGER -- DO NOT USE EVERY FRAME");
+        int countontheboard = 0;
+        for (int j = 0; j < Const.OBOnBoardTargets[id].Count; j++)
+        {
+           countontheboard++;
+
+        }
+        if (i >= Const.OBOnBoardTargets[id].Count) i = 0;
+        if (Const.OBOnBoardTargets[id][i].Object == null) return false;
+
+        if (Const.OBOnBoardTargets[id][i].Object.GetComponent<StatsControll>() == null) return false;
+
+        if (Const.OBOnBoardTargets[id][i].Object.GetComponent<StatsControll>().Occupied && !IgnoreOccupation )
             return false;
 
-        if (CarringDish != null && Const.OBOnBoard[i].Object.GetComponent<PubObject>().DishesOnTable.Count > 0)
+     
+
+
+
+        if (CarringDish != null && Const.OBOnBoardTargets[id][i].PO.DishesOnTable.Count > 0)
         {
-            for (int j = 0; j < Const.OBOnBoard[i].Object.GetComponent<PubObject>().DishesOnTable.Count; j++)
+            for (int j = 0; j < Const.OBOnBoardTargets[id][i].PO.DishesOnTable.Count; j++)
             {
-                if (Const.OBOnBoard[i].Object.GetComponent<PubObject>().DishesOnTable[j].itemID == CarringDish.itemID)
+                if (Const.OBOnBoardTargets[id][i].PO.DishesOnTable[j].itemID == CarringDish.itemID)
                     return false;
             }
         }
 
 
-        if (Mathf.Abs(Const.OBOnBoard[i].Object.transform.position.x - transform.position.x) <= 0.1f &&
-            Mathf.Abs(Const.OBOnBoard[i].Object.transform.position.y - transform.position.y) <= 0.1f && !MoveBetweenA_B)
-            return false;
-
-
+        if (countontheboard > 1)
+        {
+            if (Vector2.Distance(Const.OBOnBoard[i].Object.transform.position,  transform.position) <= 0.1f)
+                return false;
+        }
+     
         return true;
     }
 
-    void CheckAndSetTheTarget(int i, GameObject Target, ref GameObject MoveToOB)
+    void CheckAndSetTheTarget(int i, int id, GameObject Target, ref GameObject MoveToOB)
     {
+     
+        if (!CheckTheTarget(i,id, Target)) return;
 
-        if (!CheckTheTarget(i, Target)) return;
-
-
-        for (int j = 0; j < Const.OBOnBoard.Count; j++)
+        
+        for (int j = 0; j < Const.OBOnBoardTargets[id].Count; j++)
         {
-
-            if (CheckTheTarget(j, Target))
+            if (j >= Const.OBOnBoardTargets[id].Count)
             {
-                if (maxpos.magnitude > Const.OBOnBoard[j].Place.magnitude)
+                j--;
+                continue;
+            }
+
+
+            if (Const.OBOnBoardTargets[id].Count<=0) return;
+
+            if (CheckTheTarget(j, id, Target))
+            {
+                if(j >= Const.OBOnBoardTargets[id].Count) return;
+
+                if (maxpos.magnitude > Const.OBOnBoardTargets[id][j].Place.magnitude)
                 {
-                    maxpos = Const.OBOnBoard[j].Place;
+                    maxpos = Const.OBOnBoardTargets[id][j].Place;
                     i = j;
                 }
             }
+
+
         }
 
 
 
-
-        MoveToOB = Const.OBOnBoard[i].Object;
+        MoveToOB = Const.OBOnBoardTargets[id][i].Object;
 
         SetMoveToObject(MoveToOB);
-
-        SearchForTargetsTimer = 3;
+   
+        SearchForTargetsTimer = Random.Range(3, 5);
 
         ObjectOfOccupation = null;
 
-        if (!IgnoreOccupation)
-            Const.OBOnBoard[i].Object.GetComponent<StatsControll>().Occupied = true;
-
+       
 
     }
 
@@ -787,12 +763,14 @@ public class MovementControll : MonoBehaviour
                 if (!DropItemsOnTarget)
                 {
 
-                    for (int i = 0; i < MTO_StatsControll.ItemIDs.Length; i++)
-                        if (!NoAudioOnItems)
-                            pl.inv.AddItem(MTO_StatsControll.ItemIDs[i], MTO_StatsControll.CurrentGrowState, pl.inv.GetItemInDatabase(MTO_StatsControll.ItemIDs[i]).Durability, pl._transform.position);
-                        else
-                            pl.inv.AddItemNOAUDIO(MTO_StatsControll.ItemIDs[i], MTO_StatsControll.CurrentGrowState, pl.inv.GetItemInDatabase(MTO_StatsControll.ItemIDs[i]).Durability, pl._transform.position);
-
+                    if (!KeepItemForThemselves)
+                    {
+                        for (int i = 0; i < MTO_StatsControll.ItemIDs.Length; i++)
+                            if (!NoAudioOnItems)
+                                pl.inv.AddItem(MTO_StatsControll.ItemIDs[i], MTO_StatsControll.CurrentGrowState, itemDatabase.FindItem(MTO_StatsControll.ItemIDs[i]).Durability, pl._transform.position);
+                            else
+                                pl.inv.AddItemNOAUDIO(MTO_StatsControll.ItemIDs[i], MTO_StatsControll.CurrentGrowState, itemDatabase.FindItem(MTO_StatsControll.ItemIDs[i]).Durability, pl._transform.position);
+                    }
 
 
                 }
@@ -802,9 +780,9 @@ public class MovementControll : MonoBehaviour
                     for (int i = 0; i < MTO_StatsControll.ItemIDs.Length; i++)
                     {
                         if (!NoAudioOnItems)
-                            pl.inv.DropItemInSameSpot(_transform.position, MTO_StatsControll.CurrentGrowState, MTO_StatsControll.ItemIDs, pl.inv.GetItemInDatabase(MTO_StatsControll.ItemIDs[i]).Durability);
+                            pl.inv.DropItemInSameSpot(_transform.position, MTO_StatsControll.CurrentGrowState, MTO_StatsControll.ItemIDs, itemDatabase.FindItem(MTO_StatsControll.ItemIDs[i]).Durability);
                         else
-                            pl.inv.DropItemInSameSpotNOAUDIO(_transform.position, MTO_StatsControll.CurrentGrowState, MTO_StatsControll.ItemIDs, pl.inv.GetItemInDatabase(MTO_StatsControll.ItemIDs[i]).Durability);
+                            pl.inv.DropItemInSameSpotNOAUDIO(_transform.position, MTO_StatsControll.CurrentGrowState, MTO_StatsControll.ItemIDs, itemDatabase.FindItem(MTO_StatsControll.ItemIDs[i]).Durability);
 
                     }
 
@@ -816,6 +794,7 @@ public class MovementControll : MonoBehaviour
 
             MTO_StatsControll.CurrentGrowState = 0;
             MTO_StatsControll.Occupied = false;
+            SetOccupation(MoveToObject, false);
 
             MTO_StatsControll.GrowTimer = Time.fixedTime + MTO_StatsControll.GrowDelay;
 
@@ -827,8 +806,8 @@ public class MovementControll : MonoBehaviour
         {
 
             for (int i = 0; i < GI.item.Length; i++)
-                pl.inv.AddItem(GI.item[i], GI.itemcount[i], pl.inv.GetItemInDatabase(GI.item[i]).Durability, pl._transform.position);
-            print("CharacterBringsItemToUs 1");
+                pl.inv.AddItem(GI.item[i], GI.itemcount[i], itemDatabase.FindItem(GI.item[i]).Durability, pl._transform.position);
+
             if (Stats.DurabilityMax > -1) Stats.Durability--;
 
 
@@ -858,7 +837,7 @@ public class MovementControll : MonoBehaviour
         {
             if (Const.AllTrash < Const.MaxTrash)
             {
-                DropObject(pl.inv.GetItemInDatabase(9998).ObjectPrefs);
+                DropObject(itemDatabase.FindItem(9998).ObjectPrefs);
                 Const.AllTrash++;
             }
         }
@@ -867,9 +846,9 @@ public class MovementControll : MonoBehaviour
         {
             for (int i = 0; i < ItemsTheyDropAfterEating.Length; i++)
                 if (!NoAudioOnItems)
-                    pl.inv.DropItemInSameSpot(_transform.position, Stats.ItemCount, ItemsTheyDropAfterEating, pl.inv.GetItemInDatabase(ItemsTheyDropAfterEating[i]).Durability);
+                    pl.inv.DropItemInSameSpot(_transform.position, Stats.ItemCount, ItemsTheyDropAfterEating, itemDatabase.FindItem(ItemsTheyDropAfterEating[i]).Durability);
                 else
-                    pl.inv.DropItemInSameSpotNOAUDIO(_transform.position, Stats.ItemCount, ItemsTheyDropAfterEating, pl.inv.GetItemInDatabase(ItemsTheyDropAfterEating[i]).Durability);
+                    pl.inv.DropItemInSameSpotNOAUDIO(_transform.position, Stats.ItemCount, ItemsTheyDropAfterEating, itemDatabase.FindItem(ItemsTheyDropAfterEating[i]).Durability);
 
         }
 
@@ -880,7 +859,7 @@ public class MovementControll : MonoBehaviour
             if (ItemsTheyPaysToPlayer.Length > 0)
             {
                 for (int i = 0; i < ItemsTheyPaysToPlayer.Length; i++)
-                    pl.inv.AddItemNOAUDIO(ItemsTheyPaysToPlayer[i], pl.Payment * MoveToObject.GetComponent<PubObject>().DishesOnTable[0].Cost, -1, transform.position);
+                    pl.inv.AddItemNOAUDIO(ItemsTheyPaysToPlayer[i], pl.Payment * MTO_PubObject.DishesOnTable[0].Cost, -1, transform.position);
 
             }
             else pl.inv.AddItemNOAUDIO(9, pl.Payment * MTO_PubObject.DishesOnTable[0].Cost, -1, transform.position);
@@ -923,7 +902,7 @@ public class MovementControll : MonoBehaviour
 
         for (int i = 0; i < MTO_GetItem.item.Length; i++)
         {
-           CarringDish = pl.inv.DeepCopyItem(MTO_GetItem.item[0], 1, pl.inv.GetItemInDatabase(MTO_GetItem.item[0]).Durability);
+           CarringDish = pl.inv.DeepCopyItem(MTO_GetItem.item[0], 1, itemDatabase.FindItem(MTO_GetItem.item[0]).Durability);
 
             
         }
@@ -954,7 +933,8 @@ public class MovementControll : MonoBehaviour
         if (MTO_StatsControll != null)
         {
             MTO_StatsControll.Occupied = false;
-          MTO_StatsControll.HasAChracter = false;
+            MTO_StatsControll.HasCharacter = false;
+            MTO_StatsControll.ReverseMoney = false;
 
         }
 
@@ -1000,13 +980,51 @@ public class MovementControll : MonoBehaviour
         
     }
 
+    int CharacterDamage()
+    {
+        int basedamage = 1;
+
+
+        if (itemDatabase.FindItem(Stats.DatabaseID).itemNames[0].Contains("Knight"))
+            basedamage += pl.Knight_Damage_Boost;
+        if (itemDatabase.FindItem(Stats.DatabaseID).itemNames[0].Contains("Guard"))
+            basedamage += pl.Guard_Damage_Boost;
+        if (itemDatabase.FindItem(Stats.DatabaseID).itemNames[0].Contains("Cleric"))
+            basedamage += pl.Cleric_Damage_Boost;
+
+
+        return basedamage;
+    }
     void FadeToAnim(string n)
     {
         if (CurrentAnimName == n) return;
         AnimFade = Time.fixedTime+ 0.2f;
         CurrentAnimName = n;
 
-        print("fade to anim");
+    }
+
+    private void OnDestroy()
+    {
+        if (MoveToObject != null)
+            if (MTO_StatsControll != null) MTO_StatsControll.Occupied = false;
+    }
+
+    public void Death()
+    {
+
+        DeathTimer = Time.fixedTime + 2;
+
+        FadeToAnim("Death");
+    }
+
+    void DeathManager()
+    {
+        if (DeathTimer > Time.fixedTime && DeathTimer < Time.fixedTime + 1.6f)
+        {
+
+            Const.BlowObject(Stats);
+        }
+    
     }
 
     void RemoveDishesOnTable(int i, int count)
@@ -1020,7 +1038,12 @@ public class MovementControll : MonoBehaviour
         
     }
 
+    void SetOccupation(GameObject stats, bool occupation)
+    {
+        stats.GetComponent<StatsControll>().Occupied = occupation;
 
+
+    }
     void DropObject(GameObject obj)
     {
         GameObject poop = Instantiate<GameObject>(obj);

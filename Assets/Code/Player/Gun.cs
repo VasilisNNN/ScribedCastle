@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Gun : MonoBehaviour
@@ -53,14 +54,15 @@ public class Gun : MonoBehaviour
 
     private List<GameObject> BulletsForThisGun = new List<GameObject>();
     public GameObject RightHand;
+    private ItemDatabase itemDatabase;
     void Start()
     {
         LastDirection = new Vector2(1, 0);
         SwingEffect = transform.Find("SwingEffect").gameObject;
         MouseOB = GameObject.Find("MouseOB");
+        itemDatabase = InitializeObjects.Itemdatabase;
 
 
-       
         //GunOB = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Objects/Gun"),transform);
         constr = GameObject.Find("Constructor").GetComponent<Constructor>();
         pl = GameObject.Find("Player").GetComponent<Player>();
@@ -137,7 +139,7 @@ public class Gun : MonoBehaviour
                 GunOB.transform.position = Hand.transform.position;
             else
             {
-                if (pl.inv.GetItemInDatabase(CurrentGunID).Gun)
+                if (itemDatabase.FindItem(CurrentGunID).Gun)
                     GunOB.transform.position = pl._transform.position;
                 else GunOB.transform.position = Hand.transform.position;
 
@@ -166,9 +168,9 @@ public class Gun : MonoBehaviour
         }
 
  
-        if (!constr.Building && !pl.menu.MenuONOFF && !pl.inv.showinvent && !pl.inv.crafting && (pl.IM.space_b || (pl.IM.LeftMouseButton && pl.CollidingItems.Count <= 0)) && pl.Stamina >= pl.inv.GetItemInDatabase(CurrentGunID).StaminaUse && HitDuration <= 0 && pl.IM.ActionDelay < Time.fixedTime)
+        if (!constr.Building && !pl.menu.MenuONOFF && !pl.inv.showinvent && !pl.inv.crafting && (pl.IM.space_b || (pl.IM.LeftMouseButton && pl.CollidingItems.Count <= 0)) && pl.Stamina >= itemDatabase.FindItem(CurrentGunID).StaminaUse && HitDuration <= 0 && pl.IM.ActionDelay < Time.fixedTime)
         {
-            if (!pl.inv.GetItemInDatabase(CurrentGunID).Gun)
+            if (!itemDatabase.FindItem(CurrentGunID).Gun)
             GunOB.GetComponent<PolygonCollider2D>().enabled = true;
 
 
@@ -205,7 +207,7 @@ public class Gun : MonoBehaviour
             ActualHit();
 
 
-            if(!pl.inv.GetItemInDatabase(CurrentGunID).Gun)
+            if(!itemDatabase.FindItem(CurrentGunID).Gun)
             GunOB.transform.position = Hand.transform.position;
 
             // GunOB.transform.localScale = pl._transform.localScale;
@@ -225,11 +227,11 @@ public class Gun : MonoBehaviour
 
             if (HitEffectTimer + 0.1f > Time.fixedTime)
             {
-                if (pl.inv.GetItemInDatabase(CurrentGunID).MagicEffectToCast != null)
+                if (itemDatabase.FindItem(CurrentGunID).MagicEffectToCast != null)
                 {
-                    if (pl.inv.GetItemInDatabase(CurrentGunID).MagicEffectToCast.Length > 0 && AttackEffect == null)
+                    if (itemDatabase.FindItem(CurrentGunID).MagicEffectToCast.Length > 0 && AttackEffect == null)
                     {
-                        AttackEffect = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Effects/" + pl.inv.GetItemInDatabase(CurrentGunID).MagicEffectToCast));
+                        AttackEffect = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Effects/" + itemDatabase.FindItem(CurrentGunID).MagicEffectToCast));
 
                         AttackEffect.transform.position = GunTip.transform.position;
                         AttackEffect.transform.rotation = GunOB.transform.rotation;
@@ -251,7 +253,7 @@ public class Gun : MonoBehaviour
 
 
 
-        if (SwingEffect != null&& LastDirection.y==0 && !pl.inv.GetItemInDatabase(CurrentGunID).Gun)
+        if (SwingEffect != null&& LastDirection.y==0 && !itemDatabase.FindItem(CurrentGunID).Gun)
         {
             if (HitTimer > Time.fixedTime && HitTimer - 0.19 < Time.fixedTime)
             {
@@ -284,7 +286,7 @@ public class Gun : MonoBehaviour
                 GunOB = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Objects/Gun"), Hand.transform);
             else
             {
-                if (pl.inv.GetItemInDatabase(CurrentGunID).Gun)
+                if (itemDatabase.FindItem(CurrentGunID).Gun)
                 {
                     GunOB = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Objects/Gun"));
                     pl.inv.ONOFF(Hand, false);
@@ -301,13 +303,13 @@ public class Gun : MonoBehaviour
   
             GunTip = GunOB.transform.Find("GunTip").gameObject;
 
-            if (GunTip == null || GunOB == null || pl.inv.GetItemInDatabase(CurrentGunID) == null) return;
+            if (GunTip == null || GunOB == null || itemDatabase.FindItem(CurrentGunID) == null) return;
 
-            GunTip.transform.position = GunOB.transform.position + new Vector3(0, pl.inv.GetItemInDatabase(CurrentGunID).GunLength, 0);
+            GunTip.transform.position = GunOB.transform.position + new Vector3(0, itemDatabase.FindItem(CurrentGunID).GunLength, 0);
 
 
 
-            GunOB.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/" + inv.GetItemInDatabase(CurrentGunID).itemNames[0]);
+            GunOB.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/" + itemDatabase.FindItem(CurrentGunID).itemNames[0]);
             GunOB.AddComponent<PolygonCollider2D>();
             GunOB.GetComponent<PolygonCollider2D>().isTrigger = true;
             GunOB.GetComponent<PolygonCollider2D>().enabled = false;
@@ -345,7 +347,7 @@ public class Gun : MonoBehaviour
     {
         DigItem(constr.Tile.WorldToCell(DigObject.transform.position));
 
-        if(SwingEffect!=null && SwingEffect.GetComponent<Animator>()!=null &&  !pl.inv.GetItemInDatabase(CurrentGunID).Gun)
+        if(SwingEffect!=null && SwingEffect.GetComponent<Animator>()!=null &&  !itemDatabase.FindItem(CurrentGunID).Gun)
         SwingEffect.GetComponent<Animator>().Play(SwingEffect.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).fullPathHash, -1, 0f);
 
         Vector3 Bulletpos = Vector3.zero;
@@ -358,9 +360,9 @@ public class Gun : MonoBehaviour
 
             PlayerAnim.SetBool("Attack", true);
 
-            if (inv.GetItemInDatabase(CurrentGunID).MagicObjectToCast != null)
+            if (itemDatabase.FindItem(CurrentGunID).MagicObjectToCast != null)
             {
-                if (inv.GetItemInDatabase(CurrentGunID).Gun)
+                if (itemDatabase.FindItem(CurrentGunID).Gun)
                     PlayerAnim.SetBool("Gun", true);
             }
             else PlayerAnim.SetBool("Gun", false);
@@ -397,41 +399,41 @@ public class Gun : MonoBehaviour
 
        
 
-        if (pl.inv.GetItemInDatabase(CurrentGunID)._Soundtype == Item.Soundtype.regular)
+        if (itemDatabase.FindItem(CurrentGunID)._Soundtype == Item.Soundtype.regular)
         {
             Hand.GetComponent<AudioSource>().clip = ReguralSwing;
         }
-        else if (pl.inv.GetItemInDatabase(CurrentGunID)._Soundtype == Item.Soundtype.club)
+        else if (itemDatabase.FindItem(CurrentGunID)._Soundtype == Item.Soundtype.club)
         {
             Hand.GetComponent<AudioSource>().clip = ClubSwing;
         }
-        else if (pl.inv.GetItemInDatabase(CurrentGunID)._Soundtype == Item.Soundtype.sword)
+        else if (itemDatabase.FindItem(CurrentGunID)._Soundtype == Item.Soundtype.sword)
         {
             Hand.GetComponent<AudioSource>().clip = SwordSwing;
         }
-        else if (pl.inv.GetItemInDatabase(CurrentGunID)._Soundtype == Item.Soundtype.axe)
+        else if (itemDatabase.FindItem(CurrentGunID)._Soundtype == Item.Soundtype.axe)
         {
             Hand.GetComponent<AudioSource>().clip = AxeSwing;
         }
-        else if (pl.inv.GetItemInDatabase(CurrentGunID)._Soundtype == Item.Soundtype.fakegun)
+        else if (itemDatabase.FindItem(CurrentGunID)._Soundtype == Item.Soundtype.fakegun)
         {
             Hand.GetComponent<AudioSource>().clip = AxeSwing;
         }
-        else if (pl.inv.GetItemInDatabase(CurrentGunID)._Soundtype == Item.Soundtype.shotgun)
+        else if (itemDatabase.FindItem(CurrentGunID)._Soundtype == Item.Soundtype.shotgun)
         {
             Hand.GetComponent<AudioSource>().clip = AxeSwing;
         }
-        else if (pl.inv.GetItemInDatabase(CurrentGunID)._Soundtype == Item.Soundtype.rifle)
+        else if (itemDatabase.FindItem(CurrentGunID)._Soundtype == Item.Soundtype.rifle)
         {
             Hand.GetComponent<AudioSource>().clip = AxeSwing;
         }
-        else if (pl.inv.GetItemInDatabase(CurrentGunID)._Soundtype == Item.Soundtype.pistol)
+        else if (itemDatabase.FindItem(CurrentGunID)._Soundtype == Item.Soundtype.pistol)
         {
             Hand.GetComponent<AudioSource>().clip = AxeSwing;
         }
-        if (pl.inv.GetItemInDatabase(CurrentGunID).MagicObjectToCast != null)
+        if (itemDatabase.FindItem(CurrentGunID).MagicObjectToCast != null)
         {
-            if (pl.inv.GetItemInDatabase(CurrentGunID).MagicObjectToCast.Length > 0)
+            if (itemDatabase.FindItem(CurrentGunID).MagicObjectToCast.Length > 0)
                 Hand.GetComponent<AudioSource>().clip = MagicSwing;
         }
 
@@ -442,7 +444,7 @@ public class Gun : MonoBehaviour
         HitDuration = HitDurationMax;
         HitTimer = Time.fixedTime + 0.2f;
         HitEffectTimer = Time.fixedTime + 0.1f;
-        pl.ReduceStamina(-pl.inv.GetItemInDatabase(CurrentGunID).StaminaUse);
+        pl.ReduceStamina(-itemDatabase.FindItem(CurrentGunID).StaminaUse);
 
     }
 
@@ -451,11 +453,11 @@ public class Gun : MonoBehaviour
 
     void CastMagicObject( Vector3 Bulletpos)
     {
-        if (pl.inv.GetItemInDatabase(CurrentGunID).MagicObjectToCast == null) return;
+        if (itemDatabase.FindItem(CurrentGunID).MagicObjectToCast == null) return;
         
-        if (pl.inv.GetItemInDatabase(CurrentGunID).MagicObjectToCast.Length <= 0) return;
+        if (itemDatabase.FindItem(CurrentGunID).MagicObjectToCast.Length <= 0) return;
         
-        if (pl.inv.GetItemInDatabase(CurrentGunID).MagicObjectToCast != "Random")
+        if (itemDatabase.FindItem(CurrentGunID).MagicObjectToCast != "Random")
         {
 
         
@@ -702,7 +704,7 @@ public class Gun : MonoBehaviour
 
     void DigItem(Vector3Int TilePos)
     {
-        if (!pl.inv.GetItemInDatabase(CurrentGunID).CanDig) return;
+        if (!itemDatabase.FindItem(CurrentGunID).CanDig) return;
         
 
         if (constr.Tile.GetTile(TilePos) == null) return;
@@ -859,6 +861,7 @@ public class Gun : MonoBehaviour
                 {
 
                     bool c = false;
+               
                     for (int i = 0; i < constr.OBOnBoard.Count; i++)
                     {
                         if (BulletList[b].GetComponent<CollList>().coll_obj.Contains(constr.OBOnBoard[i].Object))
@@ -953,20 +956,20 @@ public class Gun : MonoBehaviour
 
             print("ID " + ID);
 
-            CurrentGunID = inv.GetItemInDatabase(ID).itemID;
+            CurrentGunID = itemDatabase.FindItem(ID).itemID;
             Durability = durability;
-            EXItemID = inv.GetItemInDatabase(ID).itemID;
+            EXItemID = itemDatabase.FindItem(ID).itemID;
 
             for (int i = 0; i < BulletsForThisGun.Count; i++) Destroy(BulletsForThisGun[i]);
             BulletsForThisGun = new List<GameObject>();
 
-            if (inv.GetItemInDatabase(CurrentGunID).MagicObjectToCast!=null && inv.GetItemInDatabase(CurrentGunID).MagicObjectToCast.Length > 1)
+            if (itemDatabase.FindItem(CurrentGunID).MagicObjectToCast!=null && itemDatabase.FindItem(CurrentGunID).MagicObjectToCast.Length > 1)
             {
                 for (int i = 0; i < 20; i++)
                 {
                     if (BulletsForThisGun.Count < 20)
                     {
-                        GameObject b = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Objects/" + inv.GetItemInDatabase(CurrentGunID).MagicObjectToCast));
+                        GameObject b = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Objects/" + itemDatabase.FindItem(CurrentGunID).MagicObjectToCast));
                         b.transform.position = new Vector3(9999, 9999);
                         BulletsForThisGun.Add(b);
                     }
@@ -990,7 +993,7 @@ public class Gun : MonoBehaviour
 
         if (ID > -1)
         {
-            if (inv.GetItemInDatabase(ID).CanDig)
+            if (itemDatabase.FindItem(ID).CanDig)
                 inv.ONOFF(DigObject, true);
             else inv.ONOFF(DigObject, false);
         }
@@ -1006,7 +1009,7 @@ public class Gun : MonoBehaviour
     {
         if (GunOB == null) return;
         if (CurrentGunID<=-1) return;
-        if (!pl.inv.GetItemInDatabase(CurrentGunID).Gun) return;
+        if (!itemDatabase.FindItem(CurrentGunID).Gun) return;
 
         Vector3 targetDirection;
 

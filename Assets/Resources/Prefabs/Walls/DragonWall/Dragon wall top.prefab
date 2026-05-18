@@ -76,7 +76,7 @@ SpriteRenderer:
   m_SortingLayerID: 777213259
   m_SortingLayer: 1
   m_SortingOrder: 10
-  m_Sprite: {fileID: 940657320, guid: b2bae4f7c1f4777449812a935d7ba571, type: 3}
+  m_Sprite: {fileID: 331615343, guid: b2bae4f7c1f4777449812a935d7ba571, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -171,6 +171,19 @@ MonoBehaviour:
   GettingDamageFromWalls: 0
   ReduceAlphaOnColl: 0
   NewMaterialOnColl: {fileID: 0}
+  Occupied: 0
+  ConstructorElement:
+    Place: {x: 0, y: 0}
+    Name: 
+    ID: 0
+    Object: {fileID: 0}
+    Stats: {fileID: 0}
+    CharMove: {fileID: 0}
+    PO: {fileID: 0}
+    BaseObjectPosition: {x: 0, y: 0}
+    hasParrent: 0
+    orderinParrent: 0
+    _TileBase: {fileID: 0}
   CanBeHungry: 0
   HungerDamage: 1
   Friend: 0
@@ -189,6 +202,18 @@ MonoBehaviour:
   SpawnPointName: 
   ColorMaterial: {fileID: 0}
   MiddleReplacement: {fileID: 0}
+  OBOnBoardElement:
+    Place: {x: 0, y: 0}
+    Name: 
+    ID: 0
+    Object: {fileID: 0}
+    Stats: {fileID: 0}
+    CharMove: {fileID: 0}
+    PO: {fileID: 0}
+    BaseObjectPosition: {x: 0, y: 0}
+    hasParrent: 0
+    orderinParrent: 0
+    _TileBase: {fileID: 0}
 --- !u!114 &544492360443353469
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -202,26 +227,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Table: 0
-  Shield: 0
   TransperentWall: 0
   ComfortPlus: 0
   TimePlus: 0
-  GodDelayPlus: 0
   DamageFromWall: 1
   floors: 0
-  kitchenfloors: 0
   tables: 0
-  beds: 0
   ground: 0
   wall: 1
-  oven: 0
-  toilet: 0
   people: 0
   Trash: 0
   Poop: 0
   CharactersOnThisStructure: []
-  decoration: 0
-  TopObject: 0
   TrueName: []
   Draw: 1
   DishesOnTable: []

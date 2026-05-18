@@ -29,15 +29,11 @@ public class CameraBor : MonoBehaviour {
 
     public float cameraHalfWidth, orthographicSize;
 
-    public bool MoveinaWayOfMovemement;
-    public bool DirectMove;
+ 
 
-    private float YPlusMoveWay = 0;
-    private float XPlusMoveWay = 0;
     private Constructor Constr;
 
-    public Vector2 MoveinaWayOfMovemementBorder = new Vector2 (-1,1);
-
+ 
 
     public Texture2D CursorT, CursorRightT, CursorLeftT, CursorUpT, CursorDownT;
     public float speedmultiplier = 12;
@@ -47,11 +43,20 @@ public class CameraBor : MonoBehaviour {
     private int CamSide = 1;
     private Vector3 CamStartPos;
 
-    private PixelPerfectCamera PixelCam; 
-   
-	public void Start()
-	{
+    private PixelPerfectCamera PixelCam;
 
+    public int MaxScale = 130;
+    public int MinScale = 50;
+
+
+    private float dragSpeed = 1;
+
+    private Vector3 lastMousePosition;
+
+    private float NearBorderTimer;
+    public void Start()
+	{
+    
         PixelCam = GetComponent<PixelPerfectCamera>();
 
         pl = InitializeObjects.PL;
@@ -86,71 +91,41 @@ public class CameraBor : MonoBehaviour {
 
 	public void Update()
 	{
-        if (Constr.TutorialPause || pl.menu.MenuONOFF || pl.inv.showinvent || pl.inv.showjournal || pl.inv.blueprintshow) return;
+        if (Constr.TutorialPause || pl.menu.MenuONOFF || pl.inv.showjournal || pl.inv.blueprintshow) return;
 
 
-        if (pl.IM.MouseScroll > 0.1 && PixelCam.assetsPPU < 160) PixelCam.assetsPPU+=10;
-        if (pl.IM.MouseScroll < -0.1 && PixelCam.assetsPPU>40) PixelCam.assetsPPU-=10;
+        if (pl.IM.MouseScroll > 0.1 && PixelCam.assetsPPU < MaxScale) PixelCam.assetsPPU+=10;
+        if (pl.IM.MouseScroll < -0.1 && PixelCam.assetsPPU> MinScale) PixelCam.assetsPPU-=10;
 
         if (PixelCam.assetsPPU == 80) PixelCam.assetsPPU = 82;
 
         CamShake();
 
-        if (DirectMove && !pl.StartLoading) MoveCameraOnTheField();
-
-        if (MoveinaWayOfMovemement && !Constr.Building )
-        {
-           
-            Vector2 XBorder = new Vector2(Screen.width / 12, Screen.width - Screen.width / 12);
-            Vector2 YBorder = new Vector2(Screen.height / 18, Screen.height - Screen.height / 18);
-
-            Vector2 MousePos = new Vector2(0, 0);
-            
-                MousePos = Constr.transform.position;
-
-            if (MousePos.x < XBorder.x || MousePos.x > XBorder.y ||
-              MousePos.y < YBorder.x || MousePos.y > YBorder.y)
-            {
-                XPlusMoveWay = PlayerV.transform.position.x - PlayerV.GetComponent<Player>().MainCamera.ScreenToWorldPoint(PlayerV.GetComponent<Player>().IM.MousePosition).x;
-                YPlusMoveWay = PlayerV.transform.position.y - PlayerV.GetComponent<Player>().MainCamera.ScreenToWorldPoint(PlayerV.GetComponent<Player>().IM.MousePosition).y;
-            }
-            else XPlusMoveWay = YPlusMoveWay = 0;
-
-            XPlusMoveWay = Mathf.Clamp(XPlusMoveWay, MoveinaWayOfMovemementBorder.x, MoveinaWayOfMovemementBorder.y) * -1;
-            YPlusMoveWay = Mathf.Clamp(YPlusMoveWay, MoveinaWayOfMovemementBorder.x, MoveinaWayOfMovemementBorder.y) * -1;
+#if UNITY_STANDALONE
+        MoveCameraWithMouseButton();
+        if (Input.GetMouseButton(2)) return;
+#endif
 
 
-        }
+        if (!pl.StartLoading) MoveCameraOnTheField();
+
+       
 
 
         _min = _bounds.bounds.min;
 		_max = _bounds.bounds.max;
 
 
-        if (!DirectMove)
-        {
-
+        
             if (isFollowing)
             {
-                if (Mathf.Abs(x - (PlayerV.position.x + XPlusMoveWay + DirectMove_XSpeed)) > Margin.x)
-                    x = Mathf.Lerp(x, PlayerV.position.x + XPlusMoveWay + DirectMove_XSpeed, Smoothin.x * Time.deltaTime * 3);
+                 x = Mathf.Lerp(x, CamStartPos.x  + DirectMove_XSpeed, Smoothin.x * Time.deltaTime * 3);
 
-                if (Mathf.Abs(y - (PlayerV.position.y + YPlusMoveWay + DirectMove_YSpeed)) > Margin.y)
-                    y = Mathf.Lerp(y, PlayerV.position.y + YPlusMoveWay + DirectMove_YSpeed, Smoothin.y * Time.deltaTime * 3);
-
-            }
-        }
-        else
-        {
-            if (isFollowing)
-            {
-                 x = Mathf.Lerp(x, CamStartPos.x + XPlusMoveWay + DirectMove_XSpeed, Smoothin.x * Time.deltaTime * 3);
-
-                 y = Mathf.Lerp(y, CamStartPos.y + YPlusMoveWay + DirectMove_YSpeed, Smoothin.y * Time.deltaTime * 3);
+                 y = Mathf.Lerp(y, CamStartPos.y  + DirectMove_YSpeed, Smoothin.y * Time.deltaTime * 3);
 
             }
 
-        }
+        
 
 
         cameraHalfWidth = Camera.main.orthographicSize * ((float)Screen.width / Screen.height);
@@ -160,7 +135,7 @@ public class CameraBor : MonoBehaviour {
             y = Mathf.Clamp(y, _min.y + orthographicSize, _max.y - orthographicSize);
 
 
-        
+
 
         //--------------MoveWithPlayer-------------------//
         if (Mathf.Abs(PlayerV.GetComponent<Player>()._normalHSpeed) < 1.5f && Mathf.Abs(PlayerV.GetComponent<Player>()._normalHSpeed)>0.5)
@@ -193,17 +168,57 @@ public class CameraBor : MonoBehaviour {
 
     }
 
+    void MoveCameraWithMouseButton()
+    {
+        if (Input.GetMouseButtonDown(2))
+        {
+            lastMousePosition = Input.mousePosition;
+        }
 
+        if (Input.GetMouseButton(2))
+        {
+            Vector3 delta = Input.mousePosition - lastMousePosition;
+
+            Vector3 move = new Vector3(-delta.x, -delta.y, 0f) * dragSpeed * Time.deltaTime;
+
+            transform.Translate(move, Space.Self);
+            x = Mathf.Clamp(transform.position.x, _min.x + cameraHalfWidth, _max.x - cameraHalfWidth);
+            y = Mathf.Clamp(transform.position.y, _min.y + orthographicSize, _max.y - orthographicSize);
+
+            DirectMove_XSpeed = x - CamStartPos.x;
+            DirectMove_YSpeed = y - CamStartPos.y;
+
+            lastMousePosition = Input.mousePosition;
+        }
+    }
     void MoveCameraOnTheField()
     {
+       
         _min = _bounds.bounds.min;
         _max = _bounds.bounds.max;
 
-        Vector2 XBorder = new Vector2(40, Screen.width -40);
-        Vector2 YBorder = new Vector2(40, Screen.height - 40);
+        Vector2 XBorder = new Vector2(10, Screen.width -10);
+        Vector2 YBorder = new Vector2(10, Screen.height - 10);
 
         if (!pl.IM.joystick)
         {
+            if (pl.IM.MousePosition.x > XBorder.y && transform.position.x < _max.x - cameraHalfWidth)
+                NearBorderTimer += Time.deltaTime;
+
+            if (pl.IM.MousePosition.x < XBorder.x && transform.position.x > _min.x + cameraHalfWidth)
+                NearBorderTimer += Time.deltaTime;
+
+            if (pl.IM.MousePosition.y > YBorder.y && transform.position.y < _max.y - orthographicSize)
+                NearBorderTimer += Time.deltaTime;
+
+            if (pl.IM.MousePosition.y < YBorder.x && transform.position.y > _min.y + orthographicSize)
+                NearBorderTimer += Time.deltaTime;
+
+            if (pl.IM.MousePosition.x < XBorder.y && pl.IM.MousePosition.x > XBorder.x && pl.IM.MousePosition.y < YBorder.y && pl.IM.MousePosition.y > YBorder.x)
+                NearBorderTimer = 0;
+
+            if (NearBorderTimer < 0.2f) return;
+
             if (pl.IM.MousePosition.x > XBorder.y && transform.position.x < _max.x - cameraHalfWidth)
             {
                 
@@ -242,18 +257,24 @@ public class CameraBor : MonoBehaviour {
         }
         else
         {
+          
+
             if (pl.IM.Rightstickpush)
             {
                 
                 transform.position = new Vector3(0.55f, 0.33f, -10);
             }
 
+           
+
+
             if (pl.IM._horizontal_R > 0.2f && transform.position.x < _max.x - cameraHalfWidth)
             {
              
                 DirectMove_XSpeed += Time.deltaTime * speedmultiplier;
+              
 
-                
+
             }
             if (pl.IM._horizontal_R < -0.2f && transform.position.x > _min.x + cameraHalfWidth)
             {

@@ -6,6 +6,8 @@ using UnityEngine.UI;
 using System;
 using TMPro;
 using UnityEngine.SceneManagement;
+using System.Linq;
+
 
 
 [Serializable]
@@ -45,7 +47,7 @@ public class Constructor : MonoBehaviour
 
     public bool ChooseMouseObject { get; set;}
 
-    public bool DEMO { get; private set; }
+
  
 
     public Tilemap Tile;
@@ -85,8 +87,20 @@ public class Constructor : MonoBehaviour
     public List<GameObject> ClientsList = new List<GameObject>();
     [HideInInspector]
     public List<ObjectOnBoard> OBOnBoard = new List<ObjectOnBoard>();
+
     [HideInInspector]
-    public List<ObjectOnBoard> ConstructedStructures = new List<ObjectOnBoard>();
+    public Dictionary<int,List<ObjectOnBoard>> OBOnBoardTargets = new Dictionary<int, List<ObjectOnBoard>>();
+
+    [HideInInspector]
+    public Dictionary<Vector3, ObjectOnBoard> OBOnBoardPositions = new Dictionary<Vector3, ObjectOnBoard>();
+
+
+    [HideInInspector]
+    public List<ObjectOnBoard> ConstructedStructures = new List< ObjectOnBoard>();
+
+
+
+
     [HideInInspector]
     public List<GameObject> DroppedItems = new List<GameObject>();
     [HideInInspector]
@@ -107,7 +121,7 @@ public class Constructor : MonoBehaviour
 
     private AudioClip Place;
 
-    public int Floors { get;  set; }
+    public int TilesSurface { get;  set; }
     public int KitchenFloors { get;  set; }
     public int Walls { get;  set; }
     public int Grounds { get;  set; }
@@ -150,6 +164,7 @@ public class Constructor : MonoBehaviour
  
 
     private Vector2 ConstructorObjectPosition;
+    private int ConstructorFloor;
 
     private GameObject ExitBuildingMode,ConstructorButtons;
 
@@ -233,7 +248,7 @@ public class Constructor : MonoBehaviour
 
     private GameObject BuildEffect, DemolishEffect;
     private TextDatabase textdatabase;
-
+    private ItemDatabase itemdatabase;
 
     public bool AlphaBuildingFade { get; private set; }
     public bool DistanceFade { get; set; }
@@ -245,17 +260,17 @@ public class Constructor : MonoBehaviour
         MerchantNameText = GameObject.Find("MerchantNameText").GetComponent<TextMeshProUGUI>();
 
         if(SceneManager.GetActiveScene().name == "Island")
-            WaterBase = Resources.Load<TileBase>("Assets/Resources/Brushes/Water");
+            WaterBase = Resources.Load<TileBase>("Brushes/Water");
 
         else if (SceneManager.GetActiveScene().name == "Lake")
-            WaterBase = Resources.Load<TileBase>("Assets/Resources/Brushes/WaterDark");
+            WaterBase = Resources.Load<TileBase>("Brushes/WaterDark");
         else
-            WaterBase = Resources.Load<TileBase>("Assets/Resources/Brushes/WaterDark");
+            WaterBase = Resources.Load<TileBase>("Brushes/WaterDark");
 
 
 
         textdatabase = InitializeObjects.Textdatabase;
-        
+        itemdatabase = InitializeObjects.Itemdatabase;
 
         SalariesOB = GameObject.Find("Salaries").GetComponent<TextMeshProUGUI>();
         ExitBuildingMode = GameObject.Find("ExitBuildingMode");
@@ -311,7 +326,7 @@ public class Constructor : MonoBehaviour
 
         MinimumWage = 0;
       
-        DEMO = false;
+      
         _transform = transform;
         Place = Resources.Load<AudioClip>("Sound/UI/Build");
        
@@ -364,7 +379,7 @@ public class Constructor : MonoBehaviour
                     
                     TOnBoard.Add(new TilesOnBoard(x, y, Tile.GetTile(new Vector3Int(x, y, 0)).name));
 
-                    if (_menu.FirstStart == 0) Floors++;
+                    if (_menu.FirstStart == 0) TilesSurface++;
 
                 }
                 
@@ -422,6 +437,7 @@ public class Constructor : MonoBehaviour
     {
         grid.Clear();
 
+      
         for (int i = 0; i < OBOnBoard.Count; i++)
         {
             if (OBOnBoard[i].Object != null)
@@ -447,6 +463,18 @@ public class Constructor : MonoBehaviour
         objectsInRange.Clear();
 
         Vector3 playerPos = MainCamera.transform.position;
+
+        if (Building)
+        {
+            if(IM.MouseMode)
+            playerPos = MainCamera.ScreenToWorldPoint(IM.MousePosition);
+            else playerPos = _transform.position;
+        }
+        else
+            playerPos = MainCamera.transform.position;
+
+
+
         Vector2Int playerGridPosition = GetGridPosition(playerPos);
 
         Vector2Int gridPosition;
@@ -497,6 +525,7 @@ public class Constructor : MonoBehaviour
         if (destructibleOB == null || destructibleOB.Object == null) return;
 
         FO = destructibleOB.Stats;
+
         FO = destructibleOB.Object.GetComponent<StatsControll>();
 
         if (FO == null)
@@ -577,9 +606,10 @@ public class Constructor : MonoBehaviour
             VisionDraw(ref FO);
 
            FO.GrowControll();
+          
+           FO.ColorMaterial.ObjectColorAlpha();
 
-           
-        
+
         }
 
         if (FO.HP <= 0)
@@ -611,9 +641,10 @@ public class Constructor : MonoBehaviour
         }
 
      
-        if (UnsettingTile == null && IM.ActionDelay < Time.fixedTime)
+        if (UnsettingTile == null )
         {
 
+          
 
             if (Tile.GetTile(new Vector3Int(XPos, YPos, 0)) != null)
             {
@@ -628,7 +659,7 @@ public class Constructor : MonoBehaviour
 
             }
             
-            if (pl.inv.GetItemInDatabase(OnButtonID).TargetTileMap == GreyMap)
+            if (itemdatabase.FindItem(OnButtonID).TargetTileMap == GreyMap)
             {
                 if (GreyMap.GetTile(new Vector3Int(XPos, YPos, 0)) != null)
                 {
@@ -636,11 +667,16 @@ public class Constructor : MonoBehaviour
 
                 }
             }
-        }
-       
 
-        if (UnsettingTile != null && !_DestroyObject && !ChooseMouseObject && Building)
-         UnSetTile(UnsettingTile);
+        }
+        if (IM.ActionDelay < Time.fixedTime && UnsettingTile!=null)
+        {
+            _DestroyObject = false;
+        }
+
+      
+        if (UnsettingTile != null && !_DestroyObject && !ChooseMouseObject )
+            DeconstructTile(UnsettingTile);
         
     }
 
@@ -671,9 +707,9 @@ public class Constructor : MonoBehaviour
                 if (pl.inv.CheckItem(OnButtonID))
                 {
                     if (ChildPubObject.MAPS != null)
-                        ConstructTile(0, ChildPubObject._TileBase, pl.inv.GetItemInDatabase(OnButtonID).TargetTileMap);
+                        ConstructTile(0, ChildPubObject._TileBase, itemdatabase.FindItem(OnButtonID).TargetTileMap);
                     else
-                        ConstructTile(0, ChildPubObject._TileBase, pl.inv.GetItemInDatabase(OnButtonID).TargetTileMap);
+                        ConstructTile(0, ChildPubObject._TileBase, itemdatabase.FindItem(OnButtonID).TargetTileMap);
                         
 
 
@@ -697,10 +733,10 @@ public class Constructor : MonoBehaviour
         if (IM.delete_b || IM.RightMouseButton)
         {
 
-            if (IM.ActionDelay < Time.fixedTime && !ChooseMouseObject && Building)
+            if (IM.ActionDelay < Time.fixedTime && !ChooseMouseObject )
             {
-             
-                UnSetObjects();
+
+                DeconstructObjects();
                 _DestroyObject = true;
                 IM.ActionDelay = Time.fixedTime + 0.3f;
 
@@ -733,8 +769,8 @@ public class Constructor : MonoBehaviour
             if (ChildPubObject.floors <= 0 && _transform.GetChild(0) != null)
             {
 
-                ConstructStructure(pl.inv.GetItemInDatabase(_transform.GetChild(0).GetComponent<StatsControll>().DatabaseID).TargetTileMap,
-                    pl.inv.GetItemInDatabase(_transform.GetChild(0).GetComponent<StatsControll>().DatabaseID).TargetBrush);
+                ConstructStructure(itemdatabase.FindItem(_transform.GetChild(0).GetComponent<StatsControll>().DatabaseID).TargetTileMap,
+                    itemdatabase.FindItem(_transform.GetChild(0).GetComponent<StatsControll>().DatabaseID).TargetBrush);
             }
         }
         else
@@ -867,73 +903,10 @@ public class Constructor : MonoBehaviour
     }
 
 
-    void ObjFlip(GameObject Child, ref int LayerPlus, string LLayer, int ParentLayerOrder, int i, int pluslayer)
-    {
-        if (Child.GetComponent<SpriteRenderer>() == null)
-        return;
-        
-        Child.GetComponent<SpriteRenderer>().sortingLayerName = LLayer;
-        Child.GetComponent<SpriteRenderer>().sortingOrder = ParentLayerOrder + (1 * i + 2);
-
-        LayerPlus = ParentLayerOrder + (1 * i + 2);
-        
-    }
 
 
 
-    void LayerFlip(GameObject obj)
-    {
-
-        SpriteRenderer spriteRenderer = obj.GetComponent<SpriteRenderer>();
-
-
-        if (obj.tag != "Flipping")
-        {
-            spriteRenderer.sortingLayerName = "Default";
-            spriteRenderer.sortingOrder = -900;
-            return;
-        }
-
-
-        BoxCollider2D playerBox = pl.GetComponent<BoxCollider2D>();
-        BoxCollider2D boxCollider = obj.GetComponent<BoxCollider2D>();
-
-        string lLayer = "";
-
-        if (boxCollider.bounds.min.y < playerBox.bounds.min.y)
-            lLayer = ForG;
-        else
-            lLayer = StartLayer;
-
-        if (spriteRenderer != null)
-        {
-            spriteRenderer.sortingLayerName = lLayer;
-            spriteRenderer.sortingOrder = (int)(obj.transform.position.y * -200) + (int)(obj.transform.position.x); 
-            
-            
-        }
-
-
-
-        SetChildLayer(obj, lLayer, spriteRenderer.sortingOrder, 2);
-
-        
-    }
-
-    void SetChildLayer(GameObject obj, string layerName, int parentSortingOrder, int childCount)
-    {
-        for (int i = 0; i < obj.transform.childCount; i++)
-        {
-            GameObject child = obj.transform.GetChild(i).gameObject;
-
-            if (!child.name.Contains("Base"))
-            {
-                ObjFlip(child, ref parentSortingOrder, layerName, parentSortingOrder, i, childCount);
-                SetChildLayer(child, layerName, parentSortingOrder, childCount + 2);
-            }
-        }
-    }
-
+   
 
 
     void ConstructTile(int n, TileBase Brush, Tilemap Map)
@@ -1064,33 +1037,32 @@ public class Constructor : MonoBehaviour
 
         if (!TOnBoard.Contains(NewTile))
              TOnBoard.Add(NewTile);
-        
 
 
-        Floors += ChildPubObject.floors;
 
-        KitchenFloors += ChildPubObject.kitchenfloors;
+        TilesSurface += ChildPubObject.floors;
+
         Grounds += ChildPubObject.ground;
         Walls += ChildPubObject.wall;
 
 
         pl.inv.ReduceItemCount(OnButtonID, 1);
 
-        IM.ActionDelay = Time.fixedTime + 0.1f;
+       // IM.ActionDelay = Time.fixedTime + 0.1f;
 
         pl.RescanInBounds(new Bounds(new Vector3(FinalXPos, FinalYPos, 0), new Vector3(2, 2, 0)));
 
         LastBuildingConstructed = OnButtonID;
-        SetObjectDelay = Time.fixedTime + 0.1f;
+       // SetObjectDelay = Time.fixedTime + 0.1f;
 
     }
 
-    void UnSetTile(Tilemap Map)
+    void DeconstructTile(Tilemap Map)
     {
 
         
         GameObject OBOnTile = null;
-
+        print("DeconstructTile 0");
         for (int i = 0; i < OBOnBoard.Count; i++)
         {
                
@@ -1106,7 +1078,7 @@ public class Constructor : MonoBehaviour
             }
         }
 
-
+        print("DeconstructTile 01");
 
         if (OBOnTile!=null ||
              _menu.MenuONOFF || show_questbook  )
@@ -1118,21 +1090,30 @@ public class Constructor : MonoBehaviour
         }*/
 
 
-        Floors--;
+        TilesSurface--;
 
-     
-        StatsControll _StatsControll = _transform.GetChild(0).GetComponent<StatsControll>();
+        StatsControll _StatsControll = null;
 
+        if (_transform.childCount>0)
+        _StatsControll = _transform.GetChild(0).GetComponent<StatsControll>();
+       
 
         PlaySound(Place, 0.8f);
-        AddMoney(_transform.position, pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).BuildingCost);
-        
+
+
+        if (_transform.childCount > 0)
+            AddMoney(_transform.position, itemdatabase.FindItem(_StatsControll.DatabaseID).BuildingCost);
+        else AddMoney(_transform.position, 5);
+
 
 
         for (int i = 0; i < TOnBoard.Count; i++)
         {
-            if(XPos == TOnBoard[i].xPOS && (YPos) == TOnBoard[i].yPOS)
+            if (XPos == TOnBoard[i].xPOS && (YPos) == TOnBoard[i].yPOS)
+            {
                 TOnBoard.RemoveAt(i);
+            
+            }
         }
 
         PitsTileBase.SetTile(new Vector3Int(XPos, YPos , 0), null);
@@ -1142,33 +1123,40 @@ public class Constructor : MonoBehaviour
         if(PlaceWaterOnTileDestroy)
         WaterMap.SetTile(new Vector3Int(XPos, YPos , 0), WaterBase);
 
-        if (Map == GreyMap) WaterMap.SetTile(new Vector3Int(XPos, YPos, 0), WaterBase);
+        if (Map == GreyMap)
+        {
+            WaterMap.SetTile(new Vector3Int(XPos, YPos, 0), WaterBase);
+            TOnBoard.Add(new TilesOnBoard(XPos, YPos, WaterBase.name));
+        }
 
         GameObject DestroyedOB = FindConstructedObject(ConstructorObjectPosition.x + "_" + ConstructorObjectPosition.y);
         _DestroyObject = false;
 
 
-
+        print("DeconstructTile 1");
         pl.RescanInBounds(new Bounds(new Vector3(XPos, YPos, 0), new Vector3(2, 2, 0)));
 
         IM.ActionDelay = Time.fixedTime + 0.1f;
-        
 
-        
+        UnsettingTile = null;
+
+
     }
 
-    void UnSetObjects()
+    void DeconstructObjects()
     {
 
         GameObject ObjectToDestory = null;
 
+     
         for (int i = 0; i < OBOnBoard.Count; i++)
         {
          
             if (OBOnBoard[i].Object != null)
             {
-                if (new Vector2(OBOnBoard[i].Object.transform.position.x, OBOnBoard[i].Object.transform.position.y) == ConstructorObjectPosition && 
-                    (OBOnBoard[i].Object.transform.parent==null || (OBOnBoard[i].Object.transform.parent!=null && OBOnBoard[i].Object.transform.parent.GetComponent<StatsControll>()==null)))
+                if (Vector2.Distance( new Vector2(OBOnBoard[i].Object.transform.position.x, OBOnBoard[i].Object.transform.position.y),
+                    ConstructorObjectPosition)<0.15f && 
+                    (OBOnBoard[i].Object.transform.parent == null || (OBOnBoard[i].Object.transform.parent!=null && OBOnBoard[i].Object.transform.parent.GetComponent<StatsControll>()==null)))
 
                 {
 
@@ -1190,9 +1178,9 @@ public class Constructor : MonoBehaviour
         if (ObjectToDestory.GetComponent<PubObject>() != null || (ObjectToDestory.GetComponent<PubObject>() != null && ObjectToDestory.GetComponent<MovementControll>() != null ))
         {
             PubObject POPO = ObjectToDestory.GetComponent<PubObject>();
-            
-            Floors -= POPO.floors;
-            KitchenFloors -= POPO.kitchenfloors;
+
+            TilesSurface -= POPO.floors;
+     
             if(Comfort> ComfortMin)
             Comfort -= POPO.ComfortPlus;
             if(TimerStay>-TimerStayMax)
@@ -1208,7 +1196,7 @@ public class Constructor : MonoBehaviour
                 if (POPO.ItemNeeded.Length > 0)
                 {
                     for (int i = 0; i < POPO.ItemNeeded.Length; i++)
-                        pl.inv.AddItem(POPO.ItemNeeded[i], POPO.ItemNeededCount[i], pl.inv.GetItemInDatabase(POPO.ItemNeeded[i]).Durability, pl._transform.position);
+                        pl.inv.AddItem(POPO.ItemNeeded[i], POPO.ItemNeededCount[i], itemdatabase.FindItem(POPO.ItemNeeded[i]).Durability, pl._transform.position);
                 }
             }
 
@@ -1237,7 +1225,7 @@ public class Constructor : MonoBehaviour
 
 
 
-        AddMoney(new Vector3(0,0,0),(int)(pl.inv.GetItemInDatabase(ObjectToDestory.GetComponent<StatsControll>().DatabaseID).BuildingCost * 0.8f));
+        AddMoney(new Vector3(0,0,0),(int)(itemdatabase.FindItem(ObjectToDestory.GetComponent<StatsControll>().DatabaseID).BuildingCost * 0.8f));
 
         if (ObjectToDestory == null) return;
 
@@ -1250,13 +1238,15 @@ public class Constructor : MonoBehaviour
         DemolishEffect.GetComponent<AnimationFrame>().ResetAnimation();
         DemolishEffect.GetComponent<AudioSource>().Play();
 
-    
-        if (ObjectToDestory.GetComponent<PubObject>().TopObjectsCount <= 0 || ObjectToDestory.GetComponent<PubObject>().TopObjectsCount >= 99)
+        if (ObjectToDestory.GetComponent<PubObject>().FloorsCount > ObjectToDestory.transform.childCount)
+            ObjectToDestory.GetComponent<PubObject>().FloorsCount = ObjectToDestory.transform.childCount;
+
+        if (ObjectToDestory.GetComponent<PubObject>().FloorsCount <= 0 || ObjectToDestory.GetComponent<PubObject>().FloorsCount >= 99)
         {
                    
             RemoveFromOBOnBoard(ObjectToDestory);
             RemoveFrom_ConstructedObjects(ObjectToDestory);
-            pl.inv.AddItemNOAUDIO(ObjectToDestory.GetComponent<StatsControll>().DatabaseOriginalID, 1, pl.inv.GetItemInDatabase(ObjectToDestory.GetComponent<StatsControll>().DatabaseID).Durability, ObjectToDestory.transform.position);
+            pl.inv.AddItemNOAUDIO(ObjectToDestory.GetComponent<StatsControll>().DatabaseOriginalID, 1, itemdatabase.FindItem(ObjectToDestory.GetComponent<StatsControll>().DatabaseID).Durability, ObjectToDestory.transform.position);
 
             DemolishEffect.transform.position = ObjectToDestory.transform.position;
             PlaySound(Place, UnityEngine.Random.Range(0.4f, 0.5f));
@@ -1271,7 +1261,7 @@ public class Constructor : MonoBehaviour
             RemoveFromOBOnBoard(ObjectToDestory.transform.GetChild(ObjectToDestory.transform.childCount - 1).gameObject);
             RemoveFrom_ConstructedObjects(ObjectToDestory.transform.GetChild(ObjectToDestory.transform.childCount - 1).gameObject);
 
-            pl.inv.AddItemNOAUDIO(ObjectToDestory.transform.GetChild(ObjectToDestory.transform.childCount - 1).gameObject.GetComponent<StatsControll>().DatabaseOriginalID, 1, pl.inv.GetItemInDatabase(ObjectToDestory.transform.GetChild(ObjectToDestory.transform.childCount - 1).gameObject.GetComponent<StatsControll>().DatabaseID).Durability, ObjectToDestory.transform.position);
+            pl.inv.AddItemNOAUDIO(ObjectToDestory.transform.GetChild(ObjectToDestory.transform.childCount - 1).gameObject.GetComponent<StatsControll>().DatabaseOriginalID, 1, itemdatabase.FindItem(ObjectToDestory.transform.GetChild(ObjectToDestory.transform.childCount - 1).gameObject.GetComponent<StatsControll>().DatabaseID).Durability, ObjectToDestory.transform.position);
 
             DemolishEffect.transform.position = ObjectToDestory.transform.GetChild(ObjectToDestory.transform.childCount - 1).gameObject.transform.position;
 
@@ -1285,7 +1275,7 @@ public class Constructor : MonoBehaviour
 
             pl.RescanInBounds(new Bounds(new Vector3(ObjectToDestory.transform.position.x, ObjectToDestory.transform.position.y, 0), new Vector3(10, 10, 0)));
             
-            ObjectToDestory.GetComponent<PubObject>().TopObjectsCount--;
+            ObjectToDestory.GetComponent<PubObject>().FloorsCount--;
         }
 
    
@@ -1295,46 +1285,52 @@ public class Constructor : MonoBehaviour
     }
 
 
-    void CheckObjectOnGround(ref GameObject ObjectOnGround, ref GameObject TopOnGround, ref GameObject DecorationOnGround)
+    void CheckObjectOnGround(ref GameObject ObjectOnGround, ref PubObject PO)
     {
-      //  if (ObjectOnGround == null) return;
-
-        for (int i = 0; i < OBOnBoard.Count; i++)
-        {
-            ObjectOnBoard ob = OBOnBoard[i];
-
-          
-            GameObject obj = ob.Object;
-            if (obj != null )
-            if (ob.Place == ConstructorObjectPosition && obj.transform.parent != _transform && (obj.transform.parent == null || (obj.transform.parent != null && obj.transform.parent.GetComponent<StatsControll>()==null)))
-            {
-                ObjectOnGround = obj;
-                PubObject pubObject = obj.GetComponent<PubObject>();
-
-                if (pubObject != null)
-                {
-                    if (pubObject.TopObject)
-                    {
-                        TopOnGround = obj;
-                    }
-                    else if (pubObject.decoration)
-                    {
-                        DecorationOnGround = obj;
-                    }
-                }
-
-                return;
-            }
-        }
-
+       
         ObjectOnGround = null;
+
+        Vector3 pos = new Vector3(RoundPosition(ConstructorObjectPosition, 2).x, RoundPosition(ConstructorObjectPosition, 2).y, 0);
+
+        if(!OBOnBoardPositions.ContainsKey(pos)) return;
+
+
+        GameObject obj = OBOnBoardPositions[pos].Object;
+            if (obj == null) return;
+
+
+        if (Vector2.Distance(RoundPosition(obj.transform.position,2), ConstructorObjectPosition) > 0.2f)
+            return;
+
+
+        if (obj.transform.parent == _transform) return;
+
+         if (obj.transform.parent != null && obj.transform.parent.GetComponent<StatsControll>() != null) return;
+            
+           
+        ObjectOnGround = obj;
+        PO = OBOnBoardPositions[pos].PO;
+
+        return;
+            
+        
+
 
     }
 
-
+    public static Vector3 RoundPosition(Vector3 v, int decimals)
+    {
+        float m = Mathf.Pow(10f, decimals);
+        return new Vector3(
+            Mathf.Round(v.x * m) / m,
+            Mathf.Round(v.y * m) / m,
+            Mathf.Round(v.z * m) / m
+        );
+    }
 
     void ModifyObjectToBuild_CorrespondingToParentObject(StatsControll _statsControll, ref GameObject ObjectOnGround, ref GameObject objecttobuild, ref PubObject _PubObject)
     {
+    
         objecttobuild.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
 
         if (ObjectOnGround == null)
@@ -1353,8 +1349,8 @@ public class Constructor : MonoBehaviour
                 }
             }
 
-            if (pl.inv.GetItemInDatabase(_statsControll.DatabaseID).ObjectPrefsBottom.Length > 0 )
-                CopyObject(objecttobuild, pl.inv.GetItemInDatabase(_statsControll.DatabaseID).ObjectPrefsBottom[RandomisedNumber]);
+            if (itemdatabase.FindItem(_statsControll.DatabaseID).ObjectPrefsBottom.Length > 0 )
+                CopyObject(objecttobuild, itemdatabase.FindItem(_statsControll.DatabaseID).ObjectPrefsBottom[RandomisedNumber]);
          
             return;
         }
@@ -1363,32 +1359,31 @@ public class Constructor : MonoBehaviour
         if (ObjectOnGround.GetComponent<PubObject>() == null) return;
         PubObject ObjectOnGround_PubObject = ObjectOnGround.GetComponent<PubObject>();
 
-        if (ObjectOnGround_PubObject.TopObjectsCount < TopObjectsMax && ObjectOnGround_PubObject.wall > 0 && !_PubObject.decoration)
-            ObjectOnGround_PubObject.TopObjectsCount++;
+        if (ObjectOnGround_PubObject.FloorsCount < TopObjectsMax && ObjectOnGround_PubObject.wall > 0 )
+            ObjectOnGround_PubObject.FloorsCount++;
 
        
-        if (ObjectOnGround_PubObject.TopObjectsCount < 99 && ObjectOnGround_PubObject.TopObjectsCount > 0 && ObjectOnGround_PubObject.TopObjectsCount <= TopObjectsMax)
+        if (ObjectOnGround_PubObject.FloorsCount < 99 && ObjectOnGround_PubObject.FloorsCount > 0 && ObjectOnGround_PubObject.FloorsCount <= TopObjectsMax)
         {
             if (_statsControll != null)
             {
             
-               if (pl.inv.GetItemInDatabase(_statsControll.DatabaseID).ObjectPrefsMid.Length > 0 && ObjectOnGround_PubObject.TopObjectsCount < TopObjectsMax)
-                    CopyObject(objecttobuild, pl.inv.GetItemInDatabase(_statsControll.DatabaseID).ObjectPrefsMid[RandomisedNumber]);
+               if (itemdatabase.FindItem(_statsControll.DatabaseID).ObjectPrefsMid.Length > 0 && ObjectOnGround_PubObject.FloorsCount < TopObjectsMax)
+                    CopyObject(objecttobuild, itemdatabase.FindItem(_statsControll.DatabaseID).ObjectPrefsMid[RandomisedNumber]);
 
-                else if (pl.inv.GetItemInDatabase(_statsControll.DatabaseID).ObjectPrefsTop.Length > 0 && ObjectOnGround_PubObject.TopObjectsCount == TopObjectsMax)
-                    CopyObject(objecttobuild, pl.inv.GetItemInDatabase(_statsControll.DatabaseID).ObjectPrefsTop[RandomisedNumber]);
+                else if (itemdatabase.FindItem(_statsControll.DatabaseID).ObjectPrefsTop.Length > 0 && ObjectOnGround_PubObject.FloorsCount == TopObjectsMax)
+                    CopyObject(objecttobuild, itemdatabase.FindItem(_statsControll.DatabaseID).ObjectPrefsTop[RandomisedNumber]);
                 else
-                    CopyObject(objecttobuild, pl.inv.GetItemInDatabase(_statsControll.DatabaseID).ObjectPrefs);
+                    CopyObject(objecttobuild, itemdatabase.FindItem(_statsControll.DatabaseID).ObjectPrefs);
 
               
 
             }
 
 
-            if (!_PubObject.decoration)
-                objecttobuild.transform.position = new Vector2(ConstructorObjectPosition.x, ConstructorObjectPosition.y + 1 * ObjectOnGround_PubObject.TopObjectsCount);
-            else objecttobuild.transform.position = new Vector2(ConstructorObjectPosition.x, ConstructorObjectPosition.y);
-
+          
+                objecttobuild.transform.position = new Vector2(ConstructorObjectPosition.x, ConstructorObjectPosition.y + 1 * ObjectOnGround_PubObject.FloorsCount);
+            
             if (objecttobuild.transform.Find("Base") != null)
                 Destroy(objecttobuild.transform.Find("Base").gameObject);
 
@@ -1436,12 +1431,8 @@ public class Constructor : MonoBehaviour
         }
 
 
-
-
-
-
-
     }
+
 
 
     void SetComponents_in_ObjectToBuild(ref GameObject objecttobuild , GameObject ObjectOnGround)
@@ -1453,9 +1444,7 @@ public class Constructor : MonoBehaviour
 
         PubObject _PubObject = objecttobuild.GetComponent<PubObject>();
 
-        if (_PubObject.decoration) objecttobuild.name += "decoration";
-        if (_PubObject.TopObject) objecttobuild.name += "TopObject";
-
+    
 
         if (_PubObject != null)
             _PubObject.enabled = true;
@@ -1543,8 +1532,8 @@ public class Constructor : MonoBehaviour
         }
 
 
-        Floors += _PubObject.floors;
-        KitchenFloors += _PubObject.kitchenfloors;
+        TilesSurface += _PubObject.floors;
+
 
         Grounds += _PubObject.ground;
         Walls += _PubObject.wall;
@@ -1598,8 +1587,7 @@ public class Constructor : MonoBehaviour
         }
 
 
-        LayerFlip(_transform.GetChild(0).gameObject);
-
+       
         PubObject POPO = _transform.GetChild(0).GetComponent<PubObject>();
      
         bool ValidBrush = false;
@@ -1642,12 +1630,12 @@ public class Constructor : MonoBehaviour
    
 
         GameObject ObjectOnGround = null;
-        GameObject TopOnGround = null;
-        GameObject DecorationOnGround = null;
+        PubObject ObjectOnGround_PO = null;
+
 
         //----------Object on Ground can bacome parent object for objecttobuild
-      
-        CheckObjectOnGround(ref ObjectOnGround, ref TopOnGround, ref DecorationOnGround);
+
+        CheckObjectOnGround(ref ObjectOnGround, ref ObjectOnGround_PO);
 
 
         StatsControll _StatsControllR = ChildOnMouse.GetComponent<StatsControll>();
@@ -1662,7 +1650,7 @@ public class Constructor : MonoBehaviour
         //GameObject ObjectOnGroundDecoration = GameObject.Find(ConstructorObjectPosition.x + "_" + ConstructorObjectPosition.y + "decoration");
 
 
-        if (ObjectOnGround == null || POPO.decoration)
+        if (ObjectOnGround == null )
         ChildOnMouse.position = new Vector3(ChildOnMouse.position.x, _transform.position.y + 0.5f, ChildOnMouse.position.z);
 
 
@@ -1675,8 +1663,8 @@ public class Constructor : MonoBehaviour
 
             if (ChildOnMouse.GetComponent<SpriteRenderer>() != null)
             {
-                if(ObjectOnGround.GetComponent<PubObject>()!=null)
-                ChildOnMouse.GetComponent<SpriteRenderer>().sortingOrder = ObjectOnGround.GetComponent<SpriteRenderer>().sortingOrder + ObjectOnGround.GetComponent<PubObject>().TopObjectsCount * 3 + 1;
+                if(ObjectOnGround_PO != null)
+                ChildOnMouse.GetComponent<SpriteRenderer>().sortingOrder = ObjectOnGround.GetComponent<SpriteRenderer>().sortingOrder + ObjectOnGround_PO.FloorsCount * 3 + 1;
 
             }
         }
@@ -1696,8 +1684,6 @@ public class Constructor : MonoBehaviour
     
         if (NeededItemCheck() && (RegularObjectCheck(POPO, ObjectOnGround) ||
             WallObjectCheck(POPO, ObjectOnGround) ||
-            DecorationObjectCheck(POPO, DecorationOnGround) ||
-            TopObjectCheck(POPO,TopOnGround)||
                 TableObjectCheck(POPO,ObjectOnGround) ||
                 WorkerObjectCheck(POPO, ObjectOnGround)))
         {
@@ -1706,17 +1692,16 @@ public class Constructor : MonoBehaviour
 
            
 
-            if (!POPO.decoration)
-            {
+           
 
                 if (ObjectOnGround != null)
                 {
                     //-------------------setting Object to build Y POS ---------------------------//
-                    if (ObjectOnGround.GetComponent<PubObject>().TopObjectsCount < 99)
+                    if (ObjectOnGround_PO.FloorsCount < 99)
                     {
                         ChildOnMouse.position = new Vector3(
                             ChildOnMouse.position.x,
-                            _transform.position.y+0.5f + 1 * (ObjectOnGround.GetComponent<PubObject>().TopObjectsCount + 1),
+                            _transform.position.y+0.5f + 1 * (ObjectOnGround_PO.FloorsCount + 1),
                             ChildOnMouse.position.z);
 
                     }
@@ -1725,7 +1710,7 @@ public class Constructor : MonoBehaviour
                 RandomiseConstructingObject(ChildOnMouse.gameObject, ref ObjectOnGround, ref _StatsControll);
 
 
-            }
+            
 
 
         
@@ -1757,8 +1742,8 @@ public class Constructor : MonoBehaviour
 
             if (ObjectOnGround != null)
             {
-                if (ObjectOnGround.GetComponent<PubObject>().TopObjectsCount>0)
-                PlaySound(Place, 0.55f + ObjectOnGround.GetComponent<PubObject>().TopObjectsCount*((1-0.55f)/ TopObjectsMax));
+                if (ObjectOnGround.GetComponent<PubObject>().FloorsCount > 0)
+                PlaySound(Place, 0.55f + ObjectOnGround.GetComponent<PubObject>().FloorsCount * ((1-0.55f)/ TopObjectsMax));
                 else
                 PlaySound(Place, UnityEngine.Random.Range(0.55f, 0.65f));
 
@@ -1781,29 +1766,41 @@ public class Constructor : MonoBehaviour
                 BuildEffect = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Effects/BuildEffect"));
 
             }
-
+         
 
             BuildEffect.GetComponent<AnimationFrame>().ResetAnimation();
             BuildEffect.transform.position = ChildOnMouse.transform.position;
             BuildEffect.GetComponent<AudioSource>().Play();
+            
+            
+            if (ChildOnMouse.tag != "Flipping")
+            {
+                if (ChildOnMouse.GetComponent<SpriteRenderer>() != null)
+                {
+                    ChildOnMouse.GetComponent<SpriteRenderer>().sortingLayerName = "Default";
+                    ChildOnMouse.GetComponent<SpriteRenderer>().sortingOrder = 1;
+                }
+            }
 
             ModifyObjectToBuild_CorrespondingToParentObject(_StatsControll,ref ObjectOnGround, ref objecttobuild,ref _PubObject);
             SetComponents_in_ObjectToBuild(ref objecttobuild, ObjectOnGround);
             SetPubObject_In_ObjectToBuild(ref _PubObject);
 
-            
+            objecttobuild.GetComponent<StatsControll>().ConstructorElement = OBOnBoard[OBOnBoard.Count - 1];
 
-            OBOnBoard.Add(new ObjectOnBoard(objecttobuild.GetComponent<StatsControll>().DatabaseID, objecttobuild.transform.position, objecttobuild.name, objecttobuild, _StatsControll, objecttobuild.GetComponent<PubObject>()));
+            AddObOnBoard( new ObjectOnBoard(objecttobuild.GetComponent<StatsControll>().DatabaseID, objecttobuild.transform.position, objecttobuild.name, objecttobuild, _StatsControll, objecttobuild.GetComponent<PubObject>()));
 
-            ConstructedStructures.Add(new ObjectOnBoard(objecttobuild.GetComponent<StatsControll>().DatabaseID, objecttobuild.transform.position, objecttobuild.name, objecttobuild, _StatsControll, objecttobuild.GetComponent<PubObject>()));
+            AddConstructedStructure(
+                new ObjectOnBoard(objecttobuild.GetComponent<StatsControll>().DatabaseID, objecttobuild.transform.position, objecttobuild.name, objecttobuild, _StatsControll, objecttobuild.GetComponent<PubObject>()));
 
+               
             SetColorAndAlpha(objecttobuild, new Color(1f, 1, 1, 1f));
 
           
 
             pl.RescanInBounds(new Bounds(new Vector3(objecttobuild.transform.position.x, objecttobuild.transform.position.y, 0), new Vector3(10, 10, 0)));
 
-            SpendMoney(_transform.position, pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).BuildingCost);
+            SpendMoney(_transform.position, itemdatabase.FindItem(_StatsControll.DatabaseID).BuildingCost);
             pl.inv.ReduceItemCount(OnButtonID, 1);
 
             pl.inv.UpdateInvFolder();
@@ -1834,7 +1831,7 @@ public class Constructor : MonoBehaviour
         bool result = false;
       //  if (ObjectOnGround == null) return false;
 
-        if (ObjectOnGround == null && !POPO.decoration && POPO.tables == 0 && POPO.tag != "Pers"  && POPO.wall == 0)
+        if (ObjectOnGround == null  && POPO.tables == 0 && POPO.tag != "Pers"  && POPO.wall == 0)
             result = true;
         
         return result;
@@ -1847,7 +1844,7 @@ public class Constructor : MonoBehaviour
         bool result = false;
         if (pl.inv.GetItem(9) == null) return false;
 
-        if (pl.inv.GetItemInDatabase(ID).BuildingCost <= pl.inv.GetItem(9).Count)
+        if (itemdatabase.FindItem(ID).BuildingCost <= pl.inv.GetItem(9).Count)
             result = true;
 
         return result;
@@ -1859,7 +1856,7 @@ public class Constructor : MonoBehaviour
 
         if(ObjectOnGround != null)
         if(ObjectOnGround.GetComponent<PubObject>() != null)
-        if (POPO.wall > 0 && ObjectOnGround.GetComponent<PubObject>().TopObjectsCount < TopObjectsMax && ObjectOnGround.GetComponent<PubObject>().wall > 0)
+        if (POPO.wall > 0 && ObjectOnGround.GetComponent<PubObject>().FloorsCount < TopObjectsMax && ObjectOnGround.GetComponent<PubObject>().wall > 0)
             result = true;
 
         if (ObjectOnGround == null && POPO.wall > 0 )
@@ -1890,26 +1887,7 @@ public class Constructor : MonoBehaviour
         return result;
     }
 
-    bool DecorationObjectCheck(PubObject POPO, GameObject DecorationOnGround)
-    {
-        bool result = false;
-        if (POPO.decoration && DecorationOnGround == null) result = true;
-
-    
-
-        return result;
-    }
-
-    bool TopObjectCheck(PubObject POPO, GameObject TopOnGround)
-    {
-        bool result = false;
-        if (POPO.TopObject && TopOnGround == null) result = true;
-
-
-
-        return result;
-    }
-
+   
     bool NeededItemCheck()
     {
         bool setbrush = false;
@@ -1947,46 +1925,12 @@ public class Constructor : MonoBehaviour
 
 
 
-    void ObjectsColorControll(ref PubObject POPO, GameObject ObjectOnGround, GameObject ObjectOnGroundDecoration)
-    {
-        Transform POPO_Transform = _transform.GetChild(0).transform;
-
-        if (((ObjectOnGround == null &&
-             !POPO.decoration ) ||
-
-         //---------------------------------decoration condition-----------------------------------//
-
-         (POPO.decoration && ObjectOnGround != null && ObjectOnGround.GetComponent<PubObject>() != null && ObjectOnGround.GetComponent<PubObject>().wall > 0 && ObjectOnGroundDecoration == null) ||
-
-         //---------------------------------wall condition-----------------------------------//
-         
-         (ObjectOnGround != null && ObjectOnGround.GetComponent<PubObject>() != null && ObjectOnGround.GetComponent<PubObject>().TopObjectsCount < TopObjectsMax && ObjectOnGround.GetComponent<PubObject>().wall > 0 && POPO.wall > 0))
-
-         && StartBlock.GetTile(new Vector3Int(XPos, YPos - 1, 0)) == null && TileBlock.GetTile(new Vector3Int(XPos, YPos - 1, 0)) == null)
-        {
-
-            if (ObjectOnGround != null) print("ObjectOnGround ");
-
-
-           
-        }
-        else
-        {
-            POPO_Transform.position = new Vector3(POPO_Transform.position.x, _transform.position.y, POPO_Transform.position.z);
-            SetColorAndAlpha(POPO_Transform.gameObject, new Color(1, 0.1f, 0.1f, 0.7f));
-        }
-
-
-
-
-
-    }
-
 
 
     public void SetColorAndAlpha(GameObject ob,Color _color)
     {
-       // print("SetColorAndAlpha");
+      
+
         SetColorAndAlpha_S(ob, _color);
 
         for (int i = 0; i < ob.transform.childCount; i++)
@@ -2099,7 +2043,7 @@ public class Constructor : MonoBehaviour
         if (Building  && !inv.blueprintshow)
         {
           
-            if ( IM.menu_b || (IM.exit_b && !IM.joystick) || IM.inventory_b )
+            if ( IM.menu_b || (IM.exit_b && !IM.joystick) )
             {
 
                 DeActivateBuilding();
@@ -2123,7 +2067,7 @@ public class Constructor : MonoBehaviour
 
         if (CanScrollCamera) ScroolCamera();
             
-        if (Building && !_menu.MenuONOFF && !show_questbook )
+        if ( !_menu.MenuONOFF && !show_questbook )
         {
           
             if (_transform.position.x < _max.x && ((IM._horizontal > 0 && IM._horizontalPush && _menu.ScrollDelay < Time.fixedTime) || (IM.DPADX > 0 && IM._horizontal_DPAD_Push && _menu.ScrollDelay < Time.fixedTime)))
@@ -2177,7 +2121,7 @@ public class Constructor : MonoBehaviour
 
 
             Vector3Int vi = Tile.WorldToCell(new Vector3(mouse.x - ObshiftX, mouse.y + ObshiftY, 0));
-            if (Building)
+           
                 v = Tile.CellToWorld(new Vector3Int(vi.x, vi.y, 1));
 
 
@@ -2188,24 +2132,47 @@ public class Constructor : MonoBehaviour
 
         }
 
-        if (ConstructorObjectPosition != new Vector2(v.x + ObshiftOnBoardX, v.y + 0.5f))
-        {
 
-            ConstructorObjectPosition = new Vector2(v.x + ObshiftOnBoardX, v.y + 0.5f);
-            isRandomised = false;
-        }
+        ConstructorObjectPositionManager(v, ObshiftOnBoardX);
 
-    
-        if (!Building) v = new Vector3(9999, 9999, 0);
+       // if (!Building) v = new Vector3(9999, 9999, 0);
         _transform.position = v;
 
         
     }
 
+    private void ConstructorObjectPositionManager(Vector3 v, float ObshiftOnBoardX)
+    {
+        if (ConstructorObjectPosition == new Vector2(v.x + ObshiftOnBoardX, v.y + 0.5f)) return;
+        
+        GameObject ObjectOnGround = null;
+        PubObject ObjectOnGround_PO = null;
+
+        CheckObjectOnGround(ref ObjectOnGround, ref ObjectOnGround_PO);
+
+
+        if (ObjectOnGround != null)
+        {
+            if (ObjectOnGround_PO != null)
+                ConstructorFloor = ObjectOnGround_PO.floors;
+            else ConstructorFloor = 0;
+        }
+        else ConstructorFloor = 0;
+
+            ConstructorObjectPosition = new Vector2(v.x + ObshiftOnBoardX, v.y + 0.5f);
+        isRandomised = false;
+        
+    }
+
+
+
+ 
+
     public void ActivateBuilding()
     {
         EnterHolding = true;
         Building = true;
+        if(!_menu.HideUI)
         pl.inv.ONOFF(ExitBuildingMode, true);
         //  pl.inv.showinvent = true;
 
@@ -2220,12 +2187,12 @@ public class Constructor : MonoBehaviour
     {
         Building = false;
         pl.inv.ONOFF(ExitBuildingMode, false);
-        pl.inv.showinvent = false;
+       
         RandomisedNumber = 0;
         if (_transform.childCount > 0)
             Destroy(_transform.GetChild(0).gameObject);
 
-        _transform.position = new Vector3(9999, 9999, 0);
+       // _transform.position = new Vector3(9999, 9999, 0);
         pl.inv.ONOFF( gameObject,false);
         pl.inv.ONOFF( ConstructorButtons, false);
 
@@ -2243,7 +2210,7 @@ public class Constructor : MonoBehaviour
         if (_transform.childCount > 0)
             Destroy(_transform.GetChild(0).gameObject);
 
-        _transform.position = new Vector3(9999, 9999, 0);
+      //  _transform.position = new Vector3(9999, 9999, 0);
         pl.inv.ONOFF(gameObject, false);
         pl.inv.ONOFF( ConstructorButtons, false);
 
@@ -2295,20 +2262,23 @@ public class Constructor : MonoBehaviour
       
          if (pl.menu.UIColl(Play2Button) && (IM.enter_b || Input.GetMouseButtonDown(0)))
          {
-             Game_SPEED = 3;
+             Game_SPEED = 2;
+            Time.timeScale = 2;
          }
 
          if (pl.menu.UIColl(PlayButton) && (IM.enter_b || Input.GetMouseButtonDown(0)))
          {
              Game_SPEED = 1;
+            Time.timeScale = 1;
          }
 
          if (pl.menu.UIColl(PauseButton) && (IM.enter_b || Input.GetMouseButtonDown(0)))
          {
              Game_SPEED = 0;
+             Time.timeScale = 1;
          }
        
-        if (Game_SPEED == 3)
+        if (Game_SPEED == 2)
         {
             PLAY_ButtonImage.color = new Color(0.5f, 0.5f, 0.5f, 1);
             PAUSE_ButtonImage.color = new Color(0.5f, 0.5f, 0.5f, 1);
@@ -2476,12 +2446,12 @@ public class Constructor : MonoBehaviour
     GameObject FindConstructedObject(string name)
     {
         GameObject ConstrObject = null;
-
+     
         for (int i = 0; i < OBOnBoard.Count; i++)
         {
             if (OBOnBoard[i].Object != null)
             {
-                //print("NOT NULL: " + OBOnBoard[i].Object.name + " / " + name);
+    
 
                 if (OBOnBoard[i].Object.name == name)
                     ConstrObject = OBOnBoard[i].Object;
@@ -2680,7 +2650,7 @@ public class Constructor : MonoBehaviour
 
     int CheckObjectsCountInOnBoard(string truename)
     {   int count = 0;
-        foreach (ObjectOnBoard OB in OBOnBoard)
+        foreach ( ObjectOnBoard OB in OBOnBoard)
         {
             if (OB.Name == truename) count++;
         }
@@ -2692,7 +2662,7 @@ public class Constructor : MonoBehaviour
     {
         bool res = false;
         int digits = 1;
-        foreach (ObjectOnBoard OB in OBOnBoard)
+        foreach ( ObjectOnBoard OB in OBOnBoard)
         {
 
             if (OB.Object != null)
@@ -2764,15 +2734,17 @@ public class Constructor : MonoBehaviour
 
         pl.BlowThis(FO.gameObject);
 
-
+        Vector2 pos = FO.transform.position;
         for (int i = 0; i < ConstructedStructures.Count; i++)
         {
-            if (ConstructedStructures[i].Object == FO.gameObject) ConstructedStructures.RemoveAt(i);
+            if (ConstructedStructures[i].Object == FO.gameObject) 
+                ConstructedStructures.RemoveAt(i);
         }
 
 
         if (!FO.IgnoreDestroyList && !FO.BuildedStructure)
         {
+        
             for (int i = 0; i < OBOnBoard.Count; i++)
             {
                 if (OBOnBoard[i].Object == FO.gameObject) OBOnBoard.RemoveAt(i);
@@ -2874,20 +2846,20 @@ public class Constructor : MonoBehaviour
         int max = 0;
         if (BottomCheck(ref _StatsControll))
         {
-            max = pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsBottom.Length;
+            max = itemdatabase.FindItem(_StatsControll.DatabaseID).ObjectPrefsBottom.Length;
             return max;
         }
 
         if (MidCheck(ref ObjectOnGround, ref _StatsControll))
         {
-            max = pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsMid.Length;
+            max = itemdatabase.FindItem(_StatsControll.DatabaseID).ObjectPrefsMid.Length;
                 return max;
             
         }
 
         if (TopCheck(ref ObjectOnGround, ref _StatsControll))
         {
-            max = pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsTop.Length;
+            max = itemdatabase.FindItem(_StatsControll.DatabaseID).ObjectPrefsTop.Length;
  
         }
 
@@ -2898,9 +2870,9 @@ public class Constructor : MonoBehaviour
     {
 
         
-        if (pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsBottom == null) return false;
+        if (itemdatabase.FindItem(_StatsControll.DatabaseID).ObjectPrefsBottom == null) return false;
 
-        if (pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsBottom.Length <= 0) return false;
+        if (itemdatabase.FindItem(_StatsControll.DatabaseID).ObjectPrefsBottom.Length <= 0) return false;
 
         return true;
         
@@ -2911,8 +2883,8 @@ public class Constructor : MonoBehaviour
     {
         if (ObjectOnGround == null) return false;
 
-        if (pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsMid != null)
-        if (pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsMid.Length > 0 && ObjectOnGround.GetComponent<PubObject>().TopObjectsCount < TopObjectsMax - 1)
+        if (itemdatabase.FindItem(_StatsControll.DatabaseID).ObjectPrefsMid != null)
+        if (itemdatabase.FindItem(_StatsControll.DatabaseID).ObjectPrefsMid.Length > 0 && ObjectOnGround.GetComponent<PubObject>().FloorsCount < TopObjectsMax - 1)
         return true;
             
         return false;
@@ -2923,8 +2895,8 @@ public class Constructor : MonoBehaviour
     {
         if (ObjectOnGround == null) return false;
 
-        if (pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsTop != null)
-        if (pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsTop.Length > 0 && ObjectOnGround.GetComponent<PubObject>().TopObjectsCount > 0 && ObjectOnGround.GetComponent<PubObject>().TopObjectsCount == TopObjectsMax - 1)
+        if (itemdatabase.FindItem(_StatsControll.DatabaseID).ObjectPrefsTop != null)
+        if (itemdatabase.FindItem(_StatsControll.DatabaseID).ObjectPrefsTop.Length > 0 && ObjectOnGround.GetComponent<PubObject>().FloorsCount > 0 && ObjectOnGround.GetComponent<PubObject>().FloorsCount == TopObjectsMax - 1)
         return true;
 
         return false;
@@ -2943,18 +2915,18 @@ public class Constructor : MonoBehaviour
             IM.ActionDelay = Time.fixedTime + 0.1f;
         }
 
-        if(pl.inv.GetItemInDatabase(ID).ObjectPrefsBottom == null) return;
+        if(itemdatabase.FindItem(ID).ObjectPrefsBottom == null) return;
 
-        if (pl.inv.GetItemInDatabase(ID).ObjectPrefsBottom.Length == 1)
+        if (itemdatabase.FindItem(ID).ObjectPrefsBottom.Length == 1)
         {
             return;
         }
 
-        if (RandomisedNumber >= pl.inv.GetItemInDatabase(ID).ObjectPrefsBottom.Length )
+        if (RandomisedNumber >= itemdatabase.FindItem(ID).ObjectPrefsBottom.Length )
         {
             return;
         }
-        SPRT.sprite = pl.inv.GetItemInDatabase(ID).ObjectPrefsBottom[RandomisedNumber].GetComponent<SpriteRenderer>().sprite;
+        SPRT.sprite = itemdatabase.FindItem(ID).ObjectPrefsBottom[RandomisedNumber].GetComponent<SpriteRenderer>().sprite;
 
     }
     void RandomiseConstructingObject(GameObject ChildOnMouse, ref GameObject ObjectOnGround, ref StatsControll _StatsControll)
@@ -2964,22 +2936,22 @@ public class Constructor : MonoBehaviour
 
         if (BottomCheck(ref _StatsControll))
         {
-            ChildOnMouse.GetComponent<SpriteRenderer>().sprite = pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsBottom[RandomisedNumber].GetComponent<SpriteRenderer>().sprite;
-            ChildOnMouse.layer = pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsTop[RandomisedNumber].layer;
+            ChildOnMouse.GetComponent<SpriteRenderer>().sprite = itemdatabase.FindItem(_StatsControll.DatabaseID).ObjectPrefsBottom[RandomisedNumber].GetComponent<SpriteRenderer>().sprite;
+            ChildOnMouse.layer = itemdatabase.FindItem(_StatsControll.DatabaseID).ObjectPrefsTop[RandomisedNumber].layer;
 
         }
         
         if (MidCheck(ref ObjectOnGround, ref _StatsControll))
         {
-            ChildOnMouse.GetComponent<SpriteRenderer>().sprite = pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsMid[RandomisedNumber].GetComponent<SpriteRenderer>().sprite;
-            ChildOnMouse.layer = pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsTop[RandomisedNumber].layer;
+            ChildOnMouse.GetComponent<SpriteRenderer>().sprite = itemdatabase.FindItem(_StatsControll.DatabaseID).ObjectPrefsMid[RandomisedNumber].GetComponent<SpriteRenderer>().sprite;
+            ChildOnMouse.layer = itemdatabase.FindItem(_StatsControll.DatabaseID).ObjectPrefsTop[RandomisedNumber].layer;
 
         }
 
         if (TopCheck(ref ObjectOnGround, ref _StatsControll))
         {
-            ChildOnMouse.GetComponent<SpriteRenderer>().sprite = pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsTop[RandomisedNumber].GetComponent<SpriteRenderer>().sprite;
-            ChildOnMouse.layer = pl.inv.GetItemInDatabase(_StatsControll.DatabaseID).ObjectPrefsTop[RandomisedNumber].layer;
+            ChildOnMouse.GetComponent<SpriteRenderer>().sprite = itemdatabase.FindItem(_StatsControll.DatabaseID).ObjectPrefsTop[RandomisedNumber].GetComponent<SpriteRenderer>().sprite;
+            ChildOnMouse.layer = itemdatabase.FindItem(_StatsControll.DatabaseID).ObjectPrefsTop[RandomisedNumber].layer;
 
         }
 
@@ -3020,7 +2992,7 @@ public class Constructor : MonoBehaviour
             return;
         if (IM.ActionDelay > Time.fixedTime) return;
 
-            MerchantNameText.text = inv.GetItemInDatabase(CurrentMerchantID).itemNames[_menu.Language];
+            MerchantNameText.text = itemdatabase.FindItem(CurrentMerchantID).itemNames[_menu.Language];
 
        
 
@@ -3083,18 +3055,49 @@ public class Constructor : MonoBehaviour
 
     void Remove_PERS_FromOBOnBoard(GameObject Target)
     {
+       
         for (int i = 0; i < OBOnBoard.Count; i++)
         {
             if (OBOnBoard[i].Object != null)
             {
-                if (OBOnBoard[i].Object.name == Target.name && OBOnBoard[i].Place.x == ConstructorObjectPosition.x && OBOnBoard[i].Place.y == ConstructorObjectPosition.y && OBOnBoard[i].Object.GetComponent<PubObject>().TopObjectsCount <= 0)
+                if (OBOnBoard[i].Object.name == Target.name && OBOnBoard[i].Place.x == ConstructorObjectPosition.x && OBOnBoard[i].Place.y == ConstructorObjectPosition.y && OBOnBoard[i].Object.GetComponent<PubObject>().FloorsCount <= 0)
                 {
-                    OBOnBoard.RemoveAt(i);
-
+              
+                    RemoveObOnBoard_At(i);
                 }
             }
         }
     }
+
+    public void RemoveObOnBoard_At(int i)
+    {
+        Vector3 pos = new Vector3(
+          OBOnBoard[i].Object.transform.position.x,
+          OBOnBoard[i].Object.transform.position.y,
+          OBOnBoard[i].Stats.Floor);
+
+        OBOnBoardPositions.Remove(pos);
+        OBOnBoard.RemoveAt(i);
+
+    }
+
+
+    public ObjectOnBoard GetCurrentObonBoard()
+    {
+        Vector3 pos = new Vector3(ConstructorObjectPosition.x,
+            ConstructorObjectPosition.y, ConstructorFloor);
+
+        if (!OBOnBoardPositions.ContainsKey(pos)) return null;
+
+        ObjectOnBoard obn = OBOnBoardPositions[pos];
+       
+        if (obn != null) return obn;
+
+        return null;
+
+
+    }
+
 
     void Remove_PERS_ConstructedObjects(GameObject Target)
     {
@@ -3102,7 +3105,7 @@ public class Constructor : MonoBehaviour
         {
             if (ConstructedStructures[i].Object != null)
             {
-                if (ConstructedStructures[i].Object.name == Target.name && ConstructedStructures[i].Place.x == ConstructorObjectPosition.x && ConstructedStructures[i].Place.y == ConstructorObjectPosition.y && ConstructedStructures[i].Object.GetComponent<PubObject>().TopObjectsCount <= 0)
+                if (ConstructedStructures[i].Object.name == Target.name && ConstructedStructures[i].Place.x == ConstructorObjectPosition.x && ConstructedStructures[i].Place.y == ConstructorObjectPosition.y && ConstructedStructures[i].Object.GetComponent<PubObject>().FloorsCount <= 0)
                 {
                     ConstructedStructures.RemoveAt(i);
 
@@ -3111,14 +3114,25 @@ public class Constructor : MonoBehaviour
         }
     }
 
+    void AddConstructedStructure(ObjectOnBoard obonboard)
+    {
+         ConstructedStructures.Add(obonboard);
+      
+
+    }
+
+
     void RemoveFromOBOnBoard(GameObject Target)
     {
+
+
         for (int i = 0; i < OBOnBoard.Count; i++)
         {
             if (OBOnBoard[i].Object != null)
                 if (OBOnBoard[i].Object == Target)
-                    OBOnBoard.RemoveAt(i);
-
+                {
+                    RemoveObOnBoard_At(i);
+                }
 
         }
 
@@ -3139,11 +3153,10 @@ public class Constructor : MonoBehaviour
 
 
 
-
     public bool CheckObjectName(string n)
     {
         bool result = false;
-
+   
         for (int i = 0; i < OBOnBoard.Count; i++)
         {
             if (OBOnBoard[i].Object != null)
@@ -3187,7 +3200,7 @@ public class Constructor : MonoBehaviour
 
     public bool CheckStructures(Vector3 pos)
     {
-        
+
         for (int i = 0; i < OBOnBoard.Count; i++)
         {
             ObjectOnBoard ob = OBOnBoard[i];
@@ -3206,11 +3219,59 @@ public class Constructor : MonoBehaviour
 
     }
 
+    public void AddObOnBoard(ObjectOnBoard obonboard)
+    {
+        if(OBOnBoard.Count>0)
+        obonboard.Stats.ConstructorElement = OBOnBoard[OBOnBoard.Count - 1];
+       
+        OBOnBoard.Add(obonboard);
+  
+        Vector3 pos = new Vector3(
+          obonboard.Place.x,
+          obonboard.Place.y,
+          obonboard.Stats.Floor);
 
 
+
+
+        if (obonboard.Object.GetComponent<MovementControll>() == null)
+        {
+            if (!OBOnBoardPositions.ContainsKey(pos))
+            {
+
+
+
+                OBOnBoardPositions.Add(pos, obonboard);
+            }
+            else OBOnBoardPositions[pos] = obonboard;
+
+        }
+
+    }
+
+
+
+    public void AddOBOnBoardTargets(ObjectOnBoard obonboard)
+    {
+        if (OBOnBoardTargets.ContainsKey(obonboard.ID))
+        {
+           
+            OBOnBoardTargets[obonboard.ID].Add(obonboard);
+        }
+        else
+        {
+
+            List<ObjectOnBoard> targetsloist = new List<ObjectOnBoard>();
+            targetsloist.Add(obonboard);
+
+            OBOnBoardTargets.Add(obonboard.ID, targetsloist);
+
+
+        }
+    }
     public bool CheckStructuresOnBoard(int id)
     {
-
+    
         for (int i = 0; i < OBOnBoard.Count; i++)
         {
             if (OBOnBoard[i].ID == id) return true;

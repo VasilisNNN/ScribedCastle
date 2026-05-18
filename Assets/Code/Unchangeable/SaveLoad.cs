@@ -72,8 +72,12 @@ public class SaveLoad : MonoBehaviour
     public const int saveDataSize = 131072;
     private const int MenusaveDataSize = 512;
 
+
+    public SonySaveDataMain PS_SaveMain;
+
+
 #endif
- 
+
 
 
     public int SaveTimer { get; private set; }
@@ -95,10 +99,9 @@ public class SaveLoad : MonoBehaviour
     public string[] LocationsNames;
     public int[] CreateLocationOnStart;
 
-    public List<int> BPConstructed = new List<int>();
+  
 
-    public int DayNumber;
-    public float DayTime;
+ 
     public int _TutorialPhase { get; set; }
 
     public int CurrentCharacter { get; set; }
@@ -108,15 +111,13 @@ public class SaveLoad : MonoBehaviour
     private AstarPath AP;
     private Tutorial _Tutorial;
 
-#if UNITY_PS5
-    [HideInInspector]
-    public SonySaveDataMain PS_SaveMain;
-#endif
+
 
    public SaveLoadBasic SaveLoadCurrent;
     private SwitchSaveLoad SaveLoad_Switch = new SwitchSaveLoad();
     private PCSaveLoad SaveLoad_PC = new PCSaveLoad();
-
+    private PS5SaveLoad SaveLoad_PS5 = new PS5SaveLoad();
+    private ItemDatabase itemDatabase;
 
     void Start()
     {
@@ -128,6 +129,15 @@ public class SaveLoad : MonoBehaviour
 #if UNITY_STANDALONE
         SaveLoadCurrent = SaveLoad_PC;
 #endif
+
+#if UNITY_PS5 || UNITY_PS4
+        PS_SaveMain = GameObject.Find("Constructor").GetComponent<SonySaveDataMain>();
+        SaveLoad_PS5.PS_SaveMain = PS_SaveMain;
+
+        SaveLoadCurrent = SaveLoad_PS5;
+#endif
+
+
 
         SaveLoadCurrent.Init();
         SaveLoadCurrent.SetOnStart(StartStarts);
@@ -144,10 +154,7 @@ public class SaveLoad : MonoBehaviour
 
         
 
-        print("saveload start 2");
-        for (int i = 0; i < 100; i++)
-            BPConstructed.Add(0);
-
+   
         
         if (GameObject.Find("Grid") != null)
         {
@@ -177,8 +184,9 @@ public class SaveLoad : MonoBehaviour
           
         }
 
+        itemDatabase = InitializeObjects.Itemdatabase;
 
-      
+
 
         print("saveload start 6");
         _menu = GameObject.Find("Constructor").GetComponent<MenuCustom>();
@@ -211,8 +219,8 @@ public class SaveLoad : MonoBehaviour
 
         if (_DayAndNight != null)
         {
-            print("pl.DayNight.Day " + DayTime);
-            _DayAndNight.Day = DayTime;
+            print("pl.DayNight.Day " + SaveLoadCurrent.DayTime);
+            _DayAndNight.DayTime = SaveLoadCurrent.DayTime;
         }
 
 #endif
@@ -284,147 +292,9 @@ public class SaveLoad : MonoBehaviour
 
 
 
-#if UNITY_PS4 || UNITY_PS5
-        PS5_Save(SaveAll);
-
-#endif
     }
 
 
-
-
-
-    void PS5_Save(bool SaveAll)
-    {
-
-        // Write only one save segment  - alldata / 7
-#if UNITY_PS4 || UNITY_PS5
-        byte[] data;
-        byte[] MenuSavedata;
-
-        long thisDatasizeStart = saveDataSize * _menu.CurrentSlotNumber + MenusaveDataSize;
-        // long thisDatasizeStart = MenusaveDataSize;
-        int AllDatasize = saveDataSize * 7 + MenusaveDataSize;
-
-
-        using (MemoryStream stream = new MemoryStream(MenusaveDataSize))
-        {
-
-            BinaryWriter writer = new BinaryWriter(stream);
-
-
-
-
-            for (int i = 0; i < saveslotsnumber; i++)
-            {
-
-                writer.Write(_menu.CurrentSlotDates[i]);
-                writer.Write(_menu.CurrentSlotLocations[i]);
-                writer.Write(_menu.CurrentSlotTimes[i]);
-            }
-
-
-
-            writer.Write(_menu.CurrentSlotNumber);
-
-
-            writer.Write(_menu.Language);
-            writer.Write(_menu.FirstLanguage);
-
-            if (Utility.systemLanguage.ToString().Contains("ENGLISH"))
-                _menu.LastSystemLanguage = 0;
-            if (Utility.systemLanguage.ToString().Contains("UKRAINIAN") || Utility.systemLanguage.ToString().Contains("RUSSIAN"))
-                _menu.LastSystemLanguage = 1;
-            if (Utility.systemLanguage.ToString().Contains("JAPANESE"))
-                _menu.LastSystemLanguage = 2;
-
-
-            writer.Write(_menu.LastSystemLanguage);
-            
-            writer.Write((double)_menu.MasterSliderValue);
-            writer.Write((double)_menu.BGSliderValue);
-            writer.Write((double)_menu.ObjectsSliderValue);
-            writer.Write(_menu.HideUIValue);
-            writer.Write(_menu.TransparencyUIValue);
-
-            writer.Write(_menu.DrawTutorial);
-            writer.Write(_menu.FirstStart);
-
-
-            writer.Write(SaveTimer);
-            writer.Write(LoadTimer);
-
-
-
-
-            stream.Close();
-            MenuSavedata = stream.GetBuffer();
-            PS_SaveMain.MenuSavedata = MenuSavedata;
-        }
-
-            using (MemoryStream stream2 = new MemoryStream(saveDataSize))
-            {
-            //stream2.Position = _menu.CurrentSlotNumber * saveDataSize;
-
-            BinaryWriter writer = new BinaryWriter(stream2);
-
-
-                if (_constr != null && SaveAll)
-                {
-                    SWITCH_SAVE_Vault(ref writer);
-                    SWITCH_SAVE_UnlockedItems(ref writer);
-
-                    SWITCH_SAVE_PlayerVariables(ref writer);
-                    SWITCH_Save_InventoryVariables(ref writer);
-
-                    SaveTimer = (int)((_constr.TOnBoard.Count * 3 + _constr.OBOnBoard.Count * 5 + 11) / 32);
-
-                    for (int i = 0; i < LocationsNames.Length; i++)
-                    {
-                        if (LocationsNames[i] == SceneManager.GetActiveScene().name)
-                        {
-                            SWITCH_SAVE_CREATELOCATIONS(ref writer);
-
-                            SWITCH_SAVE_GenMap(ref writer);
-
-                            SWITCH_SAVE_Blueprints(ref writer);
-                            SWITCH_SAVE_ObjectsToDestroy(ref writer);
-
-                            SWITCH_SAVE_Tiles(ref writer);
-
-                            SWITCH_SAVE_DroppedItems(ref writer);
-
-                            SWITCH_SAVE_ConstructedStructures(ref writer);
-
-                            SWITCH_SAVE_PreplacedObjects(ref writer);
-
-                           // SWITCH_SAVE_PIT_Tiles(ref writer);
-                        }
-                    }
-
-                    Saving = false;
-                }
-
-
-                stream2.Close();
-                data = stream2.GetBuffer();
-
-                PS_SaveMain.Largedata = data;
-               PS_SaveMain.SaveAll = SaveAll;
-            }
-        
-
-
-        PS_SaveMain.StartAutoSave();
-
-#endif
-
-        SaveLoadCurrent.Saving = false;
-
-    }
-
-
-   
 
 
 
@@ -446,7 +316,7 @@ public class SaveLoad : MonoBehaviour
 
 
         PS_SaveMain.StartAutoSaveLoad();
-        Loading = false;
+  
 #endif
        
     }
@@ -663,14 +533,15 @@ public class SaveLoad : MonoBehaviour
             pl.LootItem = StartStarts[CurrentCharacter].LootItem;
 
             if (_DayAndNight != null)
-                _DayAndNight.Day = 0;
+                _DayAndNight.DayTime = 0;
 
-            DayTime = 0;
+            print("RESET LOCATION");
+            SaveLoadCurrent.DayTime = 0;
 
             inv.ResetInventory();
             
             for (int i = 0; i < StartStarts[CurrentCharacter].StartItems.Length; i++)
-                inv.AddItemNOAUDIO_NOPickedNames(StartStarts[CurrentCharacter].StartItems[i], StartStarts[CurrentCharacter].StartItemsCounts[i], inv.GetItemInDatabase(StartStarts[CurrentCharacter].StartItems[i]).Durability, new Vector2(99999, 99999));
+                inv.AddItemNOAUDIO_NOPickedNames(StartStarts[CurrentCharacter].StartItems[i], StartStarts[CurrentCharacter].StartItemsCounts[i], itemDatabase.FindItem(StartStarts[CurrentCharacter].StartItems[i]).Durability, new Vector2(99999, 99999));
 
         }
 

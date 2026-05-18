@@ -172,7 +172,7 @@ public class Player : MonoBehaviour {
   
     private SpriteRenderer Child_SPRT;
 
-    public bool TEST { get; set; }
+
 
     private bool AddTestitems;
     public float FadeInDelay { get; set; }
@@ -189,17 +189,33 @@ public class Player : MonoBehaviour {
 
     public LayerSorting LayerSort;
 
+
+
+
+    public float Peasants_CollectMoney_Timer_Boost;
+    public int Peasants_CollectMoney_Amount_Boost;
+
+    public float Buildings_CollectMoney_Timer_Boost;
+    public int Buildings_CollectMoney_Amount_Boost;
+
+    public int Peasant_HP_Boost;
+    public int Knight_HP_Boost;
+    public int Guard_HP_Boost;
+    public int Cleric_HP_Boost;
+
+
+    public int Knight_Damage_Boost;
+    public int Guard_Damage_Boost;
+    public int Cleric_Damage_Boost;
+
+    public int Blueprints_Money_Boost;
+
+
+
     private void Awake()
     {
         LayerSort = GetComponent<LayerSorting>();
-        TEST = false;
-
-#if UNITY_EDITOR
-        TEST = true;
-#endif
-
-
-        TEST = true;
+ 
 
         rigidbody2D = GetComponent<Rigidbody2D>();
         DayNight = GameObject.Find("DayAndNight").GetComponent<DayAndNight>();
@@ -267,8 +283,7 @@ public class Player : MonoBehaviour {
 
 
         MaxSeconds = 100;
-        GameObject ChattingUIObject = GameObject.Find("Chatting");
-
+       
 
         PlayerMask = GameObject.Find("PlayerMask");
         StatsObject = GameObject.Find("Stats");
@@ -287,17 +302,10 @@ public class Player : MonoBehaviour {
 
     void Update()
     {
-        if (!AddTestitems && TEST)
+        if (!AddTestitems && menu.TEST)
         {
 
-            inv.AddItem(9, 9999, 99, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
-            inv.AddItem(980, 999, 99, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
-            inv.AddItem(1000, 999, 99, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
-            inv.AddItem(1015, 999, 99, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
-            inv.AddItem(354, 999, 99, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
-            inv.AddItem(354, 999, 99, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
-            inv.AddItem(355, 999, 99, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
-            AddTestitems = true;
+           AddTestitems = true;
 
         }
 
@@ -319,11 +327,11 @@ public class Player : MonoBehaviour {
         else Vision = VisionBase;
 
 
-      //  if (SeparateHeartsHPUI)
-      //  DrawHPParts();
+        //  if (SeparateHeartsHPUI)
+        //  DrawHPParts();
 
-     //   if (SliderHPUI)
-         //   DrawHPSliders();
+        //   if (SliderHPUI)
+        //   DrawHPSliders();
 
         /*objectsInRange.Clear();
 
@@ -350,9 +358,21 @@ public class Player : MonoBehaviour {
         // devmode = !devmode;
 
 
+        if (menu.DEMOTEST)
+        {
+            if (Input.GetKeyDown(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.M))
+            {
+
+                inv.AddItem(9, 99, 99999, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
 
 
-        if (TEST)
+            }
+
+        }
+
+
+
+        if (menu.TEST)
         {
 
 #if !UNITY_STANDALONE
@@ -367,9 +387,9 @@ public class Player : MonoBehaviour {
                     if (Resources.Load<Sprite>("Sprites/Items/" + inv.database.items[i].itemNames[0]) != null)
                     {
                         if (inv.database.items[i].CanStack)
-                            inv.AddItem(inv.database.items[i].itemID, 999, inv.database.items[i].Durability, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
+                            inv.AddItemNOAUDIO_NOPickedNames(inv.database.items[i].itemID, 999, inv.database.items[i].Durability, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
                         else
-                            inv.AddItem(inv.database.items[i].itemID, 1, inv.database.items[i].Durability, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
+                            inv.AddItemNOAUDIO_NOPickedNames(inv.database.items[i].itemID, 1, inv.database.items[i].Durability, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
                     }
                 }
 
@@ -378,7 +398,7 @@ public class Player : MonoBehaviour {
             if (Input.GetKeyDown(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Equals))
             {
 
-                inv.AddItem(9, 999, 99999, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
+                inv.AddItemNOAUDIO_NOPickedNames(9, 999, 99999, new Vector2(Random.Range(-3, 3), Random.Range(-3, 3)));
 
 
             }
@@ -593,17 +613,7 @@ public class Player : MonoBehaviour {
         else _constr.SetMaterial(gameObject, StartMaterial);
 
 
-        if (Invinc > Time.fixedTime && Invinc - 0.8f < Time.fixedTime)
-        {
-            _constr.SetColorAndAlpha(gameObject, new Color(1, 1, 1, 0.6f));
-            
-        }
-
-        if (Invinc > Time.fixedTime && Invinc < Time.fixedTime+0.05f)
-            _constr.SetColorAndAlpha(gameObject, new Color(1, 1, 1, 1));
-
-        if (Invinc < Time.fixedTime )
-            _constr.SetColorAndAlpha(gameObject, new Color(1, 1, 1, 1));
+       
 
         /*for (int i = 0; i < expl.Length; i++)
         {
@@ -1481,12 +1491,14 @@ public class Player : MonoBehaviour {
 
     public bool Pause()
     {
-        if(menu!=null)
+        if(_constr.Game_SPEED ==0) return true;
+
+        if (menu!=null)
         if (menu.MenuONOFF )
             return true;
 
         if(inv!=null)
-            if(inv.showinvent || inv.showjournal || inv.blueprintshow)
+            if( inv.showjournal || inv.blueprintshow)
                 return true;
 
         return false;

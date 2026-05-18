@@ -31,11 +31,11 @@ public class UnlockItems : MonoBehaviour
 
     private GameObject UnlockAnimation;
     public List<ItemToUnlock> _ItemToUnlock = new List<ItemToUnlock>();
-
+    private ItemDatabase itemDatabase;
 
     void Start()
     {
-
+        itemDatabase = InitializeObjects.Itemdatabase;
         _ItemToUnlock.Add(new ItemToUnlock(405, 1,"Winter"));
         _ItemToUnlock.Add(new ItemToUnlock(406, 2, "Winter"));
         _ItemToUnlock.Add(new ItemToUnlock(407, 3, "Winter"));
@@ -65,17 +65,17 @@ public class UnlockItems : MonoBehaviour
     void Update()
     {
         if (pl.StartLoading) return;
-        _ItemToUnlock.ForEach(unlock => { if(SL.DayNumber >= unlock.DayNumber && SceneManager.GetActiveScene().name == unlock.LocationName) Unlock(unlock.ID); });   
+        _ItemToUnlock.ForEach(unlock => { if(SL.SaveLoadCurrent.DayNumber >= unlock.DayNumber && SceneManager.GetActiveScene().name == unlock.LocationName) Unlock(unlock.ID); });   
         
     }
 
     void Unlock(int ID)
     {
-        if (pl.StartLoading || !inv.GetItemInDatabase(ID).Locked || SL.Unlocked_IDs.Contains(ID)) return;
+        if (pl.StartLoading || !itemDatabase.FindItem(ID).Locked || SL.Unlocked_IDs.Contains(ID)) return;
 
         TriggerAnimation(ID);
         SL.Unlocked_IDs.Add(ID);
-        inv.GetItemInDatabase(ID).Locked = false;
+        itemDatabase.FindItem(ID).Locked = false;
         
         pl.menu.CurrentSlotNumber = 6;
        
@@ -90,7 +90,7 @@ public class UnlockItems : MonoBehaviour
     void TriggerAnimation(int ID)
     {
         UnlockAnimation.transform.Find("UnlockAnimation_Item").GetComponent<Image>().sprite =
-        Resources.Load<Sprite>("Sprites/Items/" + inv.GetItemInDatabase(ID).itemNames[0]);
+        Resources.Load<Sprite>("Sprites/Items/" + itemDatabase.FindItem(ID).itemNames[0]);
 
         UnlockAnimation.GetComponent<Animator>().Play("MainAnimation", 0);
     }

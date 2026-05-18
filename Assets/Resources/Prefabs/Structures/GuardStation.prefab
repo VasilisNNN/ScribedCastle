@@ -255,26 +255,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Table: 0
-  Shield: 0
   TransperentWall: 0
   ComfortPlus: 0
   TimePlus: 0
-  GodDelayPlus: 0
   DamageFromWall: 1
   floors: 0
-  kitchenfloors: 0
   tables: 0
-  beds: 0
   ground: 0
   wall: 0
-  oven: 0
-  toilet: 0
   people: 0
   Trash: 0
   Poop: 0
   CharactersOnThisStructure: []
   decoration: 0
-  TopObject: 0
   TrueName: []
   Draw: 1
   DishesOnTable: []
@@ -300,8 +293,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EnemyObjects:
   - {fileID: 5062304670444103666, guid: c3edd1169992bec429e778e9a0d8acff, type: 3}
-  DelayBetweenEnemies: 1
-  DelayBetweenWaves: 1
+  DelayBetweenEnemies: 30
+  DelayBetweenWaves: 30
   DelayStart: 0
   SpawnPositions: []
   BuildedPers: []
@@ -309,3 +302,4 @@ MonoBehaviour:
   WaveCountMAX: 1
   Day_Cycle: 4
   NotInTheMorning: 1
+  RandomPosition: 0

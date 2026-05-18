@@ -1,4 +1,4 @@
-﻿using NUnit;
+﻿
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,6 +10,7 @@ public class RecipeUnlock : MonoBehaviour
     private Player pl;
     public int DishID;
     private Constructor Constr;
+    private ItemDatabase itemDatabase;
 
     public AudioClip Clip;
     public GameObject UnlockingObject;
@@ -19,7 +20,7 @@ public class RecipeUnlock : MonoBehaviour
     {
         pl = InitializeObjects.PL;
         Constr = InitializeObjects.Constr;
-
+        itemDatabase = InitializeObjects.Itemdatabase;
         Floor = InitializeObjects.FloorTilemap;
 
 
@@ -27,7 +28,7 @@ public class RecipeUnlock : MonoBehaviour
         {
             if (DishID > -1)
             {
-                Constr.Dishes.Add(pl.inv.GetItemInDatabase(DishID));
+                Constr.Dishes.Add(itemDatabase.FindItem(DishID));
             }
 
             Constr.PlaySound(Clip, 1);
@@ -48,7 +49,7 @@ public class RecipeUnlock : MonoBehaviour
             if (DishID > -1)
             {
                 Constr.AddLogPart("New recipe!", "Новий рецепт","",null);
-                Constr.Dishes.Add(pl.inv.GetItemInDatabase(DishID));
+                Constr.Dishes.Add(itemDatabase.FindItem(DishID));
                 Constr.PlaySound(Clip, 1);
             }
 

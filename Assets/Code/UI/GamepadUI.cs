@@ -21,10 +21,15 @@ public class GamepadUI : MonoBehaviour
     private SpriteRenderer SPRT;
 
     private MenuCustom _Menu;
+
+
     private void Awake()
     {
-        if(InitializeObjects.Constr!=null)
-        _Menu = InitializeObjects.Constr.GetComponent<MenuCustom>();
+        if(InitializeObjects._Menu != null)
+        _Menu = InitializeObjects._Menu;
+
+
+
         IMG = GetComponent<Image>();
         SPRT = GetComponent<SpriteRenderer>();
 
@@ -72,10 +77,20 @@ public class GamepadUI : MonoBehaviour
                 for (int i = 0; i < transform.childCount; i++)
                 {
                     if (transform.GetChild(i).GetComponent<TextMeshProUGUI>() != null)
-                        transform.GetChild(i).GetComponent<TextMeshProUGUI>().enabled = false;
+                        transform.GetChild(i).gameObject.SetActive(false);
                 }
                 return;
             }
+            else
+            {
+                for (int i = 0; i < transform.childCount; i++)
+                {
+                    if (transform.GetChild(i).GetComponent<TextMeshProUGUI>() != null)
+                        transform.GetChild(i).gameObject.SetActive(true);
+                }
+            }
+
+          
         }
 
 
@@ -86,9 +101,12 @@ public class GamepadUI : MonoBehaviour
             {
                
                 if (DrawOnlyOnGamepad) IMG.enabled = false;
+                else IMG.enabled = true;
+
+
                 if (GamepadSPRT != null)
                 {
-                   
+
 
                     if (IM.MouseMode) IMG.sprite = MouseSPRT;
                     else IMG.sprite = KeyBoardSPRT;
@@ -114,24 +132,32 @@ public class GamepadUI : MonoBehaviour
 
         if (IMG != null)
         {
-            if (DrawOnlyOnGamepad) IMG.enabled = true;
-
+        
 #if UNITY_STANDALONE
             if (GamepadSPRT != null)
-            IMG.sprite = GamepadSPRT;
+            {
+                IMG.enabled = true;
+                IMG.sprite = GamepadSPRT;
+            }
             else IMG.enabled = false;
 #endif
 
 #if UNITY_SWITCH
+
             if (SwitchGamepad != null)
-                IMG.sprite = SwitchGamepad;
+            {
+              IMG.enabled = true;
+              IMG.sprite = SwitchGamepad;
+            }
             else IMG.enabled = false;
 #endif
 
 #if UNITY_PS4 || UNITY_PS5
             if (SwitchGamepad != null)
-                IMG.sprite = GamepadSPRT;
-            else IMG.enabled = false;
+            { 
+               IMG.enabled = true;
+               IMG.sprite = GamepadSPRT;
+            }else IMG.enabled = false;
 #endif
         }
 
@@ -141,8 +167,11 @@ public class GamepadUI : MonoBehaviour
             if (DrawOnlyOnGamepad) SPRT.enabled = true;
 
 #if UNITY_STANDALONE
-            if (GamepadSPRT != null) 
-            SPRT.sprite = GamepadSPRT;
+            if (GamepadSPRT != null)
+            {
+                SPRT.enabled = true;
+                SPRT.sprite = GamepadSPRT;
+            }
             else SPRT.enabled = false;
 #endif
 

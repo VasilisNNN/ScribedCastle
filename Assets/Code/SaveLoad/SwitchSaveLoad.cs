@@ -5,6 +5,7 @@ using System.IO;
 
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
+using System.Linq;
 
 
 public class SwitchSaveLoad : SaveLoadBasic, ISaveLoad
@@ -44,6 +45,11 @@ public class SwitchSaveLoad : SaveLoadBasic, ISaveLoad
 
         filePath = string.Format("{0}:/{1}", mountName, fileName);
 
+       if(GameObject.Find("Tutorial")!=null)
+       { 
+          _Tutorial = GameObject.Find("Tutorial").GetComponent<Tutorial>();
+          _Tutorial.Init();
+       }
 #endif
 
     }
@@ -236,8 +242,24 @@ public class SwitchSaveLoad : SaveLoadBasic, ISaveLoad
         if (_Tutorial != null) _TutorialPhase = _Tutorial.GetPhase();
         writer.Write(_TutorialPhase);
 
+        writer.Write(pl.Peasants_CollectMoney_Timer_Boost);
+        writer.Write(pl.Peasants_CollectMoney_Amount_Boost);
 
-    }
+        writer.Write(pl.Buildings_CollectMoney_Timer_Boost);
+        writer.Write(pl.Buildings_CollectMoney_Amount_Boost);
+
+        writer.Write(pl.Peasant_HP_Boost);
+        writer.Write(pl.Knight_HP_Boost);
+        writer.Write(pl.Guard_HP_Boost);
+        writer.Write(pl.Cleric_HP_Boost);
+
+        writer.Write(pl.Knight_Damage_Boost);
+        writer.Write(pl.Guard_Damage_Boost);
+        writer.Write(pl.Cleric_Damage_Boost);
+
+        writer.Write(pl.Blueprints_Money_Boost);
+
+}
 
 
 
@@ -671,7 +693,6 @@ public class SwitchSaveLoad : SaveLoadBasic, ISaveLoad
 
         for (int i = 0; i < PreplacedObjects_Count; i++)
         {
-            print("SAVE PreplacedObjects " + PreplacedObjects_GrowStates[i]);
             writer.Write(PreplacedObjects_GrowStates[i]);
         }
 
@@ -688,8 +709,6 @@ public class SwitchSaveLoad : SaveLoadBasic, ISaveLoad
             if (LocationsNames[i] == SceneManager.GetActiveScene().name)
             {
                 CreateLocationOnStart[i] = 1;
-
-                print("ThisLocationIsCreated " + LocationsNames[i] + " / " + i);
 
             }
         }
@@ -804,9 +823,42 @@ public class SwitchSaveLoad : SaveLoadBasic, ISaveLoad
         int daynumber = reader.ReadInt32();
         double daytime = reader.ReadDouble();
         int tutoriaphase = reader.ReadInt32();
+        _TutorialPhase = tutoriaphase;
 
+        float peasants_CollectMoney_Timer_Boost = (float)reader.ReadDouble();
+        int peasants_CollectMoney_Amount_Boost = reader.ReadInt32();
 
-        print("SWITCH_LOAD_PlayerVariables");
+        float buildings_CollectMoney_Timer_Boost = (float)reader.ReadDouble();
+        int buildings_CollectMoney_Amount_Boost = reader.ReadInt32();
+
+        int peasant_HP_Boost = reader.ReadInt32();
+        int knight_HP_Boost = reader.ReadInt32();
+        int guard_HP_Boost = reader.ReadInt32();
+        int cleric_HP_Boost = reader.ReadInt32();
+
+        int knight_Damage_Boost = reader.ReadInt32();
+        int guard_Damage_Boost = reader.ReadInt32();
+        int cleric_Damage_Boost = reader.ReadInt32();
+
+        int blueprints_Money_Boost = reader.ReadInt32();
+
+        pl.Peasants_CollectMoney_Timer_Boost = peasants_CollectMoney_Timer_Boost;
+        pl.Peasants_CollectMoney_Amount_Boost = peasants_CollectMoney_Amount_Boost;
+
+        pl.Buildings_CollectMoney_Timer_Boost = buildings_CollectMoney_Timer_Boost;
+        pl.Buildings_CollectMoney_Amount_Boost = buildings_CollectMoney_Amount_Boost;
+
+        pl.Peasant_HP_Boost = peasant_HP_Boost;
+        pl.Knight_HP_Boost = knight_HP_Boost;
+        pl.Guard_HP_Boost = guard_HP_Boost;
+        pl.Cleric_HP_Boost = cleric_HP_Boost;
+
+        pl.Knight_Damage_Boost = knight_Damage_Boost;
+        pl.Guard_Damage_Boost = guard_Damage_Boost;
+        pl.Cleric_Damage_Boost = cleric_Damage_Boost;
+
+        pl.Blueprints_Money_Boost = blueprints_Money_Boost;
+
 
         if (_menu.FirstStart == 1)
         {
@@ -824,8 +876,12 @@ public class SwitchSaveLoad : SaveLoadBasic, ISaveLoad
             pl.MaxStamina = StartStarts[CurrentCharacter].MaxStamina;
 
             DayTime = (float)daytime;
-            if (_Tutorial != null) _Tutorial.SetPhase(tutoriaphase);
-
+            if (_Tutorial != null)
+            {
+                _Tutorial.Phase = tutoriaphase;
+                // _Tutorial.Init();
+                //  _Tutorial.SetPhase(tutoriaphase);
+            }
         }
         else
         {
@@ -838,10 +894,14 @@ public class SwitchSaveLoad : SaveLoadBasic, ISaveLoad
             pl.LootItem = StartStarts[CurrentCharacter].LootItem;
 
             for (int i = 0; i < StartStarts[CurrentCharacter].StartItems.Length; i++)
-                inv.AddItemNOAUDIO_NOPickedNames(StartStarts[CurrentCharacter].StartItems[i], StartStarts[CurrentCharacter].StartItemsCounts[i], inv.GetItemInDatabase(StartStarts[CurrentCharacter].StartItems[i]).Durability, new Vector2(99999, 99999));
+                inv.AddItemNOAUDIO_NOPickedNames(StartStarts[CurrentCharacter].StartItems[i], StartStarts[CurrentCharacter].StartItemsCounts[i], itemDatabase.FindItem(StartStarts[CurrentCharacter].StartItems[i]).Durability, new Vector2(99999, 99999));
 
-            if (_Tutorial != null) _Tutorial.SetPhase(0);
-
+            if (_Tutorial != null)
+            {
+                _Tutorial.Phase = _TutorialPhase;
+                // _Tutorial.Init();
+                // _Tutorial.SetPhase(0);
+            }
 
 
 
@@ -861,11 +921,11 @@ public class SwitchSaveLoad : SaveLoadBasic, ISaveLoad
             int iicount = reader.ReadInt32();
 
 
-            if (ii > -1 && inv.GetItemInDatabase(ii) != null && _menu.FirstStart != 0)
+            if (ii > -1 && itemDatabase.FindItem(ii) != null && _menu.FirstStart != 0)
             {
                 if (iicount > 0)
-                    inv.AddItemNOAUDIO_NOPickedNames(ii, iicount, inv.GetItemInDatabase(ii).Durability, new Vector2(99999, 1));
-                else inv.AddItemNOAUDIO_NOPickedNames(ii, 1, inv.GetItemInDatabase(ii).Durability, new Vector2(99999, 1));
+                    inv.AddItemNOAUDIO_NOPickedNames(ii, iicount, itemDatabase.FindItem(ii).Durability, new Vector2(99999, 1));
+                else inv.AddItemNOAUDIO_NOPickedNames(ii, 1, itemDatabase.FindItem(ii).Durability, new Vector2(99999, 1));
 
             }
 
@@ -952,14 +1012,12 @@ public class SwitchSaveLoad : SaveLoadBasic, ISaveLoad
     {
         PreplacedObjects_Count = reader.ReadInt32();
 
-        print("LOAD PreplacedObjects_Count " + PreplacedObjects_Count);
         if (PreplacedObjects_Count > 0)
         {
             for (int i = 0; i < PreplacedObjects_Count; i++)
             {
                 int grow = reader.ReadInt32();
-                print("LOAD PreplacedObjects grow " + grow);
-                PreplacedObjects_GrowStates.Add(grow);
+                 PreplacedObjects_GrowStates.Add(grow);
 
 
             }
@@ -1012,16 +1070,7 @@ public class SwitchSaveLoad : SaveLoadBasic, ISaveLoad
         }
         else
         {
-            /* if (_constr.OBOnBoard.Count > 0)
-             {
-                 for (int i = 0; i < _constr.OBOnBoard.Count; i++)
-                 {
-                     DestroyObject(_constr.OBOnBoard[i]);
-
-                     _constr.OBOnBoard.RemoveAt(i);
-
-                 }
-             }*/
+          
 
             if (_constr.ConstructedStructures.Count > 0)
             {
@@ -1099,7 +1148,7 @@ public class SwitchSaveLoad : SaveLoadBasic, ISaveLoad
             {
                 int id = reader.ReadInt32();
                 Unlocked_IDs.Add(id);
-                inv.GetItemInDatabase(id).Locked = false;
+                itemDatabase.FindItem(id).Locked = false;
             }
         }
     }
@@ -1312,10 +1361,13 @@ public class SwitchSaveLoad : SaveLoadBasic, ISaveLoad
 #endif
     }
 
+    public override void MENU_LOAD_DATA(byte[] data)
+    {
+        throw new System.NotImplementedException();
+    }
 
-
-
-
-
-   
+    public override void MAIN_LOAD_DATA(byte[] data)
+    {
+        throw new System.NotImplementedException();
+    }
 }

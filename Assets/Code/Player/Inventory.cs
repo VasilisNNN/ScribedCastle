@@ -62,7 +62,7 @@ public class Inventory : MonoBehaviour
     public bool showjournal { get; set; }
 
     [HideInInspector]
-    public AudioClip OpenInventory, OpenCardsInv, PickItem, ClickClip, UIOpen, ShakeClip, TakeItemClip;
+    public AudioClip OpenInventoryClip, OpenCardsInv, PickItem, ClickClip, UIOpen, ShakeClip, TakeItemClip;
 
 
     public bool devmode;
@@ -150,6 +150,7 @@ public class Inventory : MonoBehaviour
     private Tilemap FloorTilemap;
 
     private Journal JournalOB;
+
     void Awake()
     {
         JournalOB = gameObject.AddComponent<Journal>();
@@ -250,7 +251,7 @@ public class Inventory : MonoBehaviour
 
     void LoadSounds()
     {
-        OpenInventory = Resources.Load<AudioClip>("Sound/UI/Inventory_Open");
+        OpenInventoryClip = Resources.Load<AudioClip>("Sound/UI/Inventory_Open");
         OpenCardsInv = Resources.Load<AudioClip>("Sound/UI/CardDeck_Open");
         PickItem = Resources.Load<AudioClip>("Sound/Items/PickItem");
 
@@ -314,16 +315,16 @@ public class Inventory : MonoBehaviour
                 CurrentItem = 0;
         }
 
-   
-        Crafting();
+
+        CraftingManager();
   
 
         ExitFromInventory();
         ShowPicketItems();
 
 
-        if (pl.GetComponent<Achivements>()!=null) 
-            ShowAch = pl.GetComponent<Achivements>().ShowAch;
+        if (pl.GetComponent<Achievements>()!=null) 
+            ShowAch = pl.GetComponent<Achievements>().ShowAch;
 
        
         Start_Close_Inventory();
@@ -346,19 +347,41 @@ public class Inventory : MonoBehaviour
     }
 
   
-    public void StartInventory()
+    public void OpenInventory()
     {
-        if (showinvent) return;
-
-        showinvent = true;
-       
+        Choose.transform.SetParent(InventoryUIOB.transform);
+        PlaySoundsPitched(UIOpen, 1);
         CurrentItem = 0;
 
         Choose.transform.position = slots[CurrentItem].transform.position;
         PauseInventory = false;
-        IM.ActionDelay = Time.fixedTime + 0.2f;
+
+        UpdateInvFolder();
     }
 
+     void CloseInventory()
+    {
+        if (Constr.ShowChargeUI)
+        {
+            ONOFF(GameObject.Find("ButtonsUI"), true);
+            ONOFF(Controlls, true);
+        }
+
+        LeftArrow.SetActive(false);
+        RightArrow.SetActive(false);
+
+        JournalOB.DrawJournal(false);
+        DrawInventory(false);
+        crafting = false;
+
+
+        showinvent = false;
+        showjournal = false;
+        DrawINV = false;
+
+        IM.ActionDelay = Time.fixedTime + 0.1f;
+        PlaySoundsPitched(UIOpen, 0.8f);
+    }
 
     void Start_Close_Inventory()
     {
@@ -379,13 +402,9 @@ public class Inventory : MonoBehaviour
             
             if (!showinvent)
             {
-                PlaySoundsPitched(UIOpen,0.8f);
-                Constr.DeActivateBuilding();
-                PauseInventory = false;
-                crafting = false;
+             
 
-                CurrentItem = 0;
-                SlotSlide = 0;
+                CloseInventory();
 
             }
 
@@ -393,14 +412,7 @@ public class Inventory : MonoBehaviour
 
             if (showinvent && !crafting )
             {
-                
-                PlaySoundsPitched(UIOpen, 1);
-                CurrentItem = 0;
-              
-                    Choose.transform.position = slots[CurrentItem].transform.position;
-                    PauseInventory = false;
-  
-                UpdateInvFolder();
+                OpenInventory();
             }
 
 
@@ -436,7 +448,7 @@ public class Inventory : MonoBehaviour
 
         if (DrawINV) return;
 
-        Constr.DeActivateBuildingNOINV();
+
         ONOFF(GameObject.Find("ButtonsUI"), false);
         ONOFF(Controlls, false);
         DrawInventory(true);
@@ -545,8 +557,8 @@ public class Inventory : MonoBehaviour
                 FolderButtons[i].transform.Find("NewItemTag").gameObject.SetActive(false);
                 CurrentFolder = i;
                 CurrentItem = 0;
-                PauseInventory = false;
-                ChooseTopSegmentSlot = false;
+                StartChooseTopSegment();
+
                 inventoryFolder = new List<Item>();
 
                 CurrentItem = 0;
@@ -611,21 +623,21 @@ public class Inventory : MonoBehaviour
 
     void UpdateFolderNumber(int ID)
     {
-        if (!GetItemInDatabase(ID).Structure) return;
+        if (!database.FindItem(ID).Structure) return;
 
         if (crafting)
         {
             for (int i = 0; i < inventory.Count; i++)
             {
-                if (GetItemInDatabase(ID)._StructureType == Item.StructureType.Building||
-                    GetItemInDatabase(ID)._StructureType == Item.StructureType.Protection||
-                       GetItemInDatabase(ID)._StructureType == Item.StructureType.Decoration)
+                if (database.FindItem(ID)._StructureType == Item.StructureType.Building||
+                    database.FindItem(ID)._StructureType == Item.StructureType.Protection||
+                       database.FindItem(ID)._StructureType == Item.StructureType.Decoration)
                     CurrentFolder = 0;
 
-                if (GetItemInDatabase(ID)._StructureType == Item.StructureType.Tiles)
+                if (database.FindItem(ID)._StructureType == Item.StructureType.Tiles)
                     CurrentFolder = 1;
 
-                if (GetItemInDatabase(ID)._StructureType == Item.StructureType.Farms)
+                if (database.FindItem(ID)._StructureType == Item.StructureType.Farms)
                     CurrentFolder = 2;
             }
         }
@@ -723,7 +735,7 @@ public class Inventory : MonoBehaviour
 
     void ExitFromInventory()
     {
-        if ((!showinvent && !showjournal) || pl.menu.MenuONOFF) return;
+        if (!showinvent  || pl.menu.MenuONOFF) return;
         
         if (!pl.IM.menu_b && !pl.IM.exit_b ) return;
         
@@ -821,26 +833,7 @@ public class Inventory : MonoBehaviour
     }
 
 
-    public Item GetItemInDatabase(int id)
-    {
-        Item result = new Item();
-        if (database == null) return result;
-
-        for (int i = 0; i < database.items.Count; i++)
-        {
-            if (database.items[i].itemID == id)
-            {
-                result = database.items[i];
-                return result;
-            }
-
-
-        }
-
-      
-        return result;
-    }
-
+   
 
 
     public bool CheckEmpty(int ID)
@@ -858,7 +851,7 @@ public class Inventory : MonoBehaviour
 
     public void AddItem(int id, int numplus, int durability, Vector2 NamePos)
     {
-        if (GetItemInDatabase(id) == null)
+        if (database.FindItem(id) == null)
             return;
 
         AddItemToInv(id, numplus, durability, NamePos);
@@ -868,9 +861,9 @@ public class Inventory : MonoBehaviour
         pl.PlaySoundsPitched(PickItem, 1);
 
         if (numplus > 1)
-            ADDPickedName("+ " + GetItemInDatabase(id).itemNames[_menu.Language] + " x " + numplus,  0.25f, NamePos);
+            ADDPickedName("+ " + database.FindItem(id).itemNames[_menu.Language] + " x " + numplus,  0.25f, NamePos);
         else
-            ADDPickedName("+ " + GetItemInDatabase(id).itemNames[_menu.Language],  0.25f, NamePos);
+            ADDPickedName("+ " + database.FindItem(id).itemNames[_menu.Language],  0.25f, NamePos);
 
 
     }
@@ -880,20 +873,20 @@ public class Inventory : MonoBehaviour
     {
         if (id <= -1) return;
 
-        if (GetItemInDatabase(id) == null)
+        if (database.FindItem(id) == null)
             return;
 
         AddItemToInv(id, numplus, durability, NamePos);
 
-        if (numplus > 1)
-            ADDPickedName("+ " + GetItemInDatabase(id).itemNames[_menu.Language] + " x " + numplus,  0.25f, NamePos);
+        if (numplus > 0)
+            ADDPickedName("+ " + database.FindItem(id).itemNames[_menu.Language] + " x " + Mathf.Abs(numplus),  0.25f, NamePos);
         else
-            ADDPickedName("+ " + GetItemInDatabase(id).itemNames[_menu.Language],  0.25f, NamePos);
+            ADDPickedName("- " + database.FindItem(id).itemNames[_menu.Language] + " x " + Mathf.Abs(numplus), - 0.25f, NamePos);
 
     }
     public void AddItemNOAUDIO_NOPickedNames(int id, int numplus, int durability, Vector2 NamePos)
     {
-        if (GetItemInDatabase(id) == null)
+        if (database.FindItem(id) == null)
             return;
 
         AddItemToInv(id, numplus, durability, NamePos);
@@ -905,7 +898,7 @@ public class Inventory : MonoBehaviour
         LastAddedItem = id;
         UpdateFolderNumber(id);
         
-        if ((CheckItem(id) && !GetItemInDatabase(id).CanStack) || !CheckItem(id))
+        if ((CheckItem(id) && !database.FindItem(id).CanStack) || !CheckItem(id))
         {
             inventory.Add(new Item());
             int i = inventory.Count - 1;
@@ -943,7 +936,7 @@ public class Inventory : MonoBehaviour
 
 
 
-        if (CheckItem(id) && GetItemInDatabase(id).CanStack)
+        if (CheckItem(id) && database.FindItem(id).CanStack)
         { 
             for (int i = 0; i < inventory.Count; i++)
             {
@@ -987,15 +980,17 @@ public class Inventory : MonoBehaviour
         {
             if (PickedSlide[y] > 0)
             {
+                float speed = 1;
+                if (PickedSpeeds[y] < 0) speed = -1;
                 PickedText[y].GetComponent<RectTransform>().position =
-                  pl.MainCamera.WorldToScreenPoint(new Vector3(PickedX[y], PickedY[y] - PickedSlide[y] * 0.5f + 0.5f));
+                  pl.MainCamera.WorldToScreenPoint(new Vector3(PickedX[y], PickedY[y] - PickedSlide[y] * 0.5f* speed + 0.5f));
 
                 PickedText[y].GetComponent<TextMeshProUGUI>().text = Picked[y];
 
 
                 PickedText[y].GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, PickedSlide[y]);
 
-                PickedSlide[y] -= Time.deltaTime * 4 * PickedSpeeds[y];
+                PickedSlide[y] -= Time.deltaTime * 4 * Mathf.Abs(PickedSpeeds[y]);
          
             }
 
@@ -1128,6 +1123,8 @@ public class Inventory : MonoBehaviour
     public void ONOFF(GameObject g, bool TF)
     {
         if (g == null) return;
+        if (Constr == null) return;
+
         if (g.transform.parent == Constr.transform) return;
 
         TurnComponentsONOFF(g, TF);
@@ -1151,12 +1148,22 @@ public class Inventory : MonoBehaviour
 
     void TurnComponentsONOFF(GameObject g, bool TF)
     {
+        if (g.GetComponent<SpriteRenderer>() != null)
+            if (g.GetComponent<SpriteRenderer>().enabled == TF) return;
+
+     
+
+        if (g.GetComponent<Image>() != null)
+            if (g.GetComponent<Image>().enabled == TF) return;
+
         if (g.GetComponent<GamepadUI>() != null && _menu.HideUI && TF)
             return;
 
 
         if (g.GetComponent<DrawIfActive>() != null) return;
 
+       if (g.GetComponent<GamepadUI>() != null)
+            g.GetComponent<GamepadUI>().enabled = TF;
 
         if (g.GetComponent<Image>() != null)
             g.GetComponent<Image>().enabled = TF;
@@ -1187,7 +1194,7 @@ public class Inventory : MonoBehaviour
 
 
   
-    void Crafting()
+    void CraftingManager()
     {
         if (crafting && !CraftingDraw)
         {
@@ -1195,9 +1202,10 @@ public class Inventory : MonoBehaviour
 
             print("Crafting start");
             CraftingUIOB.GetComponent<ItemsSlotsUI>().StartUI();
-    
-
-            if(VaultUI!=null)
+            Choose.SetActive(true);
+            Choose.transform.SetAsLastSibling();
+            Choose.transform.SetParent(CraftingUIOB.transform);
+            if (VaultUI!=null)
             VaultUI.CloseUI();
 
             SetSlots();
@@ -1228,28 +1236,22 @@ public class Inventory : MonoBehaviour
 
     void ChoiseSlotsWithMouse()
     {
+
       
 
         if (pl.GetMouseCollList().Contains(CraftingCross) && pl.IM.LeftMouseButtonDown)
         {
-            if (Constr.ShowChargeUI)
+            if (crafting)
             {
-                ONOFF(GameObject.Find("ButtonsUI"), true);
-                ONOFF(Controlls, true);
+                CurrentItemToolTips = null;
+                GetComponent<AssembleWallsUI>().TurnOFFUI();
+                CraftingUIOB.GetComponent<ItemsSlotsUI>().CloseUI();
+                CraftingDraw = false;
+                crafting = false;
+                ONOFF(LogUI, true);
             }
 
-
-            if (showjournal) JournalOB.DrawJournal(false);
-            if (showinvent) DrawInventory(false);
-            crafting = false;
-
-           
-            showinvent = false;
-            showjournal = false;
-            DrawINV = false;
-
-            IM.ActionDelay = Time.fixedTime + 0.1f;
-            pl.menu.PlayAudio(ClickClip);
+            // CloseInventory();
         }
 
 
@@ -1296,11 +1298,9 @@ public class Inventory : MonoBehaviour
 
             Choose.transform.position = new Vector3(99999, 99999, 999);
 
-            PauseInventory = false;
-            ChooseTopSegmentSlot = false;
+            StartChooseInventory();
 
-
-            if(SlotSlide > 0)
+            if (SlotSlide > 0)
             SlotSlide--;
 
             if (CurrentItem > 0)
@@ -1362,6 +1362,8 @@ public class Inventory : MonoBehaviour
                 CurrentItemToolTips = inventoryFolder[CurrentItem];
             else CurrentItemToolTips = null;
         }
+
+        Choose.transform.SetAsLastSibling();
 
         if (CurrentItem > -1)
         {
@@ -1488,8 +1490,7 @@ public class Inventory : MonoBehaviour
                     mouseid = CraftingSlots.Slots[r].items[i].itemID;
                     CurrentItem = CraftingSlots.Slots[r].items[i].itemID;
 
-                    PauseInventory = true;
-                    ChooseTopSegmentSlot = true;
+                    StartChooseTopSegment();
 
                     break;
                 }
@@ -1507,7 +1508,7 @@ public class Inventory : MonoBehaviour
 
     void CollidingOneOfTheSlots(int i)
     {
-
+    
         if (!pl.GetMouseCollList().Contains(slots[i]) && IM.MouseMode )
         {
             if (i == slots.Count - 1)
@@ -1524,9 +1525,7 @@ public class Inventory : MonoBehaviour
 
         if (pl.GetMouseCollList().Contains(slots[i]))
         {
-            print("CollidingOneOfTheSlots 1");
-            PauseInventory = false;
-            ChooseTopSegmentSlot = false;
+            StartChooseInventory();
 
         }
 
@@ -1596,11 +1595,8 @@ public class Inventory : MonoBehaviour
                 SetToMouse(GetCurrentItem().ObjectPrefs, 0, 0, FloorTilemap, GetCurrentItem().itemID);
             else SetToMouse(GetCurrentItem().ObjectPrefs, 0, 0, GetCurrentItem().TargetTileMap, GetCurrentItem().itemID);
        
-            showinvent = false;
-            ONOFF(gameObject, false);
-            
-       
-
+          
+           
 
         }
 
@@ -1759,26 +1755,27 @@ public class Inventory : MonoBehaviour
         if (!VaultUI.showthis)
             Constr.ActivateBuilding();
 
-        if (Constr.ShowChargeUI)
-        {
-            ONOFF(GameObject.Find("ButtonsUI"), true);
-            ONOFF(Controlls, true);
-        }
+        /*  if (Constr.ShowChargeUI)
+          {
+              ONOFF(GameObject.Find("ButtonsUI"), true);
+              ONOFF(Controlls, true);
+          }
 
 
-        if (showjournal) JournalOB.DrawJournal(false);
-        if (showinvent) DrawInventory(false);
+          if (showjournal) JournalOB.DrawJournal(false);
+          if (showinvent) DrawInventory(false);
+          crafting = false;
+
+
+          showinvent = false;
+          showjournal = false;
+          DrawINV = false;
+
+          LeftArrow.SetActive(false);
+          RightArrow.SetActive(false);
+         */
+
         crafting = false;
-
-
-        showinvent = false;
-        showjournal = false;
-        DrawINV = false;
-
-        LeftArrow.SetActive(false);
-        RightArrow.SetActive(false);
-
-
 
         UpdateInvFolder();
         Constr.RandomisedNumber = 0;
@@ -1797,8 +1794,7 @@ public class Inventory : MonoBehaviour
             AddItem(BufferItem.itemID, BufferItem.Count, BufferItem.Durability, pl._transform.position);
             PlaySoundsPitched(TakeItemClip, 1);
             BufferItem = new Item();
-            PauseInventory = false;
-            ChooseTopSegmentSlot = false;
+            StartChooseInventory();
 
             //if (showinvent)
             //  pl.menu.ActionDelay = Time.fixedTime + 0.2f;
@@ -1838,7 +1834,7 @@ public class Inventory : MonoBehaviour
                 GameObject NewItem = Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Objects/Item"));
                 NewItem.name = "Dropped Item " + Constr.DroppedItems.Count;
                 NewItem.transform.position = DropPos + new Vector3(0.5f * j, 0, 0);
-                NewItem.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/" + GetItemInDatabase(ItemDrop_ID[j]).itemNames[0]);
+                NewItem.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Items/" + database.FindItem(ItemDrop_ID[j]).itemNames[0]);
                 NewItem.GetComponent<GetItem>().item = new int[1] { ItemDrop_ID[j] };
                 NewItem.GetComponent<GetItem>().itemcount = new int[1] { count };
                 NewItem.GetComponent<GetItem>().durability = new int[1] { durability };
@@ -1877,7 +1873,7 @@ public class Inventory : MonoBehaviour
                         SlotsRect[i] = new Rect( c.x , c.y , WidthSlot - slotspace, WidthSlot  - slotspace);
             #endif*/
 
-            print("SetSlots SlotSlide " + SlotSlide);
+      
             Vector2 pos = new Vector2(i * (WidthSlot + slotspace) - SlotSlide * WidthSlot, -465);
 
             RectTransform rt = slots[i].GetComponent<RectTransform>();
@@ -1988,9 +1984,9 @@ public class Inventory : MonoBehaviour
     public Item DeepCopyItem(int id, int count, int durability)
     {
         Item result = new Item();
-        Item T = GetItemInDatabase(id);
+        Item T = database.FindItem(id);
 
-        if (GetItemInDatabase(id) == null)
+        if (database.FindItem(id) == null)
         {
            
             return result;
@@ -2158,7 +2154,7 @@ public class Inventory : MonoBehaviour
 
 
 
-        if (GetItemInDatabase(i.itemID).Locked)
+        if (database.FindItem(i.itemID).Locked)
         {
             s += "<color=" + red + ">" + LockedString + "</color>";
             s += "\n";
@@ -2401,6 +2397,21 @@ public class Inventory : MonoBehaviour
         return s;
     }
 
+    public void StartChooseTopSegment()
+    {
+        pl.inv.PauseInventory = true;
+        pl.inv.ChooseTopSegmentSlot = true;
+
+    }
+
+    public void StartChooseInventory()
+    {
+        pl.inv.PauseInventory = false;
+        pl.inv.ChooseTopSegmentSlot = false;
+
+    }
+
+
 
     void ShowControlls()
     {
@@ -2480,8 +2491,15 @@ public class Inventory : MonoBehaviour
         }
     }
 
-    
-   
+
+    public Item GetItemInDatabase(int id)
+    {
+        return database.FindItem(id);
+
+
+    }
+
+
     public bool MouseCollideWithSlots()
     {
         int r = 0;

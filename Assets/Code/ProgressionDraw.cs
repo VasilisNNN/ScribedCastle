@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 using TMPro;
-using NUnit;
+
 public class ProgressionDraw : MonoBehaviour
 {
   
@@ -64,7 +64,7 @@ public class ProgressionDraw : MonoBehaviour
 
         if (FullGame)
         {
-            if (Constr.DEMO)
+            if (pl.menu.DEMO)
             {
                 if (GetComponent<Image>() != null)
                     GetComponent<Image>().enabled = false;
@@ -134,6 +134,7 @@ public class ProgressionDraw : MonoBehaviour
         {
             for (int p = 0; p < PrefabObject.Length; p++)
             {
+
                 for (int i = 0; i < Constr.OBOnBoard.Count; i++)
                 {
                     if (PrefabObject[p] != null)
@@ -156,7 +157,7 @@ public class ProgressionDraw : MonoBehaviour
 
             if (!OnField)
             {
-            if (Constr.Floors >= floor &&
+            if (Constr.TilesSurface >= floor &&
                 Constr.Walls >= wall &&
                 Constr.Humans >= humans &&
                 Constr.Grounds >= ground && PrefabIshere && FirstRecipe && setbrush)

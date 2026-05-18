@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using UnityEditor;
 using UnityEngine;
@@ -17,6 +18,11 @@ public class PCSaveLoad : SaveLoadBasic
     {
         StartStarts = stats;
 
+        if (GameObject.Find("Tutorial") != null)
+        {
+            _Tutorial = GameObject.Find("Tutorial").GetComponent<Tutorial>();
+            _Tutorial.Init();
+        }
     }
 
     public override void MainSave(bool saveall)
@@ -106,7 +112,7 @@ public class PCSaveLoad : SaveLoadBasic
     public override void MainLoad()
     {
 
-        print("main load");
+      
 
         UNITY_LOAD_MenuVariables();
         string SlotName = "Slot" + _menu.CurrentSlotNumber;
@@ -195,12 +201,31 @@ public class PCSaveLoad : SaveLoadBasic
         PlayerPrefs.SetInt("Plague" + SlotName, _constr.pl.Plague);
         PlayerPrefs.SetInt("MaxPlague" + SlotName, _constr.pl.MaxPlague);
         PlayerPrefs.SetInt("DayNumber" + SlotName, DayNumber);
-        PlayerPrefs.SetFloat("DayTime" + SlotName, DayTime);
+        PlayerPrefs.SetFloat("DayTime" + SlotName, _DayAndNight.DayTime);
 
         if (_Tutorial != null) _TutorialPhase = _Tutorial.GetPhase();
         PlayerPrefs.SetInt("TutorialPhase" + SlotName, _TutorialPhase);
 
-    }
+        PlayerPrefs.SetFloat("Peasants_CollectMoney_Timer_Boost" + SlotName, _constr.pl.Peasants_CollectMoney_Timer_Boost);
+        PlayerPrefs.SetInt("Peasants_CollectMoney_Amount_Boost" + SlotName, _constr.pl.Peasants_CollectMoney_Amount_Boost);
+
+        PlayerPrefs.SetFloat("Buildings_CollectMoney_Timer_Boost" + SlotName, _constr.pl.Buildings_CollectMoney_Timer_Boost);
+        PlayerPrefs.SetInt("Buildings_CollectMoney_Amount_Boost" + SlotName, _constr.pl.Buildings_CollectMoney_Amount_Boost);
+
+        PlayerPrefs.SetInt("Peasant_HP_Boost" + SlotName, _constr.pl.Peasant_HP_Boost);
+        PlayerPrefs.SetInt("Knight_HP_Boost" + SlotName, _constr.pl.Knight_HP_Boost);
+        PlayerPrefs.SetInt("Guard_HP_Boost" + SlotName, _constr.pl.Guard_HP_Boost);
+        PlayerPrefs.SetInt("Cleric_HP_Boost" + SlotName, _constr.pl.Cleric_HP_Boost);
+
+        PlayerPrefs.SetInt("Knight_Damage_Boost" + SlotName, _constr.pl.Knight_Damage_Boost);
+        PlayerPrefs.SetInt("Guard_Damage_Boost" + SlotName, _constr.pl.Guard_Damage_Boost);
+        PlayerPrefs.SetInt("Cleric_Damage_Boost" + SlotName, _constr.pl.Cleric_Damage_Boost);
+
+        PlayerPrefs.SetInt("Blueprints_Money_Boost" + SlotName, _constr.pl.Blueprints_Money_Boost);
+
+
+
+}
 
     void UNITY_SAVE_InventoryVaruables(string SlotName)
     {
@@ -308,7 +333,6 @@ public class PCSaveLoad : SaveLoadBasic
                     VaultIDs.Add(inv.VaultUI.Slots[i].items[ii].itemID);
                     VaultCount.Add(inv.VaultUI.Slots[i].items[ii].Count);
 
-                    print("SAVE ADD pl.inv.VaultUI.Slots[i].items[ii].Count " + inv.VaultUI.Slots[i].items[ii].Count);
                 }
             }
         }
@@ -332,7 +356,6 @@ public class PCSaveLoad : SaveLoadBasic
 
             PlayerPrefs.SetInt("VaultID" + i, VaultIDs[i]);
             PlayerPrefs.SetInt("VaultCounts" + i, VaultCount[i]);
-            print("SAVE VaultCounts " + VaultCount[i]);
         }
 
     }
@@ -567,7 +590,6 @@ public class PCSaveLoad : SaveLoadBasic
             if (GenMap != null)
             {
                 GenMap.CreateNewMap();
-                print("GenMap.CreateNewMap 0");
             }
 
             return;
@@ -691,11 +713,11 @@ public class PCSaveLoad : SaveLoadBasic
             int ii = PlayerPrefs.GetInt("Item" + i + SlotName);
             int iicount = PlayerPrefs.GetInt("ItemCount" + i + SlotName);
 
-            if (ii > -1 && inv.GetItemInDatabase(ii) != null && _menu.FirstStart != 0)
+            if (ii > -1 && itemDatabase.FindItem(ii) != null && _menu.FirstStart != 0)
             {
                 if (iicount > 0)
-                    inv.AddItemNOAUDIO_NOPickedNames(ii, iicount, inv.GetItemInDatabase(ii).Durability, new Vector2(99999, 1));
-                else inv.AddItemNOAUDIO_NOPickedNames(ii, 1, inv.GetItemInDatabase(ii).Durability, new Vector2(99999, 1));
+                    inv.AddItemNOAUDIO_NOPickedNames(ii, iicount, itemDatabase.FindItem(ii).Durability, new Vector2(99999, 1));
+                else inv.AddItemNOAUDIO_NOPickedNames(ii, 1, itemDatabase.FindItem(ii).Durability, new Vector2(99999, 1));
 
             }
 
@@ -724,13 +746,36 @@ public class PCSaveLoad : SaveLoadBasic
 
             DayNumber = PlayerPrefs.GetInt("DayNumber" + SlotName);
             DayTime = PlayerPrefs.GetFloat("DayTime" + SlotName);
-
+            _DayAndNight.DayTime = DayTime;
+            Debug.Log("_DayAndNight.DayTime " + _DayAndNight.DayTime);
 
             _TutorialPhase = PlayerPrefs.GetInt("TutorialPhase" + SlotName);
 
-            if (_Tutorial != null) _Tutorial.SetPhase(_TutorialPhase);
-
+            if (_Tutorial != null)
+            {
+                _Tutorial.Phase = _TutorialPhase;
+              //  _Tutorial.Init();
+              // _Tutorial.SetPhase(_TutorialPhase);
+            }
             pl.MaxStamina = StartStarts[CurrentCharacter].MaxStamina;
+
+            _constr.pl.Peasants_CollectMoney_Timer_Boost = PlayerPrefs.GetFloat("Peasants_CollectMoney_Timer_Boost" + SlotName);
+            _constr.pl.Peasants_CollectMoney_Amount_Boost = PlayerPrefs.GetInt("Peasants_CollectMoney_Amount_Boost" + SlotName);
+
+            _constr.pl.Buildings_CollectMoney_Timer_Boost = PlayerPrefs.GetFloat("Buildings_CollectMoney_Timer_Boost" + SlotName);
+            _constr.pl.Buildings_CollectMoney_Amount_Boost = PlayerPrefs.GetInt("Buildings_CollectMoney_Amount_Boost" + SlotName);
+
+            _constr.pl.Peasant_HP_Boost = PlayerPrefs.GetInt("Peasant_HP_Boost" + SlotName);
+            _constr.pl.Knight_HP_Boost = PlayerPrefs.GetInt("Knight_HP_Boost" + SlotName);
+            _constr.pl.Guard_HP_Boost = PlayerPrefs.GetInt("Guard_HP_Boost" + SlotName);
+            _constr.pl.Cleric_HP_Boost = PlayerPrefs.GetInt("Cleric_HP_Boost" + SlotName);
+
+            _constr.pl.Knight_Damage_Boost = PlayerPrefs.GetInt("Knight_Damage_Boost" + SlotName);
+            _constr.pl.Guard_Damage_Boost = PlayerPrefs.GetInt("Guard_Damage_Boost" + SlotName);
+            _constr.pl.Cleric_Damage_Boost = PlayerPrefs.GetInt("Cleric_Damage_Boost" + SlotName);
+
+            _constr.pl.Blueprints_Money_Boost = PlayerPrefs.GetInt("Blueprints_Money_Boost" + SlotName);
+
 
 
         }
@@ -750,8 +795,9 @@ public class PCSaveLoad : SaveLoadBasic
             pl.Payment = StartStarts[CurrentCharacter].Payment;
             pl.LootItem = StartStarts[CurrentCharacter].LootItem;
 
+            if(!SceneManager.GetActiveScene().name.Contains("Tutorial"))
             for (int i = 0; i < StartStarts[CurrentCharacter].StartItems.Length; i++)
-                inv.AddItemNOAUDIO_NOPickedNames(StartStarts[CurrentCharacter].StartItems[i], StartStarts[CurrentCharacter].StartItemsCounts[i], inv.GetItemInDatabase(StartStarts[CurrentCharacter].StartItems[i]).Durability, new Vector2(99999, 99999));
+                inv.AddItemNOAUDIO_NOPickedNames(StartStarts[CurrentCharacter].StartItems[i], StartStarts[CurrentCharacter].StartItemsCounts[i], itemDatabase.FindItem(StartStarts[CurrentCharacter].StartItems[i]).Durability, new Vector2(99999, 99999));
 
 
 
@@ -760,8 +806,7 @@ public class PCSaveLoad : SaveLoadBasic
                     inv.AddItemNOAUDIO_NOPickedNames(9, 99999, 99999, new Vector2(99999, 99999));
             */
 
-            if (_Tutorial != null) _Tutorial.SetPhase(0);
-
+          
 
         }
 
@@ -779,7 +824,7 @@ public class PCSaveLoad : SaveLoadBasic
             {
                 Unlocked_IDs.Add(PlayerPrefs.GetInt("UnlockedItems" + i + SlotName));
 
-                inv.GetItemInDatabase(PlayerPrefs.GetInt("UnlockedItems" + i + SlotName)).Locked = false;
+                itemDatabase.FindItem(PlayerPrefs.GetInt("UnlockedItems" + i + SlotName)).Locked = false;
             }
         }
 
@@ -788,6 +833,7 @@ public class PCSaveLoad : SaveLoadBasic
 
     void UNITY_LOAD_DroppedItems(string SlotName)
     {
+        if (_menu.FirstStart == 0) return;
         DroppedItems_Count = PlayerPrefs.GetInt("DroppedItems_Count" + SlotName);
 
         if (DroppedItems_Count > 0)
@@ -813,11 +859,10 @@ public class PCSaveLoad : SaveLoadBasic
     }
     void UNITY_LOAD_ConstructedStructures(string SlotName)
     {
+        if (_menu.FirstStart == 0) return;
+
         ConstructedStructures_Count = PlayerPrefs.GetInt("ConstructedStructures_Count" + SlotName);
         GenMap_GrowStates_Count = PlayerPrefs.GetInt("GenMap_GrowStates_Count" + SlotName);
-
-
-        print("UNITY_LOAD_ConstructedStructures Count " + ConstructedStructures_Count);
 
         if (GenMap_GrowStates_Count > 0)
         {
@@ -835,8 +880,7 @@ public class PCSaveLoad : SaveLoadBasic
             {
                 OB_IDs.Add(PlayerPrefs.GetInt("OB_IDs" + i + SlotName));
 
-                print("OB_names.Add");
-                OB_names.Add(PlayerPrefs.GetString("ConstructedStructures_Name" + i + SlotName));
+               OB_names.Add(PlayerPrefs.GetString("ConstructedStructures_Name" + i + SlotName));
 
 
                 OB_xpos.Add(PlayerPrefs.GetFloat("xwright" + i + SlotName));
@@ -864,10 +908,6 @@ public class PCSaveLoad : SaveLoadBasic
         if (TOnBoard_Count > 0)
 
         {
-
-            print("TOnBoard_Count: " + TOnBoard_Count);
-
-
             for (int i = 0; i < TOnBoard_Count; i++)
             {
                 Tile_names.Add(PlayerPrefs.GetString("TOnBoardName" + i + SlotName));
@@ -885,7 +925,7 @@ public class PCSaveLoad : SaveLoadBasic
         {
 
             _constr.Tile.SetTile(new Vector3Int(0, 0, 0), FloorBrush[0]);
-            _constr.Floors++;
+            _constr.TilesSurface++;
 
         }
 
@@ -990,8 +1030,10 @@ public class PCSaveLoad : SaveLoadBasic
                             {
                                 _constr.ConstructedStructures[i].Place = _constr.ConstructedStructures[i].Object.transform.position;
 
-                                xwright = _constr.ConstructedStructures[i].Place.x;
-                                ywright = _constr.ConstructedStructures[i].Place.y;
+                              
+
+                                xwright = _constr.ConstructedStructures[i].Object.transform.position.x;
+                                ywright = _constr.ConstructedStructures[i].Object.transform.position.y;
                             }
                             else
                             {
@@ -1018,9 +1060,7 @@ public class PCSaveLoad : SaveLoadBasic
 
             }
 
-            print("SAVE POS" + new Vector2(xwright, ywright));
-
-
+            
 
             PlayerPrefs.SetInt("OB_IDs" + i + SlotName, ID);
             PlayerPrefs.SetString("ConstructedStructures_Name" + i + SlotName, ConstructedStructuresName);
@@ -1059,7 +1099,13 @@ public class PCSaveLoad : SaveLoadBasic
 
     }
 
+    public override void MENU_LOAD_DATA(byte[] data)
+    {
+        throw new System.NotImplementedException();
+    }
 
-
-
+    public override void MAIN_LOAD_DATA(byte[] data)
+    {
+        throw new System.NotImplementedException();
+    }
 }

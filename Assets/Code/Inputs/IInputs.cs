@@ -46,8 +46,8 @@ internal interface IInputs
 
     public bool _horizontalPush { get; }
     public bool _verticalPush { get; }
+    public bool shift { get; }
 
-   
     public void Init()
     { 
     

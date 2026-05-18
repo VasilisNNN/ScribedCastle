@@ -934,10 +934,6 @@ MonoBehaviour:
   ACHNames: []
   LocationsNames: []
   CreateLocationOnStart: 
-  BPConstructed: 
-  DayNumber: 0
-  DayTime: 0
-  SaveLoadCurrent: {fileID: 0}
 --- !u!212 &139396748
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1149,6 +1145,10 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1888873534045273760, guid: 5669739f72248f24c891921b9f78ffcf, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2102793280681525515, guid: 5669739f72248f24c891921b9f78ffcf, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -1171,6 +1171,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2459164690358284048, guid: 5669739f72248f24c891921b9f78ffcf, type: 3}
       propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2482130261015220454, guid: 5669739f72248f24c891921b9f78ffcf, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2482130261015220454, guid: 5669739f72248f24c891921b9f78ffcf, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2482130261015220454, guid: 5669739f72248f24c891921b9f78ffcf, type: 3}
+      propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2492373252264598636, guid: 5669739f72248f24c891921b9f78ffcf, type: 3}
@@ -1183,6 +1195,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2685951944029374108, guid: 5669739f72248f24c891921b9f78ffcf, type: 3}
       propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3162898849124705069, guid: 5669739f72248f24c891921b9f78ffcf, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3162898849124705069, guid: 5669739f72248f24c891921b9f78ffcf, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3162898849124705069, guid: 5669739f72248f24c891921b9f78ffcf, type: 3}
+      propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3309529851465618956, guid: 5669739f72248f24c891921b9f78ffcf, type: 3}
@@ -1224,6 +1248,10 @@ PrefabInstance:
     - target: {fileID: 5519239557190879137, guid: 5669739f72248f24c891921b9f78ffcf, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0.0000019073486
+      objectReference: {fileID: 0}
+    - target: {fileID: 5565760983394284704, guid: 5669739f72248f24c891921b9f78ffcf, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5766641890438249119, guid: 5669739f72248f24c891921b9f78ffcf, type: 3}
       propertyPath: m_AnchorMax.x
@@ -2882,7 +2910,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &835563573
 Transform:
   m_ObjectHideFlags: 0
@@ -5987,7 +6015,7 @@ Transform:
   m_GameObject: {fileID: 1778979912}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.81, y: -2.26, z: 0}
+  m_LocalPosition: {x: 3.81, y: -2.288, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8169,7 +8197,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 170}
+  m_AnchoredPosition: {x: -50.400024, y: 170}
   m_SizeDelta: {x: 120, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!61 &2369054416998440710
@@ -8286,7 +8314,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 105.19995}
+  m_AnchoredPosition: {x: 44, y: 167.6}
   m_SizeDelta: {x: 60, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &7171505722927872636
@@ -8547,7 +8575,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DrawOnlyOnGamepad: 0
-  MouseSPRT: {fileID: 21300000, guid: fe6e8fb7b0750474184daa84004ea902, type: 3}
+  MouseSPRT: {fileID: 21300000, guid: ccf43a0c1e7dd834ba27bc2df9924b48, type: 3}
   KeyBoardSPRT: {fileID: 21300000, guid: fe6e8fb7b0750474184daa84004ea902, type: 3}
   GamepadSPRT: {fileID: 21300000, guid: 77a43a5fd46ed3b4093ceca1638933f3, type: 3}
   SwitchGamepad: {fileID: 21300000, guid: 77a43a5fd46ed3b4093ceca1638933f3, type: 3}

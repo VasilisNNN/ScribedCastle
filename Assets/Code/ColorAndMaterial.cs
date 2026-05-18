@@ -10,7 +10,6 @@ public class ColorAndMaterial : MonoBehaviour
     private SpriteRenderer ChildSPRT;
 
     private Animator Anim;
-    public float Alpha;
 
     public Material StartMaterial { get; set; }
     public float AplhaColor { get; set; }
@@ -21,9 +20,10 @@ public class ColorAndMaterial : MonoBehaviour
 
     private Material StunMaterial;
     private Material WhiteMaterial;
-
+    private ItemDatabase itemDatabase;
     public void Awake()
     {
+        itemDatabase = InitializeObjects.Itemdatabase;
         WhiteMaterial = Resources.Load<Material>("Materials/DamageLight");
 
         StunMaterial = Resources.Load<Material>("Materials/DoodleHorizontal");
@@ -42,11 +42,11 @@ public class ColorAndMaterial : MonoBehaviour
         }
 
 
-        print("Initialize color " + name);
+
     }
 
    
-    void SetColorToSPRT(Material material)
+    void SetColorToSPRT(float Alpha,Material material)
     {
         if (SR == null) return;
         
@@ -56,7 +56,7 @@ public class ColorAndMaterial : MonoBehaviour
 
         Vector3 TargetPos = pl.MainCamera.transform.position;
 
-    
+       
 
         if (Stats.BuildedStructure  && _transform.parent ==null)
         {
@@ -75,15 +75,15 @@ public class ColorAndMaterial : MonoBehaviour
 
                 SR.color = new Color(StartColor.r - colordepth / 1.5f, StartColor.g - colordepth / 1.1f, StartColor.b - colordepth, Mathf.Lerp(SR.color.a, Alpha, Time.deltaTime * 10));
                 for (int i = 0; i < _transform.childCount; i++)
-                    SetChildColor(material, i, new Color(StartColor.r - colordepth / 1.5f, StartColor.g - colordepth / 1.1f, StartColor.b - colordepth ));
-
+                    SetChildColor(Alpha,material, i, new Color(StartColor.r - colordepth / 1.5f, StartColor.g - colordepth / 1.1f, StartColor.b - colordepth ));
+             
             }
             else
 
             {
                 SR.color = new Color(StartColor.r, StartColor.g, StartColor.b, Mathf.Lerp(SR.color.a, Alpha, Time.deltaTime * 10));
                 for (int i = 0; i < _transform.childCount; i++)
-                    SetChildColor(material, i, StartColor);
+                    SetChildColor(Alpha, material, i, StartColor);
 
             }
             
@@ -91,8 +91,8 @@ public class ColorAndMaterial : MonoBehaviour
         else
         {
             for (int i = 0; i < _transform.childCount; i++)
-                SetChildColor(material, i, _transform.GetChild(i).GetComponent<SpriteRenderer>().color);
-
+                SetChildColor(Alpha, material, i, _transform.GetChild(i).GetComponent<SpriteRenderer>().color);
+          
             SR.color = new Color(SR.color.r, SR.color.g, SR.color.b, Mathf.Lerp(SR.color.a, Alpha, Time.deltaTime * 10));
         }
 
@@ -101,7 +101,7 @@ public class ColorAndMaterial : MonoBehaviour
     }
 
 
-    void SetChildColor(Material material, int i, Color color)
+    void SetChildColor(float Alpha, Material material, int i, Color color)
     {
         if (_transform.GetChild(i).GetComponent<SpriteRenderer>() == null) return;
             ChildSPRT = _transform.GetChild(i).GetComponent<SpriteRenderer>();
@@ -117,8 +117,13 @@ public class ColorAndMaterial : MonoBehaviour
 
         for (int j = 0; j < ChildSPRT.transform.childCount; j++)
         {
-            if (ChildSPRT.transform.GetChild(j).GetComponent<SpriteRenderer>() != null)
-                ChildSPRT.transform.GetChild(j).GetComponent<SpriteRenderer>().color = ChildSPRT.color;
+            SpriteRenderer sprt = ChildSPRT.transform.GetChild(j).GetComponent<SpriteRenderer>();
+
+            if (sprt != null)
+            {
+                sprt.color = ChildSPRT.color;
+                sprt.material = material;
+            }
         }
 
     }
@@ -126,10 +131,10 @@ public class ColorAndMaterial : MonoBehaviour
 
 
 
-    public void SetColorAndMaterial(float alpha, Material material)
+     void SetColorAndMaterial(float alpha, Material material)
     {
-        Alpha = alpha;
-        SetColorToSPRT(material);
+      
+        SetColorToSPRT(alpha,material);
        
         if (!Stats.BuildedStructure) return;
   
@@ -176,16 +181,29 @@ public class ColorAndMaterial : MonoBehaviour
     public void ObjectColorAlpha()
     {
         minimalalpha = 0.3f;
-  
 
-        if (pl.inv.GetItemInDatabase(Stats.DatabaseID).Structure && Constr.Building && Stats.transform.parent == null)
+        if (Stats.InvisTimer - 0.8f > Time.fixedTime)
+        {
+
+            if (!Stats.Stunned)
+            {
+                SetColorAndMaterial(0.5f, WhiteMaterial);
+            }
+            else
+                SetColorAndMaterial(0.5f, WhiteMaterial);
+
+
+            return;
+        }
+
+        if (itemDatabase.FindItem(Stats.DatabaseID).Structure && Constr.Building && _transform.parent == null)
         {
 
 
-            float alpha = MathF.Abs(Stats.transform.position.x - Constr.transform.position.x) / 10 - 1;
+            float alpha = MathF.Abs(_transform.position.x - Constr.transform.position.x) / 10 - 1;
             alpha = Mathf.Clamp(alpha, 0.1f, 1);
 
-            if (Stats.transform.position.y < Constr.transform.position.y)
+            if (_transform.position.y < Constr.transform.position.y)
             {
                 if (Constr.AlphaBuildingFade)
                    SetColorAndMaterial(alpha, StartMaterial);
@@ -195,7 +213,7 @@ public class ColorAndMaterial : MonoBehaviour
 
             }
             else
-            if (Stats.transform.position.y > Constr.transform.position.y + 1)
+            if (_transform.position.y > Constr.transform.position.y + 1)
             {
                 if (Constr.AlphaBuildingFade)
                    SetColorAndMaterial(alpha, StartMaterial);
@@ -211,28 +229,32 @@ public class ColorAndMaterial : MonoBehaviour
             }
 
 
-
-
-
         }
+
+
+     
+
 
 
         if (!Constr.Building)
-            SetColorAndMaterial(1, StartMaterial);
-
-        if (Stats.InvisTimer - 0.8f > Time.fixedTime)
         {
-
-            if (!Stats.Stunned)
+            if (Constr.GetCurrentObonBoard() != null)
             {
-                SetColorAndMaterial(0.5f, WhiteMaterial);
+                if (Constr.GetCurrentObonBoard().Object == gameObject)
+                {
+                   
+                    SetColorAndMaterial(0.5f, StartMaterial);
+                }
+                else
+                    SetColorAndMaterial(1, StartMaterial);
             }
-            else
-                SetColorAndMaterial(1, StunMaterial);
+            else SetColorAndMaterial(1, StartMaterial);
 
-            return;
+
         }
 
+
+      
 
 
         if (Stats.InvisTimer > Time.fixedTime && Stats.InvisTimer > Time.fixedTime + 0.05f)
